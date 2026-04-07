@@ -1,0 +1,6 @@
+require("user.options")
+require("user.keymaps")
+require("user.autocmds")
+require("user.colors")
+require("user.lsp")
+require("user.plugins")

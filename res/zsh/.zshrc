@@ -1,9 +1,5 @@
 PROMPT="%F{4}%~%f %F{%(?.5.1)}>%f "
 
-export PATH="$HOME/.local/bin:$PATH"
-export GNUPGHOME="$HOME/.local/share/gnupg"
-export GPG_TTY="$(tty)"
-
 bindkey -rp ""
 bindkey -R " "-"~" self-insert
 bindkey -R "\M-^@"-"\M-^?" self-insert
@@ -37,3 +33,6 @@ SAVEHIST=9999
 
 autoload -Uz compinit
 compinit -d ~/.local/state/zsh/compdump
+
+source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh

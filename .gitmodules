@@ -1,3 +1,69 @@
 [submodule "pkgs/paru"]
 	path = pkgs/paru
 	url = https://aur.archlinux.org/paru.git
+[submodule "res/nvim/pack/plugins/start/nvim-treesitter"]
+	path = res/nvim/pack/plugins/start/nvim-treesitter
+	url = https://github.com/nvim-treesitter/nvim-treesitter
+[submodule "res/nvim/pack/plugins/start/nvim-lspconfig"]
+	path = res/nvim/pack/plugins/start/nvim-lspconfig
+	url = https://github.com/neovim/nvim-lspconfig
+[submodule "res/nvim/pack/plugins/start/telescope.nvim"]
+	path = res/nvim/pack/plugins/start/telescope.nvim
+	url = https://github.com/nvim-telescope/telescope.nvim
+[submodule "res/nvim/pack/plugins/start/gitsigns.nvim"]
+	path = res/nvim/pack/plugins/start/gitsigns.nvim
+	url = https://github.com/lewis6991/gitsigns.nvim
+[submodule "res/nvim/pack/plugins/start/lualine.nvim"]
+	path = res/nvim/pack/plugins/start/lualine.nvim
+	url = https://github.com/nvim-lualine/lualine.nvim
+[submodule "res/nvim/pack/plugins/start/nvim-cmp"]
+	path = res/nvim/pack/plugins/start/nvim-cmp
+	url = https://github.com/hrsh7th/nvim-cmp
+[submodule "res/nvim/pack/plugins/start/conform.nvim"]
+	path = res/nvim/pack/plugins/start/conform.nvim
+	url = https://github.com/stevearc/conform.nvim
+[submodule "res/nvim/pack/plugins/start/nvim-autopairs"]
+	path = res/nvim/pack/plugins/start/nvim-autopairs
+	url = https://github.com/windwp/nvim-autopairs
+[submodule "res/nvim/pack/plugins/start/todo-comments.nvim"]
+	path = res/nvim/pack/plugins/start/todo-comments.nvim
+	url = https://github.com/folke/todo-comments.nvim
+[submodule "res/nvim/pack/plugins/start/oil.nvim"]
+	path = res/nvim/pack/plugins/start/oil.nvim
+	url = https://github.com/stevearc/oil.nvim
+[submodule "res/nvim/pack/plugins/start/nvim-ts-autotag"]
+	path = res/nvim/pack/plugins/start/nvim-ts-autotag
+	url = https://github.com/windwp/nvim-ts-autotag
+[submodule "res/nvim/pack/plugins/start/nvim-surround"]
+	path = res/nvim/pack/plugins/start/nvim-surround
+	url = https://github.com/kylechui/nvim-surround
+[submodule "res/nvim/pack/plugins/start/toggleterm.nvim"]
+	path = res/nvim/pack/plugins/start/toggleterm.nvim
+	url = https://github.com/akinsho/toggleterm.nvim
+[submodule "res/nvim/pack/plugins/start/plenary.nvim"]
+	path = res/nvim/pack/plugins/start/plenary.nvim
+	url = https://github.com/nvim-lua/plenary.nvim
+[submodule "res/nvim/pack/plugins/start/nvim-web-devicons"]
+	path = res/nvim/pack/plugins/start/nvim-web-devicons
+	url = https://github.com/nvim-tree/nvim-web-devicons
+[submodule "res/nvim/pack/plugins/start/cmp-nvim-lsp"]
+	path = res/nvim/pack/plugins/start/cmp-nvim-lsp
+	url = https://github.com/hrsh7th/cmp-nvim-lsp
+[submodule "res/nvim/pack/plugins/start/cmp-buffer"]
+	path = res/nvim/pack/plugins/start/cmp-buffer
+	url = https://github.com/hrsh7th/cmp-buffer
+[submodule "res/nvim/pack/plugins/start/cmp-path"]
+	path = res/nvim/pack/plugins/start/cmp-path
+	url = https://github.com/hrsh7th/cmp-path
+[submodule "res/nvim/pack/plugins/start/telescope-ui-select.nvim"]
+	path = res/nvim/pack/plugins/start/telescope-ui-select.nvim
+	url = https://github.com/nvim-telescope/telescope-ui-select.nvim
+[submodule "res/nvim/pack/plugins/start/csvview.nvim"]
+	path = res/nvim/pack/plugins/start/csvview.nvim
+	url = https://github.com/hat0uma/csvview.nvim
+[submodule "res/nvim/pack/plugins/start/onedark.nvim"]
+	path = res/nvim/pack/plugins/start/onedark.nvim
+	url = https://github.com/navarasu/onedark.nvim
+[submodule "res/nvim/pack/plugins/start/lspkind.nvim"]
+	path = res/nvim/pack/plugins/start/lspkind.nvim
+	url = https://github.com/onsails/lspkind.nvim
