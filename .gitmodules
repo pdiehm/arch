@@ -1,0 +1,3 @@
+[submodule "pkgs/paru"]
+	path = pkgs/paru
+	url = https://aur.archlinux.org/paru.git
