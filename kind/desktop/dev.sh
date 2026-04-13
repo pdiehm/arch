@@ -4,6 +4,7 @@ copy -nsu ssh/github/key .ssh/github
 persist -u -m 700 .local/share/gnupg
 run ln -sf /usr/bin/pinentry-tty /usr/bin/pinentry
 
+package git-delta
 symlink -u res/git.conf .config/git/config
 
 package neovim vim-spell-de tree-sitter-cli bash-language-server shellcheck lua-language-server shfmt stylua
