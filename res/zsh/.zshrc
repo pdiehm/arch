@@ -1,9 +1,5 @@
 PROMPT="%F{4}%~%f %F{%(?.5.1)}>%f "
 
-export PATH="$HOME/.local/bin:$PATH"
-export GNUPGHOME="$HOME/.local/share/gnupg"
-export GPG_TTY="$(tty)"
-
 bindkey -rp ""
 bindkey -R " "-"~" self-insert
 bindkey -R "\M-^@"-"\M-^?" self-insert
