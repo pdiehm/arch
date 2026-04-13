@@ -14,4 +14,4 @@ copy res/vimrc.vim /etc/vimrc
 package openssh
 copy res/ssh/known_hosts /etc/ssh/ssh_known_hosts
 
-package man-db man-pages
+package man-db man-pages bat eza fd ripgrep fzf pv duf ncdu
