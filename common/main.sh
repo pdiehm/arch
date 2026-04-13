@@ -2,7 +2,7 @@ import ./boot
 import ./locale
 import ./network
 
-package zsh
+package zsh zsh-autosuggestions zsh-completions zsh-syntax-highlighting
 run chsh -s /usr/bin/zsh pascal
 write /etc/zsh/zshenv "ZDOTDIR=\"\$HOME/.config/zsh\""
 symlink -u res/zsh .config/zsh
