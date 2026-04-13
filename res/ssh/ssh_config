@@ -1,2 +1,13 @@
+Host *
+  ControlMaster auto
+  ControlPath ~/.ssh/.%C
+  ControlPersist 600
+  IdentitiesOnly yes
+  SetEnv TERM=xterm-256color
+
 Host github.com
   IdentityFile ~/.ssh/github
+
+Host arch
+  IdentityFile ~/.ssh/arch
+  Port 1970

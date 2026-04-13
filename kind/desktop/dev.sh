@@ -1,4 +1,5 @@
 symlink -u res/ssh/ssh_config .ssh/config
+copy -nsu ssh/arch/key .ssh/arch
 copy -nsu ssh/github/key .ssh/github
 
 persist -u -m 700 .local/share/gnupg

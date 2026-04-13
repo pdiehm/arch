@@ -12,6 +12,11 @@ write -a /etc/environment "EDITOR=vim"
 copy res/vimrc.vim /etc/vimrc
 
 package openssh
+copy res/ssh/sshd_config /etc/ssh/sshd_config
 copy res/ssh/known_hosts /etc/ssh/ssh_known_hosts
+copy -ns "ssh/$HOST_NAME/host" /etc/ssh/host_key
+copy -s -m 444 "ssh/$HOST_NAME/auth" /etc/ssh/authorized_keys
+run systemctl mask sshdgenkeys.service
+run systemctl enable sshd.service
 
 package man-db man-pages bat eza fd ripgrep fzf pv duf ncdu
