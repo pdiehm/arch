@@ -5,6 +5,11 @@ copy -nsu ssh/github/key .ssh/github
 persist -u -m 700 .local/share/gnupg
 run ln -sf /usr/bin/pinentry-tty /usr/bin/pinentry
 
+script -u << EOF
+gpg --import "$(use res/key.gpg)"
+gpg --quick-set-ownertrust 32104A99C1849AF79B2C92FCE85EB0566C779A2F ultimate
+EOF
+
 package git-delta
 symlink -u res/git.conf .config/git/config
 
