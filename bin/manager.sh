@@ -11,10 +11,15 @@ help() {
   echo
   echo "Commands:"
   echo "  help      Print this help message"
+  echo "  edit      Open editor in configuration repository"
   echo "  rebuild   Rebuild the system configuration for the current host"
   echo "  secrets   Manage secrets"
   echo "  sync      Sync configuration repository"
   echo "  upgrade   Upgrade the current configuration"
+}
+
+edit() {
+  "$EDITOR" .
 }
 
 rebuild() {
@@ -22,7 +27,7 @@ rebuild() {
 }
 
 secrets() {
-  if ((UID != 0)); then exec sudo "$0" secrets "$@"; fi
+  if ((UID != 0)); then exec sudo "$0" secrets; fi
 
   trap 'rm -rf "$TMP"' EXIT
   TMP="$(mktemp -d)"
@@ -187,7 +192,7 @@ sync() {
 }
 
 upgrade() {
-  if ((UID != 0)); then exec sudo "$0" upgrade "$@"; fi
+  if ((UID != 0)); then exec sudo "$0" upgrade; fi
 
   trap 'unmount "$TMP/boot"; unmount "$TMP/root"; rm -rf --one-file-system "$TMP"' EXIT
   TMP="$(mktemp -d)"
@@ -224,9 +229,10 @@ fi
 
 case "$1" in
   help) help ;;
-  rebuild) rebuild "${@:2}" ;;
-  secrets) secrets "${@:2}" ;;
-  sync) sync "${@:2}" ;;
-  upgrade) upgrade "${@:2}" ;;
+  edit) edit ;;
+  rebuild) rebuild ;;
+  secrets) secrets ;;
+  sync) sync ;;
+  upgrade) upgrade ;;
   *) fatal "Unknown command '$1'" ;;
 esac
