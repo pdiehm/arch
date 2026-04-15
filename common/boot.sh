@@ -28,13 +28,5 @@ package limine
 script <<< "$cmd"
 upgrade <<< "$cmd"
 
-write /boot/limine.conf << EOF
-timeout: 0
-
-/Arch
-  protocol: linux
-  path: boot():/vmlinuz-linux
-  cmdline: rw root=LABEL=root rootflags=subvol=root cryptdevice=/dev/disk/by-partlabel/root:root
-  module_path: boot():/$OPT_CPU-ucode.img
-  module_path: boot():/initramfs-linux.img
-EOF
+env UCODE "$OPT_CPU-ucode.img"
+copy -e res/limine.conf /boot/limine.conf
