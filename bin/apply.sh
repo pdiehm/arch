@@ -306,7 +306,7 @@ for ((stage = 0; stage < STAGE; stage++)); do
     mount --bind "$TMP/root/pkgs" "$BUILD/var/cache/pacman/pkg"
     mount --mkdir --bind "$TMP/stages/$stage" "$BUILD/stage"
 
-    arch-chroot "$BUILD" bash -eu /stage/build.sh
+    arch-chroot "$BUILD" env -i SHELL=/bin/bash SYSTEMD_IN_CHROOT=1 bash -eu /stage/build.sh
     unmount "$BUILD"
     rmdir "$BUILD/stage"
     mv "$BUILD" "$TMP/root/images/$hash"
