@@ -3,7 +3,7 @@ copy -nsu ssh/arch/key .ssh/arch
 copy -nsu ssh/github/key .ssh/github
 
 persist -u -m 700 .local/share/gnupg
-run ln -sf /usr/bin/pinentry-tty /usr/bin/pinentry
+write -a /etc/gnupg/gpg-agent.conf "pinentry-program /usr/bin/pinentry-tty"
 
 script -u << EOF
 gpg --import "$(use res/key.gpg)"
