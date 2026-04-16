@@ -1,0 +1,33 @@
+pkgname="prettier-plugin-css-order"
+pkgver="2.2.0"
+pkgrel=1
+pkgdesc="Prettier CSS Sorting Plugin"
+arch=("any")
+url="https://github.com/Siilwyn/prettier-plugin-css-order"
+license=("ISC")
+depends=("prettier" "nodejs")
+makedepends=("npm" "jq")
+source=("https://registry.npmjs.org/$pkgname/-/$pkgname-$pkgver.tgz")
+noextract=("$pkgname-$pkgver.tgz")
+sha256sums=("bbd77902cb535f572e464137f60a9e9ceb5ab3bbfdd5e54fadaf3d4102d3dcf8")
+
+package() {
+  npm install -g --prefix "$pkgdir/usr" --no-bin-links "$srcdir/$pkgname-$pkgver.tgz"
+  install -d "$pkgdir/usr/share/licenses/$pkgname"
+  ln -s "../../../lib/node_modules/$pkgname/license.md" "$pkgdir/usr/share/licenses/$pkgname/"
+
+  local mainjson="$pkgdir/usr/lib/node_modules/$pkgname/package.json"
+  find "$pkgdir/usr" -type f -name package.json -print0 | while read -rd "" json; do
+    tempjson="$(mktemp)"
+    if [[ $json = "$mainjson" ]]; then
+      jq 'with_entries(select(.key | test("^_.+") | not))' "$json" > "$tempjson"
+    else
+      jq "del(._where, .man)" "$json" > "$tempjson"
+    fi
+
+    cp "$tempjson" "$json"
+  done
+
+  find "$pkgdir/usr" -type d -exec chmod 755 "{}" +
+  chown -R root:root "$pkgdir"
+}

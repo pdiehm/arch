@@ -1,0 +1,97 @@
+{
+  "modules-left": ["hyprland/workspaces", "group/hardware"],
+  "modules-center": ["mpris"],
+  "modules-right": ["group/settings", "clock"],
+
+  "hyprland/workspaces": {
+    "all-outputs": true,
+    "move-to-monitor": true
+  },
+
+  "group/hardware": {
+    "orientation": "inherit",
+    "modules": ["cpu", "memory", "disk"]
+  },
+
+  "mpris": {
+    "format": "{status_icon}  {dynamic}",
+    "tooltip-format": "Player: {player}\nTitle: {title}\nArtist: {artist}\nAlbum: {album}",
+    "status-icons": { "playing": "", "paused": "", "stopped": "" },
+    "dynamic-order": ["title", "artist"],
+    "title-len": 32,
+    "artist-len": 16,
+    "dynamic-len": 32
+  },
+
+  "group/settings": {
+    "orientation": "inherit",
+    "modules": ["network", "wireplumber"]
+  },
+
+  "clock": {
+    "format": "{:%b %d, %H:%M}",
+    "tooltip-format": "<tt>{calendar}</tt>",
+
+    "actions": {
+      "on-click": "mode",
+      "on-double-click": "shift_reset",
+      "on-click-right": "shift_up",
+      "on-click-middle": "shift_down"
+    },
+
+    "calendar": {
+      "mode-mon-col": 3,
+      "weeks-pos": "left",
+
+      "format": {
+        "months": "<span color='#f80'><b>{}</b></span>",
+        "weeks": "<span color='#888'><b>{}</b></span>",
+        "weekdays": "<span color='#888'><b>{}</b></span>",
+        "today": "<span color='#f00'><b>{}</b></span>"
+      }
+    }
+  },
+
+  "cpu": {
+    "interval": 1,
+    "format": "  {usage}%",
+    "states": { "load": 20, "crit": 80 }
+  },
+
+  "memory": {
+    "interval": 1,
+    "format": "  {percentage}%",
+    "tooltip-format": "{used:.1f} / {total:.1f} GiB",
+    "states": { "warn": 50, "crit": 80 }
+  },
+
+  "disk": {
+    "interval": 1,
+    "format": "  {percentage_used}%",
+    "tooltip-format": "{specific_used:.1f} / {specific_total:.1f} GiB",
+    "unit": "GiB",
+    "states": { "warn": 80, "crit": 95 }
+  },
+
+  "network": {
+    "interval": 1,
+    "format": " 󰛵 ",
+    "format-ethernet": "󰈀  {ipaddr}/{cidr}",
+    "format-wifi": "{icon}  {ipaddr}/{cidr}",
+    "format-disconnected": " 󰲛 ",
+    "format-icons": ["󰤯", "󰤟", "󰤢", "󰤥", "󰤨"],
+    "tooltip-format": "{ifname}: Unknown",
+    "tooltip-format-ethernet": "{ifname}: Ethernet\nGateway: {gwaddr}\nUp: {bandwidthUpBits}\nDown: {bandwidthDownBits}",
+    "tooltip-format-wifi": "{ifname}: {essid} ({frequency}GHz WiFi)\nGateway: {gwaddr}\nUp: {bandwidthUpBits}\nDown: {bandwidthDownBits}",
+    "tooltip-format-disconnected": "{ifname}: Disconnected"
+  },
+
+  "wireplumber": {
+    "format": "{icon}  {volume}%",
+    "format-muted": "   ",
+    "format-icons": ["", " ", " "],
+    "on-click": "wpctl set-mute @DEFAULT_SINK@ toggle",
+    "on-click-right": "wpctl set-volume @DEFAULT_SINK@ 40%",
+    "on-click-middle": "~/.local/bin/wp-toggle"
+  }
+}

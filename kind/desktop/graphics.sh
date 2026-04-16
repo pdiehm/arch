@@ -8,4 +8,7 @@ symlink -u res/fontconfig.xml .config/fontconfig/fonts.conf
 package hyprland hyprpaper hyprlock hypridle hyprshot hyprpicker xdg-desktop-portal-hyprland
 symlink -u res/hypr .config/hypr
 
-package kitty rofi
+package waybar
+symlink -u res/waybar .config/waybar
+
+package kitty rofi mako

@@ -1,0 +1,69 @@
+window#waybar {
+  background-color: transparent;
+  font-size: 12pt;
+}
+
+box#workspaces,
+box#hardware,
+label#mpris,
+box#settings,
+label#clock {
+  margin: 0.5rem 0.5rem 0;
+}
+
+box#workspaces,
+box#hardware label,
+label#mpris,
+box#settings label,
+label#clock {
+  border: 1px solid #111;
+  background-color: #333;
+  padding: 0.25rem 1rem;
+  color: #ddd;
+}
+
+box#workspaces,
+box#hardware widget:first-child label,
+label#mpris,
+box#settings widget:first-child label,
+label#clock {
+  border-top-left-radius: 10rem;
+  border-bottom-left-radius: 10rem;
+}
+
+box#workspaces,
+box#hardware widget:last-child label,
+label#mpris,
+box#settings widget:last-child label,
+label#clock {
+  border-top-right-radius: 10rem;
+  border-bottom-right-radius: 10rem;
+}
+
+box#workspaces button {
+  border-radius: 10rem;
+  padding: 0 0.25rem;
+  color: #ddd;
+}
+
+box#workspaces button.active {
+  color: #0074d9;
+  font-weight: bold;
+}
+
+label#cpu.load {
+  color: #0074d9;
+}
+
+label#memory.warn,
+label#disk.warn,
+label#network:not(.disconnected):not(.wifi):not(.ethernet) {
+  color: #ffdc00;
+}
+
+label#cpu.crit,
+label#memory.crit,
+label#disk.crit,
+label#network.disconnected {
+  color: #ff4136;
+}

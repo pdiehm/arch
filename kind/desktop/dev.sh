@@ -13,7 +13,8 @@ EOF
 package git-delta
 symlink -u res/git.conf .config/git/config
 
-package neovim vim-spell-de tree-sitter-cli bash-language-server shellcheck lua-language-server shfmt stylua
+package neovim vim-spell-de tree-sitter-cli bash-language-server shellcheck lua-language-server vscode-css-languageserver vscode-json-languageserver prettier shfmt stylua
+package -c prettier-plugin-css-order
 symlink -u res/nvim .config/nvim
 
 script -u << EOF
