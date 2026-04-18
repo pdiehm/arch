@@ -1,5 +1,6 @@
 import ./dev
 import ./graphics
+import ./nvim
 import ./yubikey
 
 package wl-clipboard
