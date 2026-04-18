@@ -236,7 +236,7 @@ package() {
   if ((aur + custom > 1)); then error "Options '-a' and '-c' are mutually exclusive"; fi
 
   if ((aur)); then
-    run paru --noconfirm --sync --sysupgrade --refresh --needed "$@"
+    run sudo -u pkgbuild paru --noconfirm --sync --sysupgrade --refresh --needed "$@"
   elif ((custom)); then
     local name
     for name; do
@@ -280,7 +280,7 @@ write -a /etc/sudoers "pkgbuild ALL=(ALL:ALL) NOPASSWD: ALL"
 package -c paru
 conf -e /etc/paru.conf BottomUp CleanAfter RemoveMake SudoLoop
 
-upgrade paru --noconfirm --newsonupgrade --sync --sysupgrade --refresh
+upgrade sudo -u pkgbuild paru --noconfirm --newsonupgrade --sync --sysupgrade --refresh
 upgrade pacman --files --refresh
 
 run useradd --create-home --groups wheel --skel /var/empty --password "$(secret password)" --uid 1000 pascal
