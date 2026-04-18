@@ -7,6 +7,7 @@ require("conform").setup({
     jsonc = { "prettier-json" },
     lua = { "stylua" },
     sh = { "shfmt" },
+    xml = { "prettier-xml" },
     zsh = { "shfmt" },
   },
 
@@ -22,6 +23,11 @@ require("conform").setup({
     ["prettier-json"] = {
       inherit = "prettier",
       prepend_args = { "--print-width=120", "--trailing-comma=none" },
+    },
+
+    ["prettier-xml"] = {
+      inherit = "prettier",
+      prepend_args = { "--plugin=/usr/lib/node_modules/@prettier/plugin-xml/src/plugin.js", "--print-width=120" },
     },
   },
 })

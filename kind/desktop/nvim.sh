@@ -4,6 +4,7 @@ package neovim vim-spell-de tree-sitter-cli prettier \
   vscode-css-languageserver \
   vscode-json-languageserver
 
+package -a prettier-plugin-xml
 package -c prettier-plugin-css-order
 
 symlink -u res/nvim .config/nvim
