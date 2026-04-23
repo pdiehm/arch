@@ -25,9 +25,6 @@
 [submodule "res/nvim/pack/plugins/start/conform.nvim"]
 	path = res/nvim/pack/plugins/start/conform.nvim
 	url = https://github.com/stevearc/conform.nvim
-[submodule "res/nvim/pack/plugins/start/nvim-autopairs"]
-	path = res/nvim/pack/plugins/start/nvim-autopairs
-	url = https://github.com/windwp/nvim-autopairs
 [submodule "res/nvim/pack/plugins/start/todo-comments.nvim"]
 	path = res/nvim/pack/plugins/start/todo-comments.nvim
 	url = https://github.com/folke/todo-comments.nvim

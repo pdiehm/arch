@@ -1,0 +1,32 @@
+require("user.keymaps.autoclose")
+require("user.keymaps.window")
+
+vim.keymap.set("n", "g0", "gg0")
+vim.keymap.set("n", "gl", "<C-o>")
+vim.keymap.set("n", "gq", "<Cmd>cnext<CR>")
+vim.keymap.set("n", "gQ", "<Cmd>cprev<CR>")
+vim.keymap.set("n", "gs", "]s")
+vim.keymap.set("n", "gS", "[s")
+
+vim.keymap.set("x", "H", "<gv")
+vim.keymap.set("x", "L", ">gv")
+vim.keymap.set("x", "J", ":m '>+1<CR>gv=gv")
+vim.keymap.set("x", "K", ":m '<-2<CR>gv=gv")
+vim.keymap.set("x", "O", ":sort<CR>")
+
+vim.keymap.set("n", "<Space><Return>", "<Cmd>terminal<CR>i")
+vim.keymap.set("t", "<A-Esc>", "<C-\\><C-n>")
+vim.keymap.set("t", "<C-BS>", "<C-h>")
+
+vim.keymap.set("!", "<C-BS>", "<C-w>")
+vim.keymap.set("n", "<C-j>", "m`J``")
+vim.keymap.set("n", "vv", "gv")
+vim.keymap.set("n", "X", '"_D')
+vim.keymap.set({ "n", "x" }, "x", '"_x')
+
+vim.keymap.del("n", "gra")
+vim.keymap.del("n", "gri")
+vim.keymap.del("n", "grn")
+vim.keymap.del("n", "grr")
+vim.keymap.del("n", "grt")
+vim.keymap.del("n", "grx")

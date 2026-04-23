@@ -7,7 +7,6 @@ require("user.plugins.telescope")
 require("user.plugins.todo-comments")
 
 require("gitsigns").setup()
-require("nvim-autopairs").setup()
 require("nvim-ts-autotag").setup()
 
 require("lualine").setup({
