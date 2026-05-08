@@ -14,7 +14,7 @@ run mkinitcpio --preset linux
 option cpu
 if [[ $PHASE == build ]]; then
   if [[ -z $OPT_CPU ]]; then error "CPU option is required"; fi
-  if [[ $OPT_CPU != amd && $OPT_CPU != intel ]]; then error "Unsupported CPU '$OPT_CPU'"; fi
+  if [[ $OPT_CPU != amd && $OPT_CPU != intel ]]; then error "Unsupported CPU: $OPT_CPU"; fi
   package "$OPT_CPU-ucode"
 fi
 

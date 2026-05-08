@@ -1,9 +1,9 @@
 [Unit]
 Description=Link systemd-resolved stub-resolv.conf to /etc/resolv.conf
 
-[Install]
-WantedBy=systemd-resolved.service
-
 [Service]
 Type=oneshot
 ExecStart=/usr/bin/ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+
+[Install]
+WantedBy=systemd-resolved.service

@@ -7,23 +7,23 @@ cd "$(dirname "$(realpath "$0")")/.."
 source bin/lib.sh
 
 help() {
-  echo "Usage: $0 <command> [args ...]"
+  echo "Usage: manager.sh <command> [args ...]"
   echo
   echo "Commands:"
   echo "  help      Print this help message"
   echo "  edit      Open editor in configuration repository"
-  echo "  rebuild   Rebuild the system configuration for the current host"
+  echo "  rebuild   Rebuild system configuration"
   echo "  secrets   Manage secrets"
   echo "  sync      Sync configuration repository"
-  echo "  upgrade   Upgrade the current configuration"
+  echo "  upgrade   Upgrade system"
 }
 
 edit() {
-  "$EDITOR" .
+  exec "$EDITOR" .
 }
 
 rebuild() {
-  sudo bin/apply.sh "$HOSTNAME"
+  exec sudo bin/apply.sh "$HOSTNAME"
 }
 
 secrets() {
@@ -101,7 +101,7 @@ secrets() {
 
   if ! "$EDITOR" "$TMP/edit"; then
     warn "Editor exited with non-zero status, aborting..."
-    return
+    exit 1
   fi
 
   mkdir "$TMP/secrets"
@@ -166,7 +166,7 @@ secrets() {
         NAME=""
         ;;
 
-      *) fatal "Unknown command '${cmd[0]}'" ;;
+      *) fatal "Unknown command: ${cmd[0]}" ;;
     esac
   done < "$TMP/edit"
 
@@ -194,7 +194,7 @@ sync() {
 upgrade() {
   if ((UID != 0)); then exec sudo "$0" upgrade; fi
 
-  trap 'unmount "$TMP/boot"; unmount "$TMP/root"; rm -rf --one-file-system "$TMP"' EXIT
+  trap 'unmount "$TMP/root"; unmount "$TMP/boot"; rm -rf --one-file-system "$TMP"' EXIT
   TMP="$(mktemp -d)"
   chmod 700 "$TMP"
 
@@ -208,7 +208,7 @@ upgrade() {
   btrfs subvolume snapshot "$TMP/root/latest" "$BUILD"
   mount --bind "$BUILD" "$BUILD"
   mount --bind "$TMP/root/pkgs" "$BUILD/var/cache/pacman/pkg"
-  arch-chroot "$BUILD" /bin/bash -eu /var/lib/syscfg/upgrade.sh
+  arch-chroot "$BUILD" bash -eu /var/lib/syscfg/upgrade.sh
 
   touch "$BUILD"
   unmount "$BUILD"
@@ -218,7 +218,7 @@ upgrade() {
   ln -s "images/$HASH" "$TMP/root/latest"
 
   mount --mkdir --label BOOT "$TMP/boot"
-  rm -rf "${TMP:?}/boot"/*
+  find "$TMP/boot" -delete
   cp -r "$TMP/root/latest/boot/." "$TMP/boot"
 }
 
@@ -234,5 +234,5 @@ case "$1" in
   secrets) secrets ;;
   sync) sync ;;
   upgrade) upgrade ;;
-  *) fatal "Unknown command '$1'" ;;
+  *) fatal "Unknown command: $1" ;;
 esac

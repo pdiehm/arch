@@ -6,8 +6,9 @@ shopt -s nullglob
 cd "$(dirname "$(realpath "$0")")/.."
 source bin/lib.sh
 
+if (($# != 1)); then fatal "Usage: apply.sh <host>"; fi
 if ((UID != 0)); then fatal "This script must be run as root"; fi
-if ! resolve_host "${1:?Host name required}"; then fatal "Host '$1' not found"; fi
+if ! resolve_host "$1"; then fatal "Host '$1' not found"; fi
 
 trap cleanup EXIT
 TMP="$(mktemp -d)"
@@ -18,14 +19,14 @@ STAGE=0
 declare -A OPTS=()
 
 cleanup() {
-  if mountpoint --quiet "$TMP/boot"; then unmount "$TMP/boot"; fi
   if mountpoint --quiet "$TMP/root"; then unmount "$TMP/root"; fi
+  if mountpoint --quiet "$TMP/boot"; then unmount "$TMP/boot"; fi
   rm -rf --one-file-system "$TMP"
 }
 
 command_not_found_handle() {
   if [[ $PHASE == declare ]]; then return; fi
-  error "Command not found: '$1'"
+  error "Command not found: $1"
 }
 
 # error <message>

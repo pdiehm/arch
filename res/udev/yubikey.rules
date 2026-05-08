@@ -1,3 +1,4 @@
-# vim: ft=udevrules
 ACTION=="add", SUBSYSTEM=="usb", ENV{PRODUCT}=="1050/407/543", RUN+="/usr/local/bin/yubikey-unlock"
 ACTION=="remove", SUBSYSTEM=="usb", ENV{PRODUCT}=="1050/407/543", RUN+="/usr/local/bin/yubikey-lock"
+
+# vim: ft=udevrules

@@ -1,4 +1,4 @@
-package greetd-tuigreet
+package greetd greetd-tuigreet
 copy res/greetd.toml /etc/greetd/config.toml
 run systemctl enable greetd.service
 
@@ -8,7 +8,5 @@ symlink -u res/fontconfig.xml .config/fontconfig/fonts.conf
 package hyprland hyprpaper hyprlock hypridle hyprshot hyprpicker xdg-desktop-portal-hyprland
 symlink -u res/hypr .config/hypr
 
-package waybar
+package kitty waybar rofi mako
 symlink -u res/waybar .config/waybar
-
-package kitty rofi mako

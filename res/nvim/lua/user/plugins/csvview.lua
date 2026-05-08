@@ -8,12 +8,3 @@ require("csvview").setup({
     jump_prev_field_start = { "<S-Tab>", mode = "n" },
   },
 })
-
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "csv",
-
-  callback = function()
-    vim.bo.syntax = "ON"
-    vim.cmd.CsvViewEnable()
-  end,
-})

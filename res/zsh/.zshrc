@@ -80,9 +80,10 @@ _prompt_host() {
 }
 
 alias ls="eza"
-alias l="ls --all --long --group"
 alias dog="doggo"
-alias lsblk="lsblk -o NAME,TYPE,SIZE,PTTYPE,PARTLABEL,PARTTYPENAME,LABEL,FSTYPE,MOUNTPOINTS"
+
+alias l="ls --all --long --group"
+alias lsblk="lsblk --output NAME,TYPE,SIZE,VENDOR,MODEL,PTTYPE,PARTLABEL,PARTTYPENAME,LABEL,FSTYPE,MOUNTPOINTS"
 alias fd="fd --follow --hidden"
 alias rg="rg --follow --hidden --smart-case"
 
@@ -113,12 +114,11 @@ watch() (
   trap "exit 0" INT
 
   printf "\e[?25l\e[?1049h"
-
   while true; do
     printf "\e[H\e[2mWatching: %s\e[m\n\n" "$*"
     script --quiet --command "zsh --interactive -c $(printf "%q" "$*")" /dev/null | sed $'s/^/\e[K/'
-    printf "\e[J"
 
+    printf "\e[J"
     sleep 1
   done
 )
@@ -129,6 +129,7 @@ bindkey -R "\M-^@"-"\M-^?" self-insert
 
 bindkey "^M" accept-line                         # Enter
 bindkey "^I" expand-or-complete                  # Tab
+bindkey "^[[Z" reverse-menu-complete             # Shift+Tab
 bindkey "^[[C" forward-char                      # Right
 bindkey "^[[1;5C" forward-word                   # Ctrl+Right
 bindkey "^[[D" backward-char                     # Left
@@ -173,6 +174,7 @@ _sm() {
 if [[ -d $KITTY_INSTALLATION_DIR ]]; then
   export KITTY_SHELL_INTEGRATION="enabled"
   autoload -Uz "$KITTY_INSTALLATION_DIR/shell-integration/zsh/kitty-integration"
+
   kitty-integration
   unfunction kitty-integration
 fi

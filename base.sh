@@ -22,11 +22,11 @@ script() {
   fi
 }
 
-# write [-aeux] [-m mode] <path> [content]
+# write [-aeux] [-m mode] <path> [content ...]
 #   -a   append
 #   -e   substitute environment variables
 #   -u   as user in home directory
-#   -x   executable
+#   -x   set executable
 #   -m   set mode
 write() {
   local OPTIND OPTARG opt
@@ -46,7 +46,7 @@ write() {
   shift $((OPTIND - 1))
   local path="$1" content dir
 
-  if (($# == 1)); then content="$(use)"; else content="$(use <<< "$2")"; fi
+  if (($# == 1)); then content="$(use)"; else content="$(use <<< "${*:2}")"; fi
   dir="$(dirname "$path")"
 
   local cmd="mkdir -p ${dir@Q} && "
@@ -68,7 +68,7 @@ write() {
 #   -n   insert final newline
 #   -s   interpret src as secret name
 #   -u   as user to home directory
-#   -x   executable
+#   -x   set executable
 #   -m   set mode
 copy() {
   local OPTIND OPTARG opt
@@ -87,7 +87,7 @@ copy() {
   done
 
   shift $((OPTIND - 1))
-  if ((secret)) && [[ -z $mode ]]; then mode="400"; fi
+  if ((secret)); then mode="${mode:-400}"; fi
 
   local src="$1" dst="$2" dir
   if ((secret)); then src="$(secret -f "$src")"; else src="$(use "$src")"; fi
@@ -111,7 +111,7 @@ copy() {
 # symlink [-u] <target> <link>
 #   -u   as user in home directory
 symlink() {
-  local OPTIND OPTARG opt
+  local OPTIND opt
   local user=0
 
   while getopts "u" opt; do
@@ -141,7 +141,7 @@ symlink() {
 }
 
 # persist [-fu] [-m mode] <path>
-#   -f   create file if it does not exist
+#   -f   initialize as file
 #   -u   as user in home directory
 #   -m   set mode if created
 persist() {
@@ -164,7 +164,7 @@ persist() {
   target="${path//+/_}"
   target="${target//\//+}"
   target="${target//[^a-zA-Z0-9._+-]/_}"
-  if [[ $target == +* ]]; then target="/perm/ROOT$target"; else target="/perm/HOME+$target"; fi
+  if [[ $target == +* ]]; then target="/perm/${target:1}"; else target="/perm/home+pascal+$target"; fi
 
   local cmd="if [[ -e ${target@Q} ]]; then echo 'Cannot persist' ${path@Q} '- Already persisted' >&2; exit 1; fi"
   cmd+=" && mkdir -p ${dir@Q} && if [[ -e ${path@Q} ]]; then mv ${path@Q} ${target@Q}; fi && ln -s ${target@Q} ${path@Q}"

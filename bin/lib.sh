@@ -50,9 +50,8 @@ save_secrets() {
 
 # resolve_host <name>
 resolve_host() {
-  local name="$1"
+  local name="$1" line head
 
-  local line head
   while IFS=, read -ra line; do
     if [[ -z ${head+x} ]]; then
       head=("${line[@]}")
@@ -72,6 +71,7 @@ resolve_host() {
 # unmount <path>
 unmount() {
   local path="$1"
+
   for _ in {0..9}; do
     if umount --recursive "$path"; then return; fi
     sleep 1

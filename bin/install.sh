@@ -30,7 +30,7 @@ done
 
 DISK=""
 until [[ -b $DISK ]]; do
-  lsblk --output NAME,MODEL,SIZE,PARTLABEL,LABEL
+  lsblk --output NAME,VENDOR,MODEL,SIZE,PARTLABEL,LABEL
   echo
 
   read -rp "Enter disk to install to: " DISK
@@ -57,22 +57,17 @@ fi
 wipefs --all "$DISK"
 printf "%s\n" "${CFG[@]}" | sfdisk "$DISK"
 
-if [[ $HOST_BOOT == EFI ]]; then
-  PART_BOOT="/dev/disk/by-partlabel/BOOT"
-  PART_SWAP="/dev/disk/by-partlabel/swap"
-  PART_ROOT="/dev/disk/by-partlabel/root"
-else
-  while [[ -z ${PARTS[1]+x} ]]; do
-    mapfile -t PARTS < <(lsblk --noheadings --paths --output KNAME "$DISK")
-  done
+while [[ -z ${PARTS[1]+x} ]]; do
+  mapfile -t PARTS < <(lsblk --noheadings --paths --output KNAME "$DISK")
+done
 
-  PART_BOOT="${PARTS[1]}"
-  PART_SWAP="${PARTS[2]}"
-  PART_ROOT="${PARTS[3]}"
-fi
-
+PART_BOOT="${PARTS[1]}"
 until [[ -b $PART_BOOT ]]; do sleep 1; done
+
+PART_SWAP="${PARTS[2]}"
 until [[ -b $PART_SWAP ]]; do sleep 1; done
+
+PART_ROOT="${PARTS[3]}"
 until [[ -b $PART_ROOT ]]; do sleep 1; done
 
 if [[ -n $CRYPT ]]; then
