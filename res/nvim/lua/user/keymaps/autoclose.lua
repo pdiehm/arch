@@ -30,6 +30,8 @@ for _, char in pairs({ '"', "'", "`" }) do
       return "<Right>"
     elseif char == "'" and pair:sub(1, 1):match("%w") then
       return "'"
+    elseif char == "'" and pre:sub(-2, -1) == "''" then
+      return "''<Left><Left>"
     elseif char == "`" and pre:sub(-2, -1) == "``" then
       return "````<Left><Left><Left>"
     elseif vim.list_contains({ '""', "''", "``" }, pair) then
