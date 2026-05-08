@@ -61,7 +61,7 @@
   "memory": {
     "interval": 1,
     "format": "  {percentage}%",
-    "tooltip-format": "{used:.1f} / {total:.1f} GiB",
+    "tooltip-format": "Memory: {used:.1f} / {total:.1f} GiB\nSwap: {swapUsed:.1f} / {swapTotal:.1f} GiB",
     "states": { "warn": 50, "crit": 80 }
   },
 
