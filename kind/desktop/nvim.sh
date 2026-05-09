@@ -13,3 +13,9 @@ script -u << EOF
 echo "Installing nvim treesitter parsers..."
 nvim -es --cmd "lua require('nvim-treesitter').install({ 'stable', 'unstable' }):wait(60000)" --cmd q
 EOF
+
+upgrade << EOF
+echo "Upgrading nvim treesitter parsers..."
+sudo -u pascal nvim -es --cmd "lua require('nvim-treesitter').install({ 'stable', 'unstable' }):wait(60000)" --cmd q
+sudo -u pascal nvim -es --cmd "lua require('nvim-treesitter').update():wait(60000)" --cmd q
+EOF
