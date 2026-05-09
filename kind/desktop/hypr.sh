@@ -10,4 +10,7 @@ symlink -u res/hypr .config/hypr
 symlink -u res/wallpaper.jpg .local/share/wallpaper.jpg
 
 package kitty waybar rofi mako
+symlink -u res/kitty.conf .config/kitty/kitty.conf
 symlink -u res/waybar .config/waybar
+symlink -u res/rofi.rasi .config/rofi/config.rasi
+symlink -u res/mako.conf .config/mako/config

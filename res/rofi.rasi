@@ -1,0 +1,15 @@
+configuration {
+  scroll-method: 1;
+  show-icons: true;
+  drun-show-actions: true;
+  disable-history: true;
+}
+
+* {
+  red: #FF4136;
+  blue: #0074D9;
+  lightbg: #333333;
+  lightfg: #AAAAAA;
+  background: #111111;
+  foreground: #DDDDDD;
+}
