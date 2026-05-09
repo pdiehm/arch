@@ -34,6 +34,8 @@ secrets() {
   chmod 700 "$TMP"
 
   declare -A SECRETS=()
+  KEYS=()
+
   if [[ -f secrets/master && -f /var/lib/syscfg/master ]]; then
     SECRETS["keys/master"]="$(< /var/lib/syscfg/master)"
 
@@ -55,7 +57,11 @@ secrets() {
   fi
 
   if [[ -f $TMP/secrets ]]; then
-    while read -r key value; do SECRETS[$key]="$value"; done < "$TMP/secrets"
+    while read -r key value; do
+      SECRETS[$key]="$value"
+      KEYS+=("$key")
+    done < "$TMP/secrets"
+
     rm "$TMP/secrets"
   fi
 
@@ -93,7 +99,7 @@ secrets() {
   printf "HOSTS %s\n" "${HOSTS[*]}" > "$TMP/edit"
   printf "MASTER %s\n" "${ACCESS["keys/master"]:-}" >> "$TMP/edit"
 
-  for key in "${!SECRETS[@]}"; do
+  for key in "${KEYS[@]}"; do
     if [[ $key == keys/* ]]; then continue; fi
     printf "\nSECRET %s %s\n" "$key" "${ACCESS[$key]:-}" >> "$TMP/edit"
     printf "%s\nEOF\n" "$(decode_secret "${SECRETS[$key]}")" >> "$TMP/edit"
