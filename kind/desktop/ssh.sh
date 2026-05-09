@@ -5,4 +5,5 @@ copy -nsu ssh/goomba .ssh/goomba
 copy -nsu ssh/github .ssh/github
 
 package sshfs
-write -a /etc/fstab "pascal@bowser:shared /home/pascal/Shared sshfs Port=1970,IdentityFile=/home/pascal/.ssh/bowser,ConnectTimeout=5,ServerAliveInterval=5,allow_other,reconnect,delay_connect 0 0"
+symlink -u res/systemd/user/home-pascal-Shared.mount .config/systemd/user/home-pascal-Shared.mount
+symlink -u /home/pascal/.config/systemd/user/home-pascal-Shared.mount .config/systemd/user/default.target.wants/home-pascal-Shared.mount

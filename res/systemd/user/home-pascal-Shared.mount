@@ -1,0 +1,8 @@
+[Mount]
+What=bowser:shared
+Where=%h/Shared
+Type=sshfs
+Options=_netdev,user,reconnect,delay_connect,idmap=user,ControlMaster=no,ConnectTimeout=5,ServerAliveInterval=5
+
+[Install]
+WantedBy=default.target
