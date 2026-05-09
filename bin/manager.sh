@@ -148,7 +148,7 @@ secrets() {
 
         NAME="${cmd[1]}"
         if [[ $NAME == keys/* ]]; then fatal "Secret name cannot start with 'keys/'"; fi
-        if [[ $NAME =~ [^a-zA-Z0-9/-] ]]; then fatal "Secret name '$NAME' contains invalid characters"; fi
+        if [[ $NAME =~ [^a-zA-Z0-9/_-] ]]; then fatal "Secret name '$NAME' contains invalid characters"; fi
 
         HOSTS=("${cmd[@]:2}")
         VALUE=()
