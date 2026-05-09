@@ -11,10 +11,12 @@ Host arch
 
 Host bowser
   IdentityFile ~/.ssh/bowser
+  ForwardAgent yes
   Port 1970
 
 Host goomba
   IdentityFile ~/.ssh/goomba
+  ForwardAgent yes
   Port 1970
 
 Host github.com
