@@ -7,7 +7,7 @@ package -a prettier-plugin-xml
 package -c prettier-plugin-css-order
 
 symlink -u res/nvim .config/nvim
-write -au .config/dropin/env "export EDITOR=nvim"
+write -au .config/dropin/env "EDITOR=nvim"
 
 script -u << EOF
 echo "Installing nvim treesitter parsers..."
