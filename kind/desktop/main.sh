@@ -1,5 +1,5 @@
-import ./desktop
 import ./gnupg
+import ./hypr
 import ./nvim
 import ./yubikey
 
