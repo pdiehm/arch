@@ -19,14 +19,14 @@ if [[ $PHASE == build ]]; then
 fi
 
 if [[ $HOST_BOOT == EFI ]]; then
-  cmd="mkdir -p /boot/EFI/BOOT && cp /usr/share/limine/BOOTX64.EFI /boot/EFI/BOOT"
+  package limine
+  script <<< "mkdir -p /boot/EFI/BOOT && cp /usr/share/limine/BOOTX64.EFI /boot/EFI/BOOT"
+  upgrade <<< "mkdir -p /boot/EFI/BOOT && cp /usr/share/limine/BOOTX64.EFI /boot/EFI/BOOT"
 else
-  cmd="cp /usr/share/limine/limine-bios.sys /boot && limine bios-install \"\$(lsblk --noheadings --paths --output PKNAME /dev/disk/by-label/BOOT)\""
+  package limine
+  script <<< "cp /usr/share/limine/limine-bios.sys /boot && limine bios-install \"\$(lsblk --noheadings --paths --output PKNAME /dev/disk/by-label/BOOT)\""
+  upgrade <<< "cp /usr/share/limine/limine-bios.sys /boot && limine bios-install \"\$(lsblk --noheadings --paths --output PKNAME /dev/disk/by-label/BOOT)\""
 fi
-
-package limine
-script <<< "$cmd"
-upgrade <<< "$cmd"
 
 env UCODE "$OPT_CPU-ucode.img"
 copy -e res/limine.conf /boot/limine.conf
