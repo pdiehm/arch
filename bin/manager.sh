@@ -99,80 +99,111 @@ secrets() {
     printf "%s\nEOF\n" "$(decode_secret "${SECRETS[$key]}")" >> "$TMP/edit"
   done
 
-  if ! "$EDITOR" "$TMP/edit"; then
-    warn "Editor exited with non-zero status, aborting..."
-    exit 1
-  fi
-
-  mkdir "$TMP/secrets"
-  printf "keys/master %s\n" "${SECRETS["keys/master"]}" > "$TMP/secrets/master"
-
-  NAME=""
-  HOSTS=()
-  VALUE=()
-
-  while read -r line; do
-    if [[ -n $NAME && $line != EOF ]]; then
-      VALUE+=("$line")
-      continue
+  while true; do
+    if ! "${EDITOR:-vim}" "$TMP/edit"; then
+      fatal "Editor exited with non-zero status, aborting..."
     fi
 
-    read -ra cmd <<< "$line"
-    if ((${#cmd[@]} == 0)); then continue; fi
+    rm -rf "$TMP/secrets"
+    mkdir "$TMP/secrets"
+    printf "keys/master %s\n" "${SECRETS["keys/master"]}" > "$TMP/secrets/master"
 
-    case "${cmd[0]}" in
-      HOSTS)
-        for host in "${cmd[@]:1}"; do
-          if [[ $host == master ]]; then fatal "Host name 'master' is reserved"; fi
-          if [[ $host =~ [^a-zA-Z0-9-] ]]; then fatal "Host name '$host' contains invalid characters"; fi
-          if [[ -f $TMP/secrets/$host ]]; then fatal "Duplicate host name '$host'"; fi
+    NAME=""
+    HOSTS=()
+    VALUE=()
+    ERROR=""
 
-          if [[ -z ${SECRETS["keys/$host"]+x} ]]; then
-            SECRETS["keys/$host"]="$(head -c 32 /dev/urandom | encode_secret)"
+    while read -r line; do
+      if [[ -n $NAME && $line != EOF ]]; then
+        VALUE+=("$line")
+        continue
+      fi
+
+      read -ra cmd <<< "$line"
+      if ((${#cmd[@]} == 0)); then continue; fi
+
+      case "${cmd[0]}" in
+        HOSTS)
+          for host in "${cmd[@]:1}"; do
+            if [[ $host == master ]]; then
+              ERROR="Host name 'master' is reserved"
+            elif [[ $host =~ [^a-zA-Z0-9-] ]]; then
+              ERROR="Host name '$host' contains invalid characters"
+            elif [[ -f $TMP/secrets/$host ]]; then
+              ERROR="Duplicate host name '$host'"
+            else
+              if [[ -z ${SECRETS["keys/$host"]+x} ]]; then
+                SECRETS["keys/$host"]="$(head -c 32 /dev/urandom | encode_secret)"
+              fi
+
+              printf "keys/%s %s\n" "$host" "${SECRETS["keys/$host"]}" >> "$TMP/secrets/master"
+              printf "keys/%s %s\n" "$host" "${SECRETS["keys/$host"]}" > "$TMP/secrets/$host"
+            fi
+          done
+          ;;
+
+        MASTER)
+          for host in "${cmd[@]:1}"; do
+            if [[ ! -f $TMP/secrets/$host ]]; then
+              ERROR="Host '$host' not in hosts list"
+            else
+              printf "keys/master %s\n" "${SECRETS["keys/master"]}" >> "$TMP/secrets/$host"
+            fi
+          done
+          ;;
+
+        SECRET)
+          NAME="${cmd[1]:-}"
+
+          if [[ -z $NAME ]]; then
+            ERROR="SECRET command requires a name"
+          elif [[ $NAME == keys/* ]]; then
+            ERROR="Secret name cannot start with 'keys/'"
+          elif [[ $NAME =~ [^a-zA-Z0-9/_-] ]]; then
+            ERROR="Secret name '$NAME' contains invalid characters"
+          else
+            HOSTS=("${cmd[@]:2}")
+            VALUE=()
           fi
+          ;;
 
-          printf "keys/%s %s\n" "$host" "${SECRETS["keys/$host"]}" >> "$TMP/secrets/master"
-          printf "keys/%s %s\n" "$host" "${SECRETS["keys/$host"]}" > "$TMP/secrets/$host"
-        done
-        ;;
+        EOF)
+          if [[ -z $NAME ]]; then
+            ERROR="Unexpected EOF"
+          else
+            value="$(IFS=$'\n' && encode_secret "${VALUE[*]}")"
 
-      MASTER)
-        for host in "${cmd[@]:1}"; do
-          if [[ ! -f $TMP/secrets/$host ]]; then fatal "Host '$host' not in hosts list"; fi
-          printf "keys/master %s\n" "${SECRETS["keys/master"]}" >> "$TMP/secrets/$host"
-        done
-        ;;
+            for host in master "${HOSTS[@]}"; do
+              if [[ ! -f $TMP/secrets/$host ]]; then
+                ERROR="Host '$host' not in hosts list"
+              else
+                printf "%s %s\n" "$NAME" "$value" >> "$TMP/secrets/$host"
+              fi
+            done
 
-      SECRET)
-        if ((${#cmd[@]} < 2)); then fatal "SECRET command requires a name"; fi
+            NAME=""
+          fi
+          ;;
 
-        NAME="${cmd[1]}"
-        if [[ $NAME == keys/* ]]; then fatal "Secret name cannot start with 'keys/'"; fi
-        if [[ $NAME =~ [^a-zA-Z0-9/_-] ]]; then fatal "Secret name '$NAME' contains invalid characters"; fi
+        *) ERROR="Unknown command: ${cmd[0]}" ;;
+      esac
 
-        HOSTS=("${cmd[@]:2}")
-        VALUE=()
-        ;;
+      if [[ -n $ERROR ]]; then
+        break
+      fi
+    done < "$TMP/edit"
 
-      EOF)
-        if [[ -z $NAME ]]; then fatal "Unexpected EOF"; fi
-        value="$(IFS=$'\n' && encode_secret "${VALUE[*]}")"
+    if [[ -z $ERROR ]]; then
+      if [[ -n $NAME ]]; then
+        ERROR="Unexpected end of file while reading secret '$NAME'"
+      else
+        break
+      fi
+    fi
 
-        for host in master "${HOSTS[@]}"; do
-          if [[ ! -f $TMP/secrets/$host ]]; then fatal "Host '$host' not in hosts list"; fi
-          printf "%s %s\n" "$NAME" "$value" >> "$TMP/secrets/$host"
-        done
-
-        NAME=""
-        ;;
-
-      *) fatal "Unknown command: ${cmd[0]}" ;;
-    esac
-  done < "$TMP/edit"
-
-  if [[ -n $NAME ]]; then
-    fatal "Unexpected end of file while reading secret '$NAME'"
-  fi
+    warn "$ERROR"
+    read -rp "Press enter to continue..."
+  done
 
   rm -rf secrets
   mkdir -m 700 secrets
