@@ -19,4 +19,8 @@ copy -s -m 444 "ssh/$HOST_NAME/auth" /etc/ssh/authorized_keys
 run systemctl mask sshdgenkeys.service
 run systemctl enable sshd.service
 
-package man-db man-pages bat doggo duf eza fd fzf ncdu pv ripgrep xh
+package \
+  man-db man-pages \
+  bat eza fd ripgrep pv fzf \
+  fastfetch duf ncdu \
+  openbsd-netcat doggo mtr xh
