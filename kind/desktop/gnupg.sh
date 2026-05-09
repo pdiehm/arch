@@ -1,10 +1,3 @@
-symlink -u res/ssh/ssh_config .ssh/config
-copy -nsu ssh/arch/key .ssh/arch
-copy -nsu ssh/github/key .ssh/github
-
-package git-delta
-symlink -u res/git.conf .config/git/config
-
 persist -u -m 700 .local/share/gnupg
 write -a /etc/gnupg/gpg-agent.conf "pinentry-program /usr/bin/pinentry-tty"
 
