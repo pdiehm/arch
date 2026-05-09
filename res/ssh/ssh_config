@@ -9,5 +9,13 @@ Host arch
   IdentityFile ~/.ssh/arch
   Port 1970
 
+Host bowser
+  IdentityFile ~/.ssh/bowser
+  Port 1970
+
+Host goomba
+  IdentityFile ~/.ssh/goomba
+  Port 1970
+
 Host github.com
   IdentityFile ~/.ssh/github
