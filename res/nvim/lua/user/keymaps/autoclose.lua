@@ -28,14 +28,14 @@ for _, char in pairs({ '"', "'", "`" }) do
   map(char, function(pair, pre)
     if pair:sub(2, 2) == char then
       return "<Right>"
+    elseif vim.list_contains({ '"', "'", "`" }, pair:sub(2, 2)) then
+      return char
     elseif char == "'" and pair:sub(1, 1):match("%w") then
       return "'"
     elseif char == "'" and pre:sub(-2, -1) == "''" then
       return "''<Left><Left>"
     elseif char == "`" and pre:sub(-2, -1) == "``" then
       return "````<Left><Left><Left>"
-    elseif vim.list_contains({ '""', "''", "``" }, pair) then
-      return char
     else
       return char .. char .. "<Left>"
     end
