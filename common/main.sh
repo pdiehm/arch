@@ -1,4 +1,5 @@
 import ./boot
+import ./docker
 import ./locale
 import ./network
 

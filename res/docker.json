@@ -1,0 +1,4 @@
+{
+  "firewall-backend": "nftables",
+  "log-driver": "local"
+}
