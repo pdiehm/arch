@@ -1,6 +1,6 @@
 Host *
   ControlMaster auto
-  ControlPath ~/.ssh/.%C
+  ControlPath ~/.ssh/.ctl-%h-%C
   ControlPersist 600
   IdentitiesOnly yes
   SetEnv TERM=xterm-256color
