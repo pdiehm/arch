@@ -79,13 +79,20 @@ _prompt_host() {
   fi
 }
 
-alias ls="eza"
 alias dog="doggo"
-
-alias l="ls --all --long --group"
-alias lsblk="lsblk --output NAME,TYPE,SIZE,VENDOR,MODEL,PTTYPE,PARTLABEL,PARTTYPENAME,LABEL,FSTYPE,MOUNTPOINTS"
 alias fd="fd --follow --hidden"
+alias l="ls --all --long --group"
+alias ls="eza"
+alias lsblk="lsblk --output NAME,TYPE,SIZE,VENDOR,MODEL,PTTYPE,PARTLABEL,PARTTYPENAME,LABEL,FSTYPE,MOUNTPOINTS"
+alias parallel="parallel --group --keep-order"
 alias rg="rg --follow --hidden --smart-case"
+alias type="type -as"
+
+if [[ $HOSTKIND == desktop ]]; then
+  alias open="xdg-open"
+  alias play="ffplay -autoexit -nodisp"
+  alias py="python3"
+fi
 
 ed() {
   if (($# == 0)); then

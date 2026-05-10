@@ -2,6 +2,11 @@ import ./boot
 import ./locale
 import ./network
 
+write -a /etc/environment << EOF
+HOSTNAME="$HOST_NAME"
+HOSTKIND="$HOST_KIND"
+EOF
+
 package zsh zsh-autosuggestions zsh-completions zsh-syntax-highlighting
 run chsh -s /usr/bin/zsh pascal
 write -a /etc/zsh/zshenv "ZDOTDIR=\"\$HOME/.config/zsh\""
@@ -21,6 +26,6 @@ run systemctl enable sshd.service
 
 package \
   man-db man-pages \
-  bat eza fd ripgrep pv fzf \
+  bat eza fd ripgrep pv fzf parallel \
   fastfetch duf ncdu \
   openbsd-netcat doggo mtr xh
