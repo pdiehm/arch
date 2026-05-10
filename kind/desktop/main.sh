@@ -4,6 +4,9 @@ import ./nvim
 import ./ssh
 import ./yubikey
 
+package networkmanager nm-connection-editor
+run systemctl enable NetworkManager.service
+
 package git-delta
 symlink -u res/git.conf .config/git/config
 
