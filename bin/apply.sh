@@ -16,7 +16,6 @@ chmod 700 "$TMP"
 
 PHASE=""
 STAGE=0
-declare -A OPTS=()
 
 cleanup() {
   if mountpoint --quiet "$TMP/root"; then unmount "$TMP/root"; fi
@@ -73,87 +72,6 @@ import() {
   done
 
   error "Cannot find module '$1'"
-}
-
-# option [-am] [-d default] <name>
-# option [-a] <name> <value>
-# option <name> <key> <value>
-option() {
-  local OPTIND OPTARG opt
-  local array=0 map=0 default=""
-
-  while getopts "amd:" opt; do
-    case "$opt" in
-      a) array=1 ;;
-      m) map=1 ;;
-      d) default="$OPTARG" ;;
-      *) error "Invalid option: -$opt" ;;
-    esac
-  done
-
-  shift $((OPTIND - 1))
-  if ((array + map > 1)); then error "Options '-a' and '-m' are mutually exclusive"; fi
-  if [[ -n $default ]] && ((array + map > 0)); then error "Option '-d' cannot be used with '-a' or '-m'"; fi
-
-  if (($# == 1)); then
-    local name="OPT_${1^^}"
-    if [[ $PHASE != declare ]]; then return; fi
-
-    if ((array)); then
-      if [[ ${OPTS[$name]:-array} != array ]]; then error "Option '$1' redeclared as different type"; fi
-
-      OPTS[$name]="array"
-      declare -ag "$name=()"
-    elif ((map)); then
-      if [[ ${OPTS[$name]:-map} != map ]]; then error "Option '$1' redeclared as different type"; fi
-
-      OPTS[$name]="map"
-      declare -Ag "$name=()"
-    else
-      if [[ ${OPTS[$name]:-string} != string ]]; then error "Option '$1' redeclared as different type"; fi
-
-      OPTS[$name]="string"
-      declare -g "$name=$default"
-    fi
-  elif (($# == 2)); then
-    local name="OPT_${1^^}" value="$2"
-    if [[ $PHASE != define ]]; then return; fi
-    if ((map)); then error "Option '-m' can only be used for declaration"; fi
-    if [[ -n $default ]]; then error "Option '-d' can only be used for declaration"; fi
-
-    local type="${OPTS[$name]:-null}"
-    local -n ref="$name"
-
-    if [[ $type == string ]]; then
-      if ((array)); then ref+="${ref:+ }$value"; else ref="$value"; fi
-    elif [[ $type == array ]]; then
-      if ((array)); then ref+=("$value"); else ref=("$value"); fi
-    elif [[ $type == map ]]; then
-      error "Setting map option requires key and value"
-    else
-      error "Setting unknown option '$1'"
-    fi
-  elif (($# == 3)); then
-    local name="OPT_${1^^}" key="$2" value="$3"
-    if [[ $PHASE != define ]]; then return; fi
-    if ((array)); then error "Cannot append to map entries"; fi
-    if ((map)); then error "Option '-m' can only be used for declaration"; fi
-    if [[ -n $default ]]; then error "Option '-d' can only be used for declaration"; fi
-
-    local type="${OPTS[$name]:-null}"
-    local -n map="$name"
-
-    if [[ $type == map ]]; then
-      # shellcheck disable=SC2004
-      map[$key]="$value"
-    elif [[ $type != null ]]; then
-      error "Setting key value pair is only valid for map options"
-    else
-      error "Setting unknown option '$1'"
-    fi
-  else
-    error "Invalid arguments"
-  fi
 }
 
 # run <command> ...

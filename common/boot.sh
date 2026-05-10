@@ -11,22 +11,14 @@ copy res/initcpio/root/install.sh /etc/initcpio/install/root
 conf /etc/mkinitcpio.conf "HOOKS=(base udev autodetect microcode keyboard block encrypt filesystems root fsck)"
 run mkinitcpio --preset linux
 
-option cpu
-if [[ $PHASE == build ]]; then
-  if [[ -z $OPT_CPU ]]; then error "CPU option is required"; fi
-  if [[ $OPT_CPU != amd && $OPT_CPU != intel ]]; then error "Unsupported CPU: $OPT_CPU"; fi
-  package "$OPT_CPU-ucode"
-fi
+package limine "$HOST_CPU-ucode"
+env UCODE "$HOST_CPU-ucode.img"
+copy -e res/limine.conf /boot/limine.conf
 
 if [[ $HOST_BOOT == EFI ]]; then
-  package limine
   script <<< "mkdir -p /boot/EFI/BOOT && cp /usr/share/limine/BOOTX64.EFI /boot/EFI/BOOT"
   upgrade <<< "mkdir -p /boot/EFI/BOOT && cp /usr/share/limine/BOOTX64.EFI /boot/EFI/BOOT"
 else
-  package limine
   script <<< "cp /usr/share/limine/limine-bios.sys /boot && limine bios-install \"\$(lsblk --noheadings --paths --output PKNAME /dev/disk/by-label/BOOT)\""
   upgrade <<< "cp /usr/share/limine/limine-bios.sys /boot && limine bios-install \"\$(lsblk --noheadings --paths --output PKNAME /dev/disk/by-label/BOOT)\""
 fi
-
-env UCODE "$OPT_CPU-ucode.img"
-copy -e res/limine.conf /boot/limine.conf
