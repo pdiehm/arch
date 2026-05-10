@@ -242,7 +242,9 @@ package() {
     for name; do
       copy "pkgs/$name" "/var/lib/syscfg/pkgs/$name"
       run chown -R pkgbuild:pkgbuild "/var/lib/syscfg/pkgs/$name"
+
       run sudo -u pkgbuild env -C "/var/lib/syscfg/pkgs/$name" makepkg --clean --install --rmdeps --syncdeps --noconfirm
+      upgrade sudo -u pkgbuild env -C "/var/lib/syscfg/pkgs/$name" makepkg --clean --install --rmdeps --syncdeps --noconfirm
     done
   else
     run pacman --noconfirm --sync --sysupgrade --refresh --needed "$@"

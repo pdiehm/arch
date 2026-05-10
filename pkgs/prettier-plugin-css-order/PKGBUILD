@@ -1,20 +1,26 @@
-# shellcheck disable=SC2034,SC2154
+# shellcheck disable=SC2034,SC2154,SC2218
+
+pkgver() {
+  local ref
+  read -r _ ref <<< "$(git ls-remote --tags --refs "$url" | tail -n 1)"
+  printf "%s" "${ref#refs/tags/v}"
+}
 
 pkgname="prettier-plugin-css-order"
-pkgver="2.2.0"
+pkgver="1.0.0"
 pkgrel=1
-pkgdesc="Prettier CSS Sorting Plugin"
+pkgdesc="Prettier plugin to sort CSS declarations in a certain order"
 arch=("any")
 url="https://github.com/Siilwyn/prettier-plugin-css-order"
 license=("ISC")
 depends=("prettier" "nodejs")
-makedepends=("npm" "jq")
-source=("https://registry.npmjs.org/$pkgname/-/$pkgname-$pkgver.tgz")
-noextract=("$pkgname-$pkgver.tgz")
-sha256sums=("bbd77902cb535f572e464137f60a9e9ceb5ab3bbfdd5e54fadaf3d4102d3dcf8")
+makedepends=("git" "npm" "jq")
+source=("$pkgname.tgz::https://registry.npmjs.org/$pkgname/-/$pkgname-$(pkgver).tgz")
+noextract=("$pkgname.tgz")
+sha256sums=("SKIP")
 
 package() {
-  npm install -g --prefix "$pkgdir/usr" --no-bin-links "$srcdir/$pkgname-$pkgver.tgz"
+  npm install -g --prefix "$pkgdir/usr" --no-bin-links "$srcdir/$pkgname.tgz"
   install -d "$pkgdir/usr/share/licenses/$pkgname"
   ln -s "../../../lib/node_modules/$pkgname/license.md" "$pkgdir/usr/share/licenses/$pkgname/"
 
