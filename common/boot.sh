@@ -4,6 +4,7 @@ LABEL=swap none                  swap  defaults    0 0
 LABEL=BOOT /boot                 vfat  defaults    0 2
 LABEL=root /perm                 btrfs subvol=perm 0 2
 LABEL=root /var/cache/pacman/pkg btrfs subvol=pkgs 0 2
+tmpfs      /home/pascal/Temp     tmpfs defaults    0 0
 EOF
 
 copy res/initcpio/root/hook.sh /etc/initcpio/hooks/root
