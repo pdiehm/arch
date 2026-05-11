@@ -1,0 +1,8 @@
+package networkmanager nm-connection-editor
+run systemctl enable NetworkManager.service
+
+env NAME hotspot
+env PRIORITY 25
+env SSID "$(secret network/hotspot/ssid)"
+env PSK "$(secret network/hotspot/psk)"
+copy -e -m 400 res/NetworkManager/wifi-dhcp.nmconnection /etc/NetworkManager/system-connections/hotspot.nmconnection
