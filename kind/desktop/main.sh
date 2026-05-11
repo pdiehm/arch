@@ -1,3 +1,4 @@
+import ./dev
 import ./gnupg
 import ./hypr
 import ./nvim
