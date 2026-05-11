@@ -29,7 +29,7 @@ _prompt_git() {
   fi
 
   if [[ -n "$(git stash list)" ]]; then
-    printf "%%F{6}\u2026%%f"
+    printf " %%F{6}\u2026%%f"
   fi
 
   if [[ -n "$(git remote show)" && $branch != HEAD ]]; then
