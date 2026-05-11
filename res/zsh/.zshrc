@@ -199,8 +199,7 @@ _repo() {
     if ((CURRENT == 3)); then
       if ((${#repos[@]} > 0)); then _values name "${repos[@]##*/}"; fi
     else
-      words=("${words[4]}" "${words[5,-1]}")
-      CURRENT=$((CURRENT - 3))
+      compset -n 4
       _normal
     fi
   elif [[ ${words[2]} == shell ]]; then
