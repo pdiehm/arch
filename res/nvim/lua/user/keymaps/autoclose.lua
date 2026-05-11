@@ -28,8 +28,6 @@ for _, char in pairs({ '"', "'", "`" }) do
   map(char, function(pair, pre)
     if pair:sub(2, 2) == char then
       return "<Right>"
-    elseif vim.list_contains({ '"', "'", "`" }, pair:sub(2, 2)) then
-      return char
     elseif char == "'" and pair:sub(1, 1):match("%w") then
       return "'"
     elseif char == "'" and pre:sub(-2, -1) == "''" then
@@ -43,8 +41,12 @@ for _, char in pairs({ '"', "'", "`" }) do
 end
 
 for open, close in pairs({ ["("] = ")", ["["] = "]", ["{"] = "}" }) do
-  map(open, function()
-    return open .. close .. "<Left>"
+  map(open, function(_, pre)
+    if open == "[" and pre:sub(-2, -1) == "\\e" then
+      return "["
+    else
+      return open .. close .. "<Left>"
+    end
   end)
 
   map(close, function(pair)
