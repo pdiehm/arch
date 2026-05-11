@@ -4,6 +4,9 @@ import ./nvim
 import ./ssh
 import ./yubikey
 
+symlink -u res/systemd/user .config/systemd/user
+persist -u .local/share/systemd
+
 package networkmanager nm-connection-editor
 run systemctl enable NetworkManager.service
 
