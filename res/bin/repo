@@ -226,8 +226,16 @@ status() {
 
   git-status | while read -r state branch; do
     if [[ -n $branch ]]; then
+      local icon=""
+      case "$state" in
+        diverged) icon=$'\u296f' ;;
+        ahead) icon=$'\u2191' ;;
+        behind) icon=$'\u2193' ;;
+        local) icon=$'\u21a5' ;;
+      esac
+
       read -r hash message <<< "$(git show --oneline --no-patch "$branch")"
-      printf "\e[32m%s \e[36m%s \e[33m%s \e[m%s\n" "$branch" "$state" "$hash" "$message"
+      printf "\e[32m%s \e[36m%s \e[33m%s \e[m%s\n" "$branch" "$icon" "$hash" "$message"
     fi
   done | column -ts $'\x09'
 
