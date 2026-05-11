@@ -64,6 +64,7 @@ label#network:not(.disconnected):not(.wifi):not(.ethernet) {
 label#cpu.crit,
 label#memory.crit,
 label#disk.crit,
+label#systemd-failed-units.degraded,
 label#network.disconnected {
   color: #ff4136;
 }

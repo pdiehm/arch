@@ -25,7 +25,7 @@
 
   "group/settings": {
     "orientation": "inherit",
-    "modules": ["network", "wireplumber"]
+    "modules": ["systemd-failed-units", "network", "wireplumber"]
   },
 
   "clock": {
@@ -71,6 +71,10 @@
     "tooltip-format": "{specific_used:.1f} / {specific_total:.1f} GiB",
     "unit": "GiB",
     "states": { "warn": 80, "crit": 95 }
+  },
+
+  "systemd-failed-units": {
+    "format": ""
   },
 
   "network": {
