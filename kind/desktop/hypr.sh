@@ -10,6 +10,7 @@ symlink -u res/hypr .config/hypr
 symlink -u res/wallpaper.jpg .local/share/wallpaper.jpg
 
 package pipewire pipewire-alsa wireplumber alsa-utils wiremix
+persist -u .local/state/wireplumber
 
 package kitty waybar rofi mako
 symlink -u res/kitty.conf .config/kitty/kitty.conf
