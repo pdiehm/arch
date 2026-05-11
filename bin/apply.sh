@@ -201,6 +201,7 @@ if [[ ! -d $TMP/root/images ]]; then mkdir "$TMP/root/images"; fi
 if [[ ! -d $TMP/root/perm ]]; then btrfs subvolume create "$TMP/root/perm"; fi
 if [[ ! -d $TMP/root/pkgs ]]; then btrfs subvolume create "$TMP/root/pkgs"; fi
 if [[ -d $BUILD ]]; then btrfs subvolume delete --recursive "$BUILD"; fi
+if [[ -n ${CLEAN:+x} && -d $TMP/root/images/$HASH ]]; then btrfs subvolume delete --recursive "$TMP/root/images/$HASH"; fi
 
 if [[ ! -d $TMP/root/images/$HASH ]]; then
   btrfs subvolume create "$BUILD"
@@ -219,7 +220,7 @@ touch "$TMP/root/images/$HASH"
 for ((stage = 0; stage < STAGE; stage++)); do
   hash="$(sha "$HASH+$(sha < "$TMP/stages/$stage/hash")")"
 
-  if [[ ! -d $TMP/root/images/$hash ]]; then
+  if [[ -n ${CLEAN:+x} || ! -d $TMP/root/images/$hash ]]; then
     btrfs subvolume snapshot "$TMP/root/images/$HASH" "$BUILD"
     mount --bind "$BUILD" "$BUILD"
     mount --bind "$TMP/root/pkgs" "$BUILD/var/cache/pacman/pkg"
@@ -228,6 +229,8 @@ for ((stage = 0; stage < STAGE; stage++)); do
     arch-chroot "$BUILD" env -i SHELL=/bin/bash SYSTEMD_IN_CHROOT=1 bash -eu /stage/build.sh
     unmount "$BUILD"
     rmdir "$BUILD/stage"
+
+    if [[ -d $TMP/root/images/$hash ]]; then btrfs subvolume delete --recursive "$TMP/root/images/$hash"; fi
     mv "$BUILD" "$TMP/root/images/$hash"
   fi
 

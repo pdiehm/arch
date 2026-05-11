@@ -222,6 +222,9 @@ _repo() {
 _sm() {
   if ((CURRENT == 2)); then
     _values command help edit rebuild secrets sync upgrade
+  elif [[ ${words[2]} == rebuild ]]; then
+    compset -n 2
+    _arguments "-h[help]" "-c[clean]"
   fi
 }
 

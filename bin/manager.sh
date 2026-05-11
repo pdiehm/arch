@@ -10,12 +10,12 @@ help() {
   echo "Usage: manager.sh <command>"
   echo
   echo "Commands:"
-  echo "  help      Print this help message"
-  echo "  edit      Open editor in configuration repository"
-  echo "  rebuild   Rebuild system configuration"
-  echo "  secrets   Manage secrets"
-  echo "  sync      Sync configuration repository"
-  echo "  upgrade   Upgrade system"
+  echo "  help            Print this help message"
+  echo "  edit            Open editor in configuration repository"
+  echo "  rebuild [-hc]   Rebuild system configuration"
+  echo "  secrets         Manage secrets"
+  echo "  sync            Sync configuration repository"
+  echo "  upgrade         Upgrade system"
 }
 
 edit() {
@@ -23,7 +23,28 @@ edit() {
 }
 
 rebuild() {
-  exec sudo bin/apply.sh "$HOSTNAME"
+  local OPTIND OPTARG opt
+  local help=0 clean=0
+
+  while getopts "hc" opt; do
+    case "$opt" in
+      h) help=1 ;;
+      c) clean=1 ;;
+      *) fatal "Invalid option: -$opt" ;;
+    esac
+  done
+
+  if ((help)); then
+    echo "Usage: manager.sh rebuild [-hc]"
+    echo
+    echo "Options:"
+    echo "  -h   Print this help message"
+    echo "  -c   Clean rebuild"
+    return
+  fi
+
+  if ((clean)); then export CLEAN=1; fi
+  exec sudo --preserve-env=CLEAN bin/apply.sh "$HOSTNAME"
 }
 
 secrets() {
@@ -263,7 +284,7 @@ fi
 case "$1" in
   help) help ;;
   edit) edit ;;
-  rebuild) rebuild ;;
+  rebuild) rebuild "${@:2}" ;;
   secrets) secrets ;;
   sync) sync ;;
   upgrade) upgrade ;;
