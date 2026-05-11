@@ -34,12 +34,15 @@
       { "Title": "Hetzner", "URL": "https://console.hetzner.cloud", "Placement": "menu" },
       { "Title": "Hyprland Wiki", "URL": "https://wiki.hypr.land", "Placement": "menu" },
       { "Title": "Monkeytype", "URL": "https://monkeytype.com", "Placement": "menu" },
+      { "Title": "Nerdfonts", "URL": "https://nerdfonts.com/cheat-sheet", "Placement": "menu" },
       { "Title": "Netflix", "URL": "https://netflix.com", "Placement": "menu" },
       { "Title": "Nix Manual", "URL": "https://nix.dev/manual/nix/stable", "Placement": "menu" },
       { "Title": "NixOS Manual", "URL": "https://nixos.org/manual/nixos/stable", "Placement": "menu" },
       { "Title": "Nixpkgs Manual", "URL": "https://nixos.org/manual/nixpkgs/stable", "Placement": "menu" },
       { "Title": "PayPal", "URL": "https://paypal.com", "Placement": "menu" },
-      { "Title": "Sparkasse", "URL": "https://sparkasse-mainfranken.de", "Placement": "menu" }
+      { "Title": "Sparkasse", "URL": "https://sparkasse-mainfranken.de", "Placement": "menu" },
+      { "Title": "Unicode Table", "URL": "https://symbl.cc/en/unicode-table/", "Placement": "menu" },
+      { "Title": "Waybar Wiki", "URL": "https://github.com/Alexays/Waybar/wiki/Configuration", "Placement": "menu" }
     ],
 
     "ExtensionSettings": {
