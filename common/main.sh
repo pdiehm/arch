@@ -25,6 +25,10 @@ copy -s -m 444 "ssh/$HOST_NAME/auth" /etc/ssh/authorized_keys
 run systemctl mask sshdgenkeys.service
 run systemctl enable sshd.service
 
+copy res/systemd/system/gc.timer /etc/systemd/system/gc.timer
+copy res/systemd/system/gc.service /etc/systemd/system/gc.service
+run systemctl enable gc.timer
+
 package \
   man-db man-pages \
   bat eza fd ripgrep pv fzf parallel \
