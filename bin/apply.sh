@@ -30,7 +30,7 @@ command_not_found_handle() {
 
 # error <message>
 error() {
-  echo "[ERROR] $*" >&2
+  printf "[\e[31mERROR\e[m] %s\n" "$*" >&2
 
   for ((src = 0; src < ${#FUNCNAME[@]} - 1; src++)); do
     if [[ ${BASH_SOURCE[src + 1]} == "$0" ]]; then continue; fi

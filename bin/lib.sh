@@ -1,12 +1,12 @@
 # fatal <message>
 fatal() {
-  echo "[ERROR] $*" >&2
+  printf "[\e[31mERROR\e[m] %s\n" "$*" >&2
   exit 1
 }
 
 # warn <message>
 warn() {
-  echo "[WARNING] $*" >&2
+  printf "[\e[33mWARNING\e[m] %s\n" "$*" >&2
 }
 
 # sha [data ...]
