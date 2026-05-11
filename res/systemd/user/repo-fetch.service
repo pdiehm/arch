@@ -1,0 +1,6 @@
+[Unit]
+Description=Fetch repos
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/repo fetch

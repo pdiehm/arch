@@ -4,6 +4,9 @@ import ./nvim
 import ./ssh
 import ./yubikey
 
+write -a /etc/fstab "tmpfs /home/pascal/Temp tmpfs defaults 0 0"
+persist -u /home/pascal/Repos
+
 symlink -u res/systemd/user .config/systemd/user
 persist -u .local/share/systemd
 

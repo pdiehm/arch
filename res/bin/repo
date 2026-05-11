@@ -1,0 +1,305 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+shopt -s nullglob
+cd ~/Repos
+
+fatal() {
+  printf "[\e[31mERROR\e[m] %s\n" "$*" >&2
+  exit 1
+}
+
+git-url() {
+  if ! git remote get-url origin 2> /dev/null; then
+    printf "local\n"
+  fi
+}
+
+git-head() {
+  if git rev-parse HEAD &> /dev/null; then
+    git rev-parse --abbrev-ref HEAD
+  else
+    printf "NULL\n"
+  fi
+}
+
+git-branches() {
+  git for-each-ref --format "%(refname:short)" refs/heads
+}
+
+git-status() {
+  if [[ -n "$(git status --porcelain)" ]]; then printf "change\n"; fi
+  if [[ -n "$(git stash list)" ]]; then printf "stash\n"; fi
+
+  local branch ahead behind
+  while read -r branch; do
+    if git rev-parse "$branch@{upstream}" &> /dev/null; then
+      ahead="$(git rev-list --count "$branch@{upstream}..$branch")"
+      behind="$(git rev-list --count "$branch..$branch@{upstream}")"
+
+      if ((ahead > 0 && behind > 0)); then
+        printf "diverged %s\n" "$branch"
+      elif ((ahead > 0)); then
+        printf "ahead %s\n" "$branch"
+      elif ((behind > 0)); then
+        printf "behind %s\n" "$branch"
+      else
+        printf "sync %s\n" "$branch"
+      fi
+    else
+      printf "local %s\n" "$branch"
+    fi
+  done < <(git-branches)
+}
+
+conflict() {
+  git status
+  read -rp "Press enter to open editor..."
+  "$EDITOR" .
+}
+
+help() {
+  echo "Usage: repo <command> [args ...]"
+  echo
+  echo "Commands:"
+  echo "  help                    Print this help message"
+  echo "  clone <url> [name]      Clone repo"
+  echo "  edit <name> [path]      Open editor in repo"
+  echo "  fetch [name]            Fetch repo(s)"
+  echo "  list                    List repos"
+  echo "  remove <name>           Remove repo"
+  echo "  run <name> <cmd ...>    Run command in repo"
+  echo "  shell <name> [path]     Open shell in repo"
+  echo "  status [name]           Print status of repo(s)"
+  echo "  update [name]           Update repo(s)"
+}
+
+clone() {
+  local url="$1" name="${2:-}"
+
+  if [[ -z $name ]]; then
+    git clone "$url"
+  else
+    git clone "$url" "$name"
+  fi
+}
+
+edit() {
+  local name="$1" path="${2:-.}"
+
+  if [[ ! -d $name ]]; then fatal "Repo '$name' not found"; fi
+  cd "$name"
+
+  if [[ -d $path ]]; then
+    cd "$path"
+    exec "$EDITOR" .
+  elif [[ -e $path ]]; then
+    cd "$(dirname "$path")"
+    exec "$EDITOR" "$(basename "$path")"
+  else
+    fatal "Path '$path' not found"
+  fi
+}
+
+fetch() {
+  local name="${1:-}"
+
+  if [[ -z $name ]]; then
+    for name in *; do fetch "$name"; done
+  elif [[ ! -d $name ]]; then
+    fatal "Repo '$name' not found"
+  else
+    git -C "$name" fetch
+  fi
+}
+
+list() {
+  for repo in *; do
+    cd "$repo"
+
+    local url head
+    url="$(git-url)"
+    head="$(git-head)"
+
+    if [[ $head == NULL ]]; then
+      printf "\e[1;34m%s \e[0;31m%s \e[0;2m%s\e[m\n" "$repo" "N/A" "$url"
+    elif [[ $head == HEAD ]]; then
+      printf "\e[1;34m%s \e[0;33m%s \e[0;2m%s\e[m\n" "$repo" "$(git rev-parse --short HEAD)" "$url"
+    else
+      local change=""
+
+      while read -r state _; do
+        case "$state" in
+          change) change="*" ;;
+          stash) if [[ -z $change ]]; then change="~"; fi ;;
+          diverged | ahead | behind | local) if [[ $change != "*" ]]; then change="+"; fi ;;
+        esac
+      done < <(git-status)
+
+      printf "\e[1;34m%s \e[0;32m%s\e[0;36m%s \e[0;2m%s\e[m\n" "$repo" "$head" "$change" "$url"
+    fi
+
+    cd ..
+  done | column -t
+}
+
+remove() {
+  local name="$1"
+
+  if [[ ! -d $name ]]; then fatal "Repo '$name' not found"; fi
+  cd "$name"
+
+  local changes=()
+  while read -r state branch; do
+    case "$state" in
+      change) changes+=("Uncommited changes") ;;
+      stash) changes+=("Stashed changes") ;;
+      diverged | ahead) changes+=("Unpushed commits ($branch)") ;;
+      local) changes+=("Local branch ($branch)") ;;
+    esac
+  done < <(git-status)
+
+  if ((${#changes[@]} > 0)); then
+    echo "The repository contains local changes:"
+    printf "  - %s\n" "${changes[@]}"
+    echo
+
+    read -rp "Are you sure you want to remove this repository? [y/N] " read
+    if [[ $read != y ]]; then exit 1; fi
+  fi
+
+  cd ..
+  rm -rf "$name"
+}
+
+run() {
+  local name="$1" cmd=("${@:2}")
+
+  if [[ ! -d $name ]]; then fatal "Repo '$name' not found"; fi
+  cd "$name"
+
+  if (($# < 2)); then fatal "Usage: repo run <name> <cmd ...>"; fi
+  exec "${cmd[@]}"
+}
+
+shell() {
+  local name="$1" path="${2:-.}"
+
+  if [[ ! -d $name ]]; then fatal "Repo '$name' not found"; fi
+  cd "$name"
+
+  if [[ ! -d $path ]]; then fatal "Path '$path' not found"; fi
+  cd "$path"
+
+  exec "$SHELL"
+}
+
+status() {
+  local name="${1:-}"
+
+  if [[ -z $name ]]; then
+    local div=0
+
+    for name in *; do
+      if ((div)); then printf "\n\n\n"; fi
+      status "$name"
+      div=1
+    done
+
+    return
+  fi
+
+  if [[ ! -d $name ]]; then fatal "Repo '$name' not found"; fi
+  cd "$name"
+
+  local url head
+  url="$(git-url)"
+  head="$(git-head)"
+
+  if [[ $head == NULL ]]; then
+    printf "\e[1mRepo: \e[34m%s \e[m(\e[31m%s\e[m, \e[2m%s\e[m)\n\n" "$name" "empty" "$url"
+  elif [[ $head == HEAD ]]; then
+    printf "\e[1mRepo: \e[34m%s \e[m(\e[33m%s\e[m, \e[2m%s\e[m)\n\n" "$name" "$(git rev-parse --short HEAD)" "$url"
+  else
+    printf "\e[1mRepo: \e[34m%s \e[m(\e[32m%s\e[m, \e[2m%s\e[m)\n\n" "$name" "$head" "$url"
+  fi
+
+  git-status | while read -r state branch; do
+    if [[ -n $branch ]]; then
+      read -r hash message <<< "$(git show --oneline --no-patch "$branch")"
+      printf "\e[32m%s \e[36m%s \e[33m%s \e[m%s\n" "$branch" "$state" "$hash" "$message"
+    fi
+  done | column -ts $'\x09'
+
+  if [[ -n "$(git stash list)" ]]; then
+    echo
+    git stash list --oneline
+  fi
+
+  if [[ -n "$(git status --porcelain)" ]]; then
+    echo
+    git status --short
+  fi
+
+  cd ..
+}
+
+update() {
+  local name="${1:-}"
+
+  if [[ -z $name ]]; then
+    for name in *; do update "$name"; done
+    return
+  fi
+
+  if [[ ! -d $name ]]; then fatal "Repo '$name' not found"; fi
+  cd "$name"
+  git fetch
+
+  local stashed=0
+  if [[ -n "$(git status --porcelain)" ]]; then
+    stashed=1
+    git stash push --include-untracked
+  fi
+
+  local head
+  head="$(git-head)"
+  if [[ $head == HEAD ]]; then head="$(git rev-parse HEAD)"; fi
+
+  git-branches | while read -r branch; do
+    if ! git rev-parse "$branch@{upstream}" &> /dev/null; then continue; fi
+    git checkout "$branch"
+
+    if [[ -n "$(git status --porcelain)" ]]; then
+      git stash push --include-untracked
+      git pull || conflict
+      git stash pop || conflict
+    else
+      git pull || conflict
+    fi
+  done
+
+  if [[ $head != NULL ]]; then git checkout "$head"; fi
+  if ((stashed)); then git stash pop || conflict; fi
+
+  cd ..
+}
+
+if (($# == 0)); then
+  help
+  exit 1
+fi
+
+case "$1" in
+  help) help ;;
+  clone) clone "${@:2}" ;;
+  edit) edit "${@:2}" ;;
+  fetch) fetch "${@:2}" ;;
+  list) list ;;
+  remove) remove "${@:2}" ;;
+  run) run "${@:2}" ;;
+  shell) shell "${@:2}" ;;
+  status) status "${@:2}" ;;
+  update) update "${@:2}" ;;
+  *) fatal "Unknown command: $1" ;;
+esac

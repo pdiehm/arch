@@ -1,4 +1,4 @@
-# shellcheck disable=SC1094,SC2016,SC2034,SC2140,SC2155,SC2164
+# shellcheck disable=SC1094,SC2016,SC2034,SC2140,SC2154,SC2155,SC2164
 
 setopt PROMPT_SUBST
 PROMPT='%F{4}%~%f$(_prompt_git) %F{%(?.5.1)}$(_prompt_char)%f '
@@ -171,6 +171,54 @@ compdef _files mkcd
 compdef _sm sm
 compdef '_arguments ":cmd:_command_names" "*::args:_normal"' watch
 compdef _xh xhs
+
+if [[ $HOSTKIND == desktop ]]; then
+  compdef _repo repo
+fi
+
+_repo() {
+  local repos=(~/Repos/*)
+
+  if ((CURRENT == 2)); then
+    _values command help clone edit fetch list remove run shell status update
+  elif [[ ${words[2]} == edit ]]; then
+    if ((CURRENT == 3)); then
+      if ((${#repos[@]} > 0)); then _values name "${repos[@]##*/}"; fi
+    elif ((CURRENT == 4)); then
+      _files -W "$HOME/Repos/${words[3]}"
+    fi
+  elif [[ ${words[2]} == fetch ]]; then
+    if ((CURRENT == 3)); then
+      if ((${#repos[@]} > 0)); then _values name "${repos[@]##*/}"; fi
+    fi
+  elif [[ ${words[2]} == remove ]]; then
+    if ((CURRENT == 3)); then
+      if ((${#repos[@]} > 0)); then _values name "${repos[@]##*/}"; fi
+    fi
+  elif [[ ${words[2]} == run ]]; then
+    if ((CURRENT == 3)); then
+      if ((${#repos[@]} > 0)); then _values name "${repos[@]##*/}"; fi
+    else
+      words=("${words[4]}" "${words[5,-1]}")
+      CURRENT=$((CURRENT - 3))
+      _normal
+    fi
+  elif [[ ${words[2]} == shell ]]; then
+    if ((CURRENT == 3)); then
+      if ((${#repos[@]} > 0)); then _values name "${repos[@]##*/}"; fi
+    elif ((CURRENT == 4)); then
+      _files -/ -W "$HOME/Repos/${words[3]}"
+    fi
+  elif [[ ${words[2]} == status ]]; then
+    if ((CURRENT == 3)); then
+      if ((${#repos[@]} > 0)); then _values name "${repos[@]##*/}"; fi
+    fi
+  elif [[ ${words[2]} == update ]]; then
+    if ((CURRENT == 3)); then
+      if ((${#repos[@]} > 0)); then _values name "${repos[@]##*/}"; fi
+    fi
+  fi
+}
 
 _sm() {
   if ((CURRENT == 2)); then
