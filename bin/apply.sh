@@ -45,7 +45,7 @@ resolve() {
   local path="$1"
 
   if [[ $path == - ]]; then
-    printf /dev/stdin
+    printf "/dev/stdin"
   elif [[ $path == ./* ]]; then
     path="$(dirname "$MODULE")/${path#./}"
     printf "%s" "${path#./}"
@@ -217,7 +217,7 @@ fi
 
 touch "$TMP/root/images/$HASH"
 for ((stage = 0; stage < STAGE; stage++)); do
-  hash="$(sha "$HASH->$(sha < "$TMP/stages/$stage/hash")")"
+  hash="$(sha "$HASH+$(sha < "$TMP/stages/$stage/hash")")"
 
   if [[ ! -d $TMP/root/images/$hash ]]; then
     btrfs subvolume snapshot "$TMP/root/images/$HASH" "$BUILD"
