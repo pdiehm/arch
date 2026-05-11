@@ -170,6 +170,7 @@ compdef _files ed
 compdef _files mkcd
 compdef _sm sm
 compdef '_arguments ":cmd:_command_names" "*::args:_normal"' watch
+compdef _nothing wp-toggle
 compdef _xh xhs
 
 if [[ $HOSTKIND == desktop ]]; then
