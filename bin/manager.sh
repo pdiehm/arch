@@ -7,7 +7,7 @@ cd "$(dirname "$(realpath "$0")")/.."
 source bin/lib.sh
 
 help() {
-  echo "Usage: manager.sh <command> [args ...]"
+  echo "Usage: manager.sh <command>"
   echo
   echo "Commands:"
   echo "  help      Print this help message"
@@ -33,13 +33,13 @@ secrets() {
   TMP="$(mktemp -d)"
   chmod 700 "$TMP"
 
-  declare -A SECRETS=()
-  KEYS=()
+  local -A secrets=()
+  local keys=()
 
   if [[ -f secrets/master && -f /var/lib/syscfg/master ]]; then
-    SECRETS["keys/master"]="$(< /var/lib/syscfg/master)"
+    secrets["keys/master"]="$(< /var/lib/syscfg/master)"
 
-    if ! load_secrets secrets/master "$TMP/secrets" "${SECRETS["keys/master"]}"; then
+    if ! load_secrets secrets/master "$TMP/secrets" "${secrets["keys/master"]}"; then
       warn "Stale master password"
     fi
   fi
@@ -48,9 +48,9 @@ secrets() {
     read -rsp "Enter master password: " read
     echo
 
-    SECRETS["keys/master"]="$(encode_secret "$read")"
+    secrets["keys/master"]="$(encode_secret "$read")"
     if [[ -f secrets/master ]]; then
-      if ! load_secrets secrets/master "$TMP/secrets" "${SECRETS["keys/master"]}"; then
+      if ! load_secrets secrets/master "$TMP/secrets" "${secrets["keys/master"]}"; then
         fatal "Incorrect master password"
       fi
     fi
@@ -58,51 +58,51 @@ secrets() {
 
   if [[ -f $TMP/secrets ]]; then
     while read -r key value; do
-      SECRETS[$key]="$value"
-      KEYS+=("$key")
+      secrets[$key]="$value"
+      keys+=("$key")
     done < "$TMP/secrets"
 
     rm "$TMP/secrets"
   fi
 
-  declare -A ACCESS=()
-  HOSTS=()
+  local -A access=()
+  local hosts=()
 
   for host in secrets/*; do
     host="${host##*/}"
 
     if [[ $host == master ]]; then continue; fi
-    HOSTS+=("$host")
+    hosts+=("$host")
 
-    if [[ -z ${SECRETS["keys/$host"]+x} ]]; then
+    if [[ -z ${secrets["keys/$host"]+x} ]]; then
       warn "No key for host '$host', skipping..."
       continue
     fi
 
-    if ! load_secrets "secrets/$host" "$TMP/secrets" "${SECRETS["keys/$host"]}"; then
+    if ! load_secrets "secrets/$host" "$TMP/secrets" "${secrets["keys/$host"]}"; then
       warn "Failed to load secrets for host '$host', skipping..."
       continue
     fi
 
     while read -r key value; do
-      if [[ -z ${SECRETS[$key]+x} ]]; then
+      if [[ -z ${secrets[$key]+x} ]]; then
         warn "Secret '$key' for host '$host' not in master, skipping..."
         continue
       fi
 
-      ACCESS[$key]+="$host "
+      access[$key]+="$host "
     done < "$TMP/secrets"
 
     rm "$TMP/secrets"
   done
 
-  printf "HOSTS %s\n" "${HOSTS[*]}" > "$TMP/edit"
-  printf "MASTER %s\n" "${ACCESS["keys/master"]:-}" >> "$TMP/edit"
+  printf "HOSTS %s\n" "${hosts[*]}" > "$TMP/edit"
+  printf "MASTER %s\n" "${access["keys/master"]:-}" >> "$TMP/edit"
 
-  for key in "${KEYS[@]}"; do
+  for key in "${keys[@]}"; do
     if [[ $key == keys/* ]]; then continue; fi
-    printf "\nSECRET %s %s\n" "$key" "${ACCESS[$key]:-}" >> "$TMP/edit"
-    printf "%s\nEOF\n" "$(decode_secret "${SECRETS[$key]}")" >> "$TMP/edit"
+    printf "\nSECRET %s %s\n" "$key" "${access[$key]:-}" >> "$TMP/edit"
+    printf "%s\nEOF\n" "$(decode_secret "${secrets[$key]}")" >> "$TMP/edit"
   done
 
   while true; do
@@ -112,16 +112,12 @@ secrets() {
 
     rm -rf "$TMP/secrets"
     mkdir "$TMP/secrets"
-    printf "keys/master %s\n" "${SECRETS["keys/master"]}" > "$TMP/secrets/master"
+    printf "keys/master %s\n" "${secrets["keys/master"]}" > "$TMP/secrets/master"
 
-    NAME=""
-    HOSTS=()
-    VALUE=()
-    ERROR=""
-
+    local error="" name="" hosts=() value=()
     while read -r line; do
-      if [[ -n $NAME && $line != EOF ]]; then
-        VALUE+=("$line")
+      if [[ -n $name && $line != EOF ]]; then
+        value+=("$line")
         continue
       fi
 
@@ -132,18 +128,18 @@ secrets() {
         HOSTS)
           for host in "${cmd[@]:1}"; do
             if [[ $host == master ]]; then
-              ERROR="Host name 'master' is reserved"
+              error="Host name 'master' is reserved"
             elif [[ $host =~ [^a-zA-Z0-9-] ]]; then
-              ERROR="Host name '$host' contains invalid characters"
+              error="Host name '$host' contains invalid characters"
             elif [[ -f $TMP/secrets/$host ]]; then
-              ERROR="Duplicate host name '$host'"
+              error="Duplicate host name '$host'"
             else
-              if [[ -z ${SECRETS["keys/$host"]+x} ]]; then
-                SECRETS["keys/$host"]="$(head -c 32 /dev/urandom | encode_secret)"
+              if [[ -z ${secrets["keys/$host"]+x} ]]; then
+                secrets["keys/$host"]="$(head -c 32 /dev/urandom | encode_secret)"
               fi
 
-              printf "keys/%s %s\n" "$host" "${SECRETS["keys/$host"]}" >> "$TMP/secrets/master"
-              printf "keys/%s %s\n" "$host" "${SECRETS["keys/$host"]}" > "$TMP/secrets/$host"
+              printf "keys/%s %s\n" "$host" "${secrets["keys/$host"]}" >> "$TMP/secrets/master"
+              printf "keys/%s %s\n" "$host" "${secrets["keys/$host"]}" > "$TMP/secrets/$host"
             fi
           done
           ;;
@@ -151,63 +147,63 @@ secrets() {
         MASTER)
           for host in "${cmd[@]:1}"; do
             if [[ ! -f $TMP/secrets/$host ]]; then
-              ERROR="Host '$host' not in hosts list"
+              error="Host '$host' not in hosts list"
             else
-              printf "keys/master %s\n" "${SECRETS["keys/master"]}" >> "$TMP/secrets/$host"
+              printf "keys/master %s\n" "${secrets["keys/master"]}" >> "$TMP/secrets/$host"
             fi
           done
           ;;
 
         SECRET)
-          NAME="${cmd[1]:-}"
+          name="${cmd[1]:-}"
 
-          if [[ -z $NAME ]]; then
-            ERROR="SECRET command requires a name"
-          elif [[ $NAME == keys/* ]]; then
-            ERROR="Secret name cannot start with 'keys/'"
-          elif [[ $NAME =~ [^a-zA-Z0-9/_-] ]]; then
-            ERROR="Secret name '$NAME' contains invalid characters"
+          if [[ -z $name ]]; then
+            error="SECRET command requires a name"
+          elif [[ $name == keys/* ]]; then
+            error="Secret name cannot start with 'keys/'"
+          elif [[ $name =~ [^a-zA-Z0-9/_-] ]]; then
+            error="Secret name '$name' contains invalid characters"
           else
-            HOSTS=("${cmd[@]:2}")
-            VALUE=()
+            hosts=("${cmd[@]:2}")
+            value=()
           fi
           ;;
 
         EOF)
-          if [[ -z $NAME ]]; then
-            ERROR="Unexpected EOF"
+          if [[ -z $name ]]; then
+            error="Unexpected EOF"
           else
-            value="$(IFS=$'\n' && encode_secret "${VALUE[*]}")"
+            text="$(IFS=$'\n' && encode_secret "${value[*]}")"
 
-            for host in master "${HOSTS[@]}"; do
+            for host in master "${hosts[@]}"; do
               if [[ ! -f $TMP/secrets/$host ]]; then
-                ERROR="Host '$host' not in hosts list"
+                error="Host '$host' not in hosts list"
               else
-                printf "%s %s\n" "$NAME" "$value" >> "$TMP/secrets/$host"
+                printf "%s %s\n" "$name" "$text" >> "$TMP/secrets/$host"
               fi
             done
 
-            NAME=""
+            name=""
           fi
           ;;
 
-        *) ERROR="Unknown command: ${cmd[0]}" ;;
+        *) error="Unknown command: ${cmd[0]}" ;;
       esac
 
-      if [[ -n $ERROR ]]; then
+      if [[ -n $error ]]; then
         break
       fi
     done < "$TMP/edit"
 
-    if [[ -z $ERROR ]]; then
-      if [[ -n $NAME ]]; then
-        ERROR="Unexpected end of file while reading secret '$NAME'"
+    if [[ -z $error ]]; then
+      if [[ -n $name ]]; then
+        error="Unexpected end of file while reading secret '$name'"
       else
         break
       fi
     fi
 
-    warn "$ERROR"
+    warn "$error"
     read -rp "Press enter to continue..."
   done
 
@@ -216,7 +212,7 @@ secrets() {
 
   for host in "$TMP/secrets"/*; do
     host="${host##*/}"
-    save_secrets "$TMP/secrets/$host" "secrets/$host" "${SECRETS["keys/$host"]}"
+    save_secrets "$TMP/secrets/$host" "secrets/$host" "${secrets["keys/$host"]}"
   done
 
   chmod 400 secrets/*
@@ -236,23 +232,23 @@ upgrade() {
   chmod 700 "$TMP"
 
   mount --mkdir --label root "$TMP/root"
-  HASH="$(readlink "$TMP/root/latest")"
-  HASH="$(sha "${HASH##*/}++")"
+  hash="$(readlink "$TMP/root/latest")"
+  hash="$(sha "${hash##*/}++")"
 
-  BUILD="$TMP/root/build"
-  if [[ -d $BUILD ]]; then btrfs subvolume delete --recursive "$BUILD"; fi
+  local build="$TMP/root/build"
+  if [[ -d $build ]]; then btrfs subvolume delete --recursive "$build"; fi
 
-  btrfs subvolume snapshot "$TMP/root/latest" "$BUILD"
-  mount --bind "$BUILD" "$BUILD"
-  mount --bind "$TMP/root/pkgs" "$BUILD/var/cache/pacman/pkg"
-  arch-chroot "$BUILD" bash -eu /var/lib/syscfg/upgrade.sh
+  btrfs subvolume snapshot "$TMP/root/latest" "$build"
+  mount --bind "$build" "$build"
+  mount --bind "$TMP/root/pkgs" "$build/var/cache/pacman/pkg"
+  arch-chroot "$build" bash -eu /var/lib/syscfg/upgrade.sh
 
-  touch "$BUILD"
-  unmount "$BUILD"
-  mv "$BUILD" "$TMP/root/images/$HASH"
+  touch "$build"
+  unmount "$build"
+  mv "$build" "$TMP/root/images/$hash"
 
   rm -f "$TMP/root/latest"
-  ln -s "images/$HASH" "$TMP/root/latest"
+  ln -s "images/$hash" "$TMP/root/latest"
 
   mount --mkdir --label BOOT "$TMP/boot"
   find "$TMP/boot" -delete
