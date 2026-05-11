@@ -57,7 +57,7 @@ fi
 wipefs --all "$DISK"
 printf "%s\n" "${CFG[@]}" | sfdisk "$DISK"
 
-while [[ -z ${PARTS[1]+x} ]]; do
+while [[ -z ${PARTS[1]:+x} ]]; do
   mapfile -t PARTS < <(lsblk --noheadings --paths --output KNAME "$DISK")
 done
 

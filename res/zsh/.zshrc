@@ -74,7 +74,7 @@ _prompt_char() {
 }
 
 _prompt_host() {
-  if [[ -n "${SSH_TTY:+x}" ]]; then
+  if [[ -n ${SSH_TTY:+x} ]]; then
     printf "%%F{14}%%n@%%M%%f"
   fi
 }

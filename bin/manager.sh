@@ -74,7 +74,7 @@ secrets() {
     if [[ $host == master ]]; then continue; fi
     hosts+=("$host")
 
-    if [[ -z ${secrets["keys/$host"]+x} ]]; then
+    if [[ -z ${secrets["keys/$host"]:+x} ]]; then
       warn "No key for host '$host', skipping..."
       continue
     fi
@@ -85,7 +85,7 @@ secrets() {
     fi
 
     while read -r key value; do
-      if [[ -z ${secrets[$key]+x} ]]; then
+      if [[ -z ${secrets[$key]:+x} ]]; then
         warn "Secret '$key' for host '$host' not in master, skipping..."
         continue
       fi
@@ -134,7 +134,7 @@ secrets() {
             elif [[ -f $TMP/secrets/$host ]]; then
               error="Duplicate host name '$host'"
             else
-              if [[ -z ${secrets["keys/$host"]+x} ]]; then
+              if [[ -z ${secrets["keys/$host"]:+x} ]]; then
                 secrets["keys/$host"]="$(head -c 32 /dev/urandom | encode_secret)"
               fi
 

@@ -53,7 +53,7 @@ resolve_host() {
   local name="$1" line head
 
   while IFS=, read -ra line; do
-    if [[ -z ${head+x} ]]; then
+    if [[ -z ${head:+x} ]]; then
       head=("${line[@]}")
     elif [[ ${line[0]} == "$name" ]]; then
       local key
