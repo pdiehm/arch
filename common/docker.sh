@@ -7,5 +7,5 @@ write /etc/sysctl.d/docker.conf "net.ipv4.ip_forward = 1"
 
 if [[ $HOST_KIND == desktop ]]; then
   run systemctl enable docker.socket
-  copy res/systemd/system/docker.service /etc/systemd/system/docker.service.d/override.conf
+  copy res/systemd/system/docker.conf /etc/systemd/system/docker.service.d/override.conf
 fi
