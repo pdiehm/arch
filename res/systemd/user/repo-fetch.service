@@ -3,4 +3,5 @@ Description=Fetch repos
 
 [Service]
 Type=oneshot
+ExecStartPre=/usr/bin/sh -c "until ping -c 1 github.com; do sleep 1; done"
 ExecStart=%h/.local/bin/repo fetch
