@@ -10,12 +10,12 @@ help() {
   echo "Usage: manager.sh <command>"
   echo
   echo "Commands:"
-  echo "  help            Print this help message"
-  echo "  edit            Open editor in configuration repository"
-  echo "  rebuild [-hc]   Rebuild system configuration"
-  echo "  secrets         Manage secrets"
-  echo "  sync            Sync configuration repository"
-  echo "  upgrade         Upgrade system"
+  echo "  help             Print this help message"
+  echo "  edit             Open editor in configuration repository"
+  echo "  rebuild [-hcd]   Rebuild system configuration"
+  echo "  secrets          Manage secrets"
+  echo "  sync             Sync configuration repository"
+  echo "  upgrade          Upgrade system"
 }
 
 edit() {
@@ -24,27 +24,34 @@ edit() {
 
 rebuild() {
   local OPTIND OPTARG opt
-  local help=0 clean=0
+  local help=0 clean=0 dry=0
 
-  while getopts "hc" opt; do
+  while getopts "hcd" opt; do
     case "$opt" in
       h) help=1 ;;
       c) clean=1 ;;
+      d) dry=1 ;;
       *) fatal "Invalid option: -$opt" ;;
     esac
   done
 
   if ((help)); then
-    echo "Usage: manager.sh rebuild [-hc]"
+    echo "Usage: manager.sh rebuild [-hcd]"
     echo
     echo "Options:"
     echo "  -h   Print this help message"
     echo "  -c   Clean rebuild"
+    echo "  -d   Dry mode"
     return
   fi
 
+  if ((clean + dry > 1)); then
+    fatal "Options '-c' and '-d' are mutually exclusive"
+  fi
+
   if ((clean)); then export CLEAN=1; fi
-  exec sudo --preserve-env=CLEAN bin/apply.sh "$HOSTNAME"
+  if ((dry)); then export DRY=1; fi
+  exec sudo --preserve-env=CLEAN --preserve-env=DRY bin/apply.sh "$HOSTNAME"
 }
 
 secrets() {

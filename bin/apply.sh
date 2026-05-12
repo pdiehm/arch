@@ -192,6 +192,11 @@ PHASE="declare" import main
 PHASE="define" import main
 PHASE="build" import main
 
+if [[ -n ${DRY+x} ]]; then
+  (cd "$TMP" && bash)
+  exit
+fi
+
 mount --mkdir --label root "$TMP/root"
 BUILD="$TMP/root/build"
 HASH="$(sha base)"
