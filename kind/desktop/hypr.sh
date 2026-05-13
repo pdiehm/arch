@@ -11,6 +11,7 @@ symlink -u res/wallpaper.jpg .local/share/wallpaper.jpg
 
 package pipewire pipewire-alsa wireplumber alsa-utils wiremix
 persist -u .local/state/wireplumber
+symlink -u res/bin/wp-toggle.sh .local/bin/wp-toggle
 
 package kitty waybar rofi mako
 symlink -u res/kitty.conf .config/kitty/kitty.conf

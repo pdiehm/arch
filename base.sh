@@ -291,4 +291,4 @@ git --git-dir .config/syscfg/.git remote set-url origin git@github.com:pdiehm/ar
 EOF
 
 persist -u .config/syscfg
-symlink -u res/bin .local/bin
+symlink -u bin/manager.sh .local/bin/sm
