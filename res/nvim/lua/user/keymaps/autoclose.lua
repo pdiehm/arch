@@ -2,7 +2,7 @@ local function map(key, fn)
   vim.keymap.set("i", key, function()
     local line = vim.api.nvim_get_current_line()
     local col = vim.api.nvim_win_get_cursor(0)[2]
-    return fn(line:sub(col, col + 1), line:sub(1, col), line:sub(col + 1))
+    return fn(line:sub(col, col + 1), line:sub(1, col), line:sub(col + 2))
   end, { expr = true })
 end
 
@@ -54,6 +54,16 @@ for open, close in pairs({ ["("] = ")", ["["] = "]", ["{"] = "}" }) do
       return "<Right>"
     else
       return close
+    end
+  end)
+end
+
+for _, char in pairs({ ",", ";" }) do
+  map(char, function(pair)
+    if vim.list_contains({ "()", "[]", "{}" }, pair) then
+      return "<Right>" .. char .. "<Left><Left>"
+    else
+      return char
     end
   end)
 end
