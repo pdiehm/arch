@@ -60,7 +60,7 @@
         "_name": "Dark Reader",
         "installation_mode": "force_installed",
         "install_url": "https://addons.mozilla.org/firefox/downloads/latest/addon@darkreader.org/latest.xpi",
-        "default_area": "menupanel",
+        "default_area": "navbar",
         "private_browsing": true
       },
 
