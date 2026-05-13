@@ -13,8 +13,8 @@ package pipewire pipewire-alsa wireplumber alsa-utils wiremix
 persist -u .local/state/wireplumber
 symlink -u res/bin/wp-toggle.sh .local/bin/wp-toggle
 
-package kitty waybar rofi mako
-symlink -u res/kitty.conf .config/kitty/kitty.conf
+package alacritty waybar rofi mako
+symlink -u res/alacritty.toml .config/alacritty.toml
 symlink -u res/waybar .config/waybar
 symlink -u res/rofi.rasi .config/rofi/config.rasi
 symlink -u res/mako.conf .config/mako/config
