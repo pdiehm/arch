@@ -81,7 +81,7 @@ _prompt_host() {
 
 alias dog="doggo"
 alias fd="fd --follow --hidden"
-alias l="ls --all --long --group"
+alias l="ls --all --all --long --group"
 alias ls="eza"
 alias lsblk="lsblk --output NAME,TYPE,SIZE,VENDOR,MODEL,PTTYPE,PARTLABEL,PARTTYPENAME,LABEL,FSTYPE,MOUNTPOINTS"
 alias parallel="parallel --group --keep-order"
