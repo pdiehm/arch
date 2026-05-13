@@ -9,9 +9,24 @@ fatal() {
   exit 1
 }
 
+enter() {
+  local name="$1"
+  if [[ ! -d $name ]]; then fatal "Repo '$name' not found"; fi
+  cd "$name"
+}
+
+conflict() {
+  git status
+  read -rp "Press enter to open editor..."
+
+  if ! "$EDITOR" .; then
+    fatal "Editor exited with non-zero status, aborting..."
+  fi
+}
+
 git-url() {
   if ! git remote get-url origin 2> /dev/null; then
-    printf "local\n"
+    printf "local"
   fi
 }
 
@@ -19,8 +34,13 @@ git-head() {
   if git rev-parse HEAD &> /dev/null; then
     git rev-parse --abbrev-ref HEAD
   else
-    printf "NULL\n"
+    printf "NULL"
   fi
+}
+
+git-is-local() {
+  local branch="$1"
+  if git rev-parse "$branch@{upstream}" &> /dev/null; then return 1; else return 0; fi
 }
 
 git-branches() {
@@ -33,29 +53,14 @@ git-status() {
 
   local branch ahead behind
   while read -r branch; do
-    if git rev-parse "$branch@{upstream}" &> /dev/null; then
+    if git-is-local "$branch"; then
+      printf "local 0 0 %s\n" "$branch"
+    else
       ahead="$(git rev-list --count "$branch@{upstream}..$branch")"
       behind="$(git rev-list --count "$branch..$branch@{upstream}")"
-
-      if ((ahead > 0 && behind > 0)); then
-        printf "diverged %s\n" "$branch"
-      elif ((ahead > 0)); then
-        printf "ahead %s\n" "$branch"
-      elif ((behind > 0)); then
-        printf "behind %s\n" "$branch"
-      else
-        printf "sync %s\n" "$branch"
-      fi
-    else
-      printf "local %s\n" "$branch"
+      printf "branch %d %d %s\n" "$ahead" "$behind" "$branch"
     fi
   done < <(git-branches)
-}
-
-conflict() {
-  git status
-  read -rp "Press enter to open editor..."
-  "$EDITOR" .
 }
 
 help() {
@@ -86,9 +91,7 @@ clone() {
 
 edit() {
   local name="$1" path="${2:-.}"
-
-  if [[ ! -d $name ]]; then fatal "Repo '$name' not found"; fi
-  cd "$name"
+  enter "$name"
 
   if [[ -d $path ]]; then
     cd "$path"
@@ -116,8 +119,6 @@ fetch() {
 list() {
   for repo in *; do
     cd "$repo"
-
-    local url head
     url="$(git-url)"
     head="$(git-head)"
 
@@ -126,17 +127,18 @@ list() {
     elif [[ $head == HEAD ]]; then
       printf "\e[1;34m%s \e[0;33m%s \e[0;2m%s\e[m\n" "$repo" "$(git rev-parse --short HEAD)" "$url"
     else
-      local change=""
+      local icon=""
 
-      while read -r state _; do
-        case "$state" in
-          change) change="*" ;;
-          stash) if [[ -z $change ]]; then change="~"; fi ;;
-          diverged | ahead | behind | local) if [[ $change != "*" ]]; then change="+"; fi ;;
+      while read -r type ahead behind _; do
+        case "$type" in
+          change) icon="*" ;;
+          stash) if [[ -z $icon ]]; then icon="~"; fi ;;
+          local) if [[ $icon != "*" ]]; then icon="+"; fi ;;
+          branch) if [[ $icon != "*" ]] && ((ahead > 0 || behind > 0)); then icon="+"; fi ;;
         esac
       done < <(git-status)
 
-      printf "\e[1;34m%s \e[0;32m%s\e[0;36m%s \e[0;2m%s\e[m\n" "$repo" "$head" "$change" "$url"
+      printf "\e[1;34m%s \e[0;32m%s\e[36m%s \e[0;2m%s\e[m\n" "$repo" "$head" "$icon" "$url"
     fi
 
     cd ..
@@ -145,17 +147,15 @@ list() {
 
 remove() {
   local name="$1"
-
-  if [[ ! -d $name ]]; then fatal "Repo '$name' not found"; fi
-  cd "$name"
+  enter "$name"
 
   local changes=()
-  while read -r state branch; do
+  while read -r state ahead behind branch; do
     case "$state" in
       change) changes+=("Uncommited changes") ;;
       stash) changes+=("Stashed changes") ;;
-      diverged | ahead) changes+=("Unpushed commits ($branch)") ;;
       local) changes+=("Local branch ($branch)") ;;
+      branch) if ((ahead > 0)); then changes+=("Unpushed commits ($branch)"); fi ;;
     esac
   done < <(git-status)
 
@@ -174,19 +174,15 @@ remove() {
 
 run() {
   local name="$1" cmd=("${@:2}")
+  if ((${#cmd[@]} == 0)); then fatal "Usage: repo run <name> <cmd ...>"; fi
 
-  if [[ ! -d $name ]]; then fatal "Repo '$name' not found"; fi
-  cd "$name"
-
-  if (($# < 2)); then fatal "Usage: repo run <name> <cmd ...>"; fi
+  enter "$name"
   exec "${cmd[@]}"
 }
 
 shell() {
   local name="$1" path="${2:-.}"
-
-  if [[ ! -d $name ]]; then fatal "Repo '$name' not found"; fi
-  cd "$name"
+  enter "$name"
 
   if [[ ! -d $path ]]; then fatal "Path '$path' not found"; fi
   cd "$path"
@@ -209,10 +205,7 @@ status() {
     return
   fi
 
-  if [[ ! -d $name ]]; then fatal "Repo '$name' not found"; fi
-  cd "$name"
-
-  local url head
+  enter "$name"
   url="$(git-url)"
   head="$(git-head)"
 
@@ -224,31 +217,22 @@ status() {
     printf "\e[1mRepo: \e[34m%s \e[m(\e[32m%s\e[m, \e[2m%s\e[m)\n\n" "$name" "$head" "$url"
   fi
 
-  git-status | while read -r state branch; do
+  local change=0 stash=0
+  while read -r state ahead behind branch; do
     if [[ -n $branch ]]; then
-      local icon=""
-      case "$state" in
-        diverged) icon=$'\u296f' ;;
-        ahead) icon=$'\u2191' ;;
-        behind) icon=$'\u2193' ;;
-        local) icon=$'\u21a5' ;;
-      esac
-
       read -r hash message <<< "$(git show --oneline --no-patch "$branch")"
-      printf "\e[32m%s \e[36m%s \e[33m%s \e[m%s\n" "$branch" "$icon" "$hash" "$message"
     fi
-  done | column -ts $'\x09'
 
-  if [[ -n "$(git stash list)" ]]; then
-    echo
-    git stash list --oneline
-  fi
+    case "$state" in
+      change) change=1 ;;
+      stash) stash=1 ;;
+      local) printf "\e[32m%s\x09\e[36mlocal\x09\e[33m%s \e[m%s\n" "$branch" "$hash" "$message" ;;
+      branch) printf "\e[32m%s\x09\e[36m\u2191\e[m%d \e[36m\u2193\e[m%d\x09\e[33m%s \e[m%s\n" "$branch" "$ahead" "$behind" "$hash" "$message" ;;
+    esac
+  done < <(git-status) > >(column -ts $'\x09')
 
-  if [[ -n "$(git status --porcelain)" ]]; then
-    echo
-    git status --short
-  fi
-
+  if ((stash)); then echo && git stash list --oneline; fi
+  if ((change)); then echo && git status --short; fi
   cd ..
 }
 
@@ -260,22 +244,17 @@ update() {
     return
   fi
 
-  if [[ ! -d $name ]]; then fatal "Repo '$name' not found"; fi
-  cd "$name"
+  enter "$name"
   git fetch
 
-  local stashed=0
-  if [[ -n "$(git status --porcelain)" ]]; then
-    stashed=1
-    git stash push --include-untracked
-  fi
+  stashed="$(git status --porcelain | wc -l)"
+  if ((stashed)); then git stash push --include-untracked; fi
 
-  local head
   head="$(git-head)"
   if [[ $head == HEAD ]]; then head="$(git rev-parse HEAD)"; fi
 
   git-branches | while read -r branch; do
-    if ! git rev-parse "$branch@{upstream}" &> /dev/null; then continue; fi
+    if git-is-local "$branch"; then continue; fi
     git checkout "$branch"
 
     if [[ -n "$(git status --porcelain)" ]]; then
@@ -289,7 +268,6 @@ update() {
 
   if [[ $head != NULL ]]; then git checkout "$head"; fi
   if ((stashed)); then git stash pop || conflict; fi
-
   cd ..
 }
 
