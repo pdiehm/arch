@@ -7,7 +7,7 @@ cd "$(dirname "$(realpath "$0")")/.."
 source bin/lib.sh
 
 if (($# != 1)); then fatal "Usage: apply.sh <host>"; fi
-if ((UID != 0)); then fatal "This script must be run as root"; fi
+if ((UID)); then fatal "This script must be run as root"; fi
 if ! resolve_host "$1"; then fatal "Host '$1' not found"; fi
 
 trap cleanup EXIT
@@ -30,7 +30,7 @@ command_not_found_handle() {
 
 # error <message>
 error() {
-  printf "[\e[31mERROR\e[m] %s\n" "$*" >&2
+  echo -e "[\e[31mERROR\e[m] $*" >&2
 
   for ((src = 0; src < ${#FUNCNAME[@]} - 1; src++)); do
     if [[ ${BASH_SOURCE[src + 1]} == "$0" ]]; then continue; fi
@@ -183,7 +183,7 @@ if [[ ! -f $TMP/secrets ]]; then
     break
   done < "$TMP/master"
 
-  if [[ ! -f $TMP/master ]]; then fatal "No key for host '$HOST_NAME'"; fi
+  if [[ ! -f $TMP/secrets ]]; then fatal "No key for host '$HOST_NAME'"; fi
   rm "$TMP/master"
 fi
 
@@ -192,7 +192,7 @@ PHASE="declare" import main
 PHASE="define" import main
 PHASE="build" import main
 
-if [[ -n ${DRY+x} ]]; then
+if [[ -n ${DRY:+x} ]]; then
   (cd "$TMP" && bash)
   exit
 fi

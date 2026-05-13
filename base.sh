@@ -253,10 +253,10 @@ package() {
 
 # upgrade [command ...]
 upgrade() {
-  if (($# == 0)); then
-    write -a /var/lib/syscfg/upgrade.sh
-  else
+  if (($#)); then
     write -a /var/lib/syscfg/upgrade.sh "${*@Q}"
+  else
+    write -a /var/lib/syscfg/upgrade.sh
   fi
 }
 

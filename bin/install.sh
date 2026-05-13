@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-if ((UID != 0)); then
+if ((UID)); then
   echo "This script must be run as root"
   exit 1
 fi

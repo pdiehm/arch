@@ -5,7 +5,7 @@ shopt -s nullglob
 cd ~/Repos
 
 fatal() {
-  printf "[\e[31mERROR\e[m] %s\n" "$*" >&2
+  echo -e "[\e[31mERROR\e[m] $*" >&2
   exit 1
 }
 
@@ -123,9 +123,9 @@ list() {
     head="$(git-head)"
 
     if [[ $head == NULL ]]; then
-      printf "\e[1;34m%s \e[0;31m%s \e[0;2m%s\e[m\n" "$repo" "N/A" "$url"
+      echo -e "\e[1;34m$repo \e[0;31mN/A \e[0;2m$url\e[m"
     elif [[ $head == HEAD ]]; then
-      printf "\e[1;34m%s \e[0;33m%s \e[0;2m%s\e[m\n" "$repo" "$(git rev-parse --short HEAD)" "$url"
+      echo -e "\e[1;34m$repo \e[0;33m$(git rev-parse --short HEAD) \e[0;2m$url\e[m"
     else
       local icon=""
 
@@ -134,15 +134,15 @@ list() {
           change) icon="*" ;;
           stash) if [[ -z $icon ]]; then icon="~"; fi ;;
           local) if [[ $icon != "*" ]]; then icon="+"; fi ;;
-          branch) if [[ $icon != "*" ]] && ((ahead > 0 || behind > 0)); then icon="+"; fi ;;
+          branch) if [[ $icon != "*" ]] && ((ahead || behind)); then icon="+"; fi ;;
         esac
       done < <(git-status)
 
-      printf "\e[1;34m%s \e[0;32m%s\e[36m%s \e[0;2m%s\e[m\n" "$repo" "$head" "$icon" "$url"
+      echo -e "\e[1;34m$repo \e[0;32m$head\e[36m$icon \e[0;2m$url\e[m"
     fi
 
     cd ..
-  done | column -t
+  done | column --table
 }
 
 remove() {
@@ -155,13 +155,13 @@ remove() {
       change) changes+=("Uncommited changes") ;;
       stash) changes+=("Stashed changes") ;;
       local) changes+=("Local branch ($branch)") ;;
-      branch) if ((ahead > 0)); then changes+=("Unpushed commits ($branch)"); fi ;;
+      branch) if ((ahead)); then changes+=("Unpushed commits ($branch)"); fi ;;
     esac
   done < <(git-status)
 
-  if ((${#changes[@]} > 0)); then
+  if ((${#changes[@]})); then
     echo "The repository contains local changes:"
-    printf "  - %s\n" "${changes[@]}"
+    for change in "${changes[@]}"; do echo "  - $change"; done
     echo
 
     read -rp "Are you sure you want to remove this repository? [y/N] " read
@@ -197,7 +197,7 @@ status() {
     local div=0
 
     for name in *; do
-      if ((div)); then printf "\n\n\n"; fi
+      if ((div)); then echo -e "\n\n"; fi
       status "$name"
       div=1
     done
@@ -210,29 +210,26 @@ status() {
   head="$(git-head)"
 
   if [[ $head == NULL ]]; then
-    printf "\e[1mRepo: \e[34m%s \e[m(\e[31m%s\e[m, \e[2m%s\e[m)\n\n" "$name" "empty" "$url"
+    echo -e "\e[1mRepo: \e[34m$name \e[m(\e[31mempty\e[m, \e[2m$url\e[m)\n"
   elif [[ $head == HEAD ]]; then
-    printf "\e[1mRepo: \e[34m%s \e[m(\e[33m%s\e[m, \e[2m%s\e[m)\n\n" "$name" "$(git rev-parse --short HEAD)" "$url"
+    echo -e "\e[1mRepo: \e[34m$name \e[m(\e[33m$(git rev-parse --short HEAD)\e[m, \e[2m$url\e[m)\n"
   else
-    printf "\e[1mRepo: \e[34m%s \e[m(\e[32m%s\e[m, \e[2m%s\e[m)\n\n" "$name" "$head" "$url"
+    echo -e "\e[1mRepo: \e[34m$name \e[m(\e[32m$head\e[m, \e[2m$url\e[m)\n"
   fi
 
-  local change=0 stash=0
-  while read -r state ahead behind branch; do
+  git-status | while read -r state ahead behind branch; do
     if [[ -n $branch ]]; then
       read -r hash message <<< "$(git show --oneline --no-patch "$branch")"
     fi
 
     case "$state" in
-      change) change=1 ;;
-      stash) stash=1 ;;
-      local) printf "\e[32m%s\x09\e[36mlocal\x09\e[33m%s \e[m%s\n" "$branch" "$hash" "$message" ;;
-      branch) printf "\e[32m%s\x09\e[36m\u2191\e[m%d \e[36m\u2193\e[m%d\x09\e[33m%s \e[m%s\n" "$branch" "$ahead" "$behind" "$hash" "$message" ;;
+      local) echo -e "\e[32m$branch\x09\e[36mlocal\x09\e[33m$hash \e[m$message" ;;
+      branch) echo -e "\e[32m$branch\x09\e[36m\u2191\e[m$ahead \e[36m\u2193\e[m$behind\x09\e[33m$hash \e[m$message" ;;
     esac
-  done < <(git-status) > >(column -ts $'\x09')
+  done | column --table --separator $'\x09'
 
-  if ((stash)); then echo && git stash list --oneline; fi
-  if ((change)); then echo && git status --short; fi
+  if [[ -n "$(git stash list)" ]]; then echo && git stash list --oneline; fi
+  if [[ -n "$(git status --porcelain)" ]]; then echo && git status --short; fi
   cd ..
 }
 

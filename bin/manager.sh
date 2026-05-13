@@ -23,7 +23,7 @@ edit() {
 }
 
 rebuild() {
-  if ((UID != 0)); then exec sudo "$0" rebuild "$@"; fi
+  if ((UID)); then exec sudo "$0" rebuild "$@"; fi
 
   local OPTIND OPTARG opt
   local help=0 clean=0 dry=0
@@ -57,7 +57,7 @@ rebuild() {
 }
 
 secrets() {
-  if ((UID != 0)); then exec sudo "$0" secrets; fi
+  if ((UID)); then exec sudo "$0" secrets; fi
 
   trap 'rm -rf "$TMP"' EXIT
   TMP="$(mktemp -d)"
@@ -255,7 +255,7 @@ sync() {
 }
 
 upgrade() {
-  if ((UID != 0)); then exec sudo "$0" upgrade; fi
+  if ((UID)); then exec sudo "$0" upgrade; fi
 
   trap 'unmount "$TMP/root"; unmount "$TMP/boot"; rm -rf --one-file-system "$TMP"' EXIT
   TMP="$(mktemp -d)"

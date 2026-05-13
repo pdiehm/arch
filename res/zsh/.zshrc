@@ -11,25 +11,25 @@ _prompt_git() {
 
   local branch="$(git rev-parse --abbrev-ref HEAD)"
   if [[ $branch == HEAD ]]; then
-    printf " %%F{3}%s%%f" "$(git rev-parse --short HEAD)"
+    echo -n " %F{3}$(git rev-parse --short HEAD)%f"
   else
-    printf " %%F{8}%s%%f" "$branch"
+    echo -n " %F{8}$branch%f"
   fi
 
   local changes="$(git status --porcelain)"
   local staged="$(grep -Ec "^\w." <<< "$changes")"
   local changed="$(grep -Ec "^.(\w|\?)" <<< "$changes")"
 
-  if ((changed > 0 && staged > 0)); then
-    printf "%%F{6}\u203d%%f"
-  elif ((changed > 0)); then
-    printf "%%F{6}?%%f"
-  elif ((staged > 0)); then
-    printf "%%F{6}!%%f"
+  if ((changed && staged)); then
+    echo -en "%F{6}\u203d%f"
+  elif ((changed)); then
+    echo -n "%F{6}?%f"
+  elif ((staged)); then
+    echo -n "%F{6}!%f"
   fi
 
   if [[ -n "$(git stash list)" ]]; then
-    printf " %%F{6}\u2026%%f"
+    echo -en " %F{6}\u2026%f"
   fi
 
   if [[ -n "$(git remote show)" && $branch != HEAD ]]; then
@@ -37,45 +37,45 @@ _prompt_git() {
       local ahead="$(git rev-list --count "@{u}..")"
       local behind="$(git rev-list --count "..@{u}")"
 
-      if ((ahead > 0 && behind > 0)); then
-        printf " %%F{6}\u296f%%f"
-      elif ((ahead > 0)); then
-        printf " %%F{6}\u2191%%f"
-      elif ((behind > 0)); then
-        printf " %%F{6}\u2193%%f"
+      if ((ahead && behind)); then
+        echo -en " %F{6}\u296f%f"
+      elif ((ahead)); then
+        echo -en " %F{6}\u2191%f"
+      elif ((behind)); then
+        echo -en " %F{6}\u2193%f"
       fi
     else
-      printf " %%F{6}\u21a5%%f"
+      echo -en " %F{6}\u21a5%f"
     fi
   fi
 
   local git="$(git rev-parse --git-dir)"
   if [[ -f $git/BISECT_LOG ]]; then
-    printf " %%F{1}(bisect)%%f"
+    echo -n " %F{1}(bisect)%f"
   elif [[ -f $git/CHERRY_PICK_HEAD ]]; then
-    printf " %%F{1}(cherry-pick)%%f"
+    echo -n " %F{1}(cherry-pick)%f"
   elif [[ -f $git/MERGE_HEAD ]]; then
-    printf " %%F{1}(merge)%%f"
+    echo -n " %F{1}(merge)%f"
   elif [[ -f $git/REVERT_HEAD ]]; then
-    printf " %%F{1}(revert)%%f"
+    echo -n " %F{1}(revert)%f"
   elif [[ -f $git/REBASE_HEAD ]]; then
     local step="$(< "$git/rebase-merge/msgnum")"
     local total="$(< "$git/rebase-merge/end")"
-    printf " %%F{1}(rebase)%%f %%F{6}%d%%F{8}/%%F{6}%d%%f" "$step" "$total"
+    echo -n " %F{1}(rebase)%f %F{6}$step%F{8}/%F{6}$total%f"
   fi
 }
 
 _prompt_char() {
   if [[ $TTY == /dev/tty* ]]; then
-    printf ">"
+    echo -n ">"
   else
-    printf "\u276f"
+    echo -en "\u276f"
   fi
 }
 
 _prompt_host() {
   if [[ -n ${SSH_TTY:+x} ]]; then
-    printf "%%F{14}%%n@%%M%%f"
+    echo -n "%F{14}%n@%M%f"
   fi
 }
 
@@ -117,15 +117,15 @@ mkcd() {
 }
 
 watch() (
-  trap "printf '\e[?25h\e[?1049l'" EXIT
+  trap "echo -en '\e[?25h\e[?1049l'" EXIT
   trap "exit 0" INT
 
-  printf "\e[?25l\e[?1049h"
+  echo -en "\e[?25l\e[?1049h"
   while true; do
-    printf "\e[H\e[2mWatching: %s\e[m\n\n" "$*"
+    echo -e "\e[H\e[2mWatching: $*\e[m\n"
     script --quiet --command "zsh --interactive -c $(printf "%q" "$*")" /dev/null | sed $'s/^/\e[K/'
 
-    printf "\e[J"
+    echo -en "\e[J"
     sleep 1
   done
 )
@@ -184,38 +184,38 @@ _repo() {
     _values command help clone edit fetch list remove run shell status update
   elif [[ ${words[2]} == edit ]]; then
     if ((CURRENT == 3)); then
-      if ((${#repos[@]} > 0)); then _values name "${repos[@]##*/}"; fi
+      if ((${#repos[@]})); then _values name "${repos[@]##*/}"; fi
     elif ((CURRENT == 4)); then
       _files -W "$HOME/Repos/${words[3]}"
     fi
   elif [[ ${words[2]} == fetch ]]; then
     if ((CURRENT == 3)); then
-      if ((${#repos[@]} > 0)); then _values name "${repos[@]##*/}"; fi
+      if ((${#repos[@]})); then _values name "${repos[@]##*/}"; fi
     fi
   elif [[ ${words[2]} == remove ]]; then
     if ((CURRENT == 3)); then
-      if ((${#repos[@]} > 0)); then _values name "${repos[@]##*/}"; fi
+      if ((${#repos[@]})); then _values name "${repos[@]##*/}"; fi
     fi
   elif [[ ${words[2]} == run ]]; then
     if ((CURRENT == 3)); then
-      if ((${#repos[@]} > 0)); then _values name "${repos[@]##*/}"; fi
+      if ((${#repos[@]})); then _values name "${repos[@]##*/}"; fi
     else
       compset -n 4
       _normal
     fi
   elif [[ ${words[2]} == shell ]]; then
     if ((CURRENT == 3)); then
-      if ((${#repos[@]} > 0)); then _values name "${repos[@]##*/}"; fi
+      if ((${#repos[@]})); then _values name "${repos[@]##*/}"; fi
     elif ((CURRENT == 4)); then
       _files -/ -W "$HOME/Repos/${words[3]}"
     fi
   elif [[ ${words[2]} == status ]]; then
     if ((CURRENT == 3)); then
-      if ((${#repos[@]} > 0)); then _values name "${repos[@]##*/}"; fi
+      if ((${#repos[@]})); then _values name "${repos[@]##*/}"; fi
     fi
   elif [[ ${words[2]} == update ]]; then
     if ((CURRENT == 3)); then
-      if ((${#repos[@]} > 0)); then _values name "${repos[@]##*/}"; fi
+      if ((${#repos[@]})); then _values name "${repos[@]##*/}"; fi
     fi
   fi
 }

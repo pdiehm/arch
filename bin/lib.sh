@@ -1,38 +1,38 @@
 # fatal <message>
 fatal() {
-  printf "[\e[31mERROR\e[m] %s\n" "$*" >&2
+  echo -e "[\e[31mERROR\e[m] $*" >&2
   exit 1
 }
 
 # warn <message>
 warn() {
-  printf "[\e[33mWARNING\e[m] %s\n" "$*" >&2
+  echo -e "[\e[33mWARNING\e[m] $*" >&2
 }
 
 # sha [data ...]
 sha() {
-  if (($# == 0)); then
-    sha256sum | cut -d " " -f 1
-  else
+  if (($#)); then
     printf "%s" "$*" | sha256sum | cut -d " " -f 1
+  else
+    sha256sum | cut -d " " -f 1
   fi
 }
 
 # encode_secret [data ...]
 encode_secret() {
-  if (($# == 0)); then
-    base64 -w 0
-  else
+  if (($#)); then
     printf "%s" "$*" | base64 -w 0
+  else
+    base64 -w 0
   fi
 }
 
 # decode_secret [data ...]
 decode_secret() {
-  if (($# == 0)); then
-    base64 -d
-  else
+  if (($#)); then
     printf "%s" "$*" | base64 -d
+  else
+    base64 -d
   fi
 }
 

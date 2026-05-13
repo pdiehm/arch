@@ -1,4 +1,4 @@
-persist -u -m 700 .local/share/gnupg
+persist -um 700 .local/share/gnupg
 write -a /etc/gnupg/gpg-agent.conf "pinentry-program /usr/bin/pinentry-tty"
 
 script -u << EOF
