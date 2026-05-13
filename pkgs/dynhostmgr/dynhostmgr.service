@@ -9,3 +9,5 @@ ExecStartPost=/usr/bin/sh -c "until grep '### DYNAMIC HOSTS START ###' /etc/host
 
 [Install]
 WantedBy=network.target
+
+; vim: ft=systemd

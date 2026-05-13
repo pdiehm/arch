@@ -3,7 +3,6 @@ copy res/hosts/static /etc/hosts
 
 package -c dynhostmgr
 copy res/hosts/dynamic /etc/dynhosts
-copy res/systemd/system/dynhostmgr.service /etc/systemd/system/dynhostmgr.service
 run systemctl enable dynhostmgr.service
 
 copy res/nftables.conf /etc/nftables.conf
