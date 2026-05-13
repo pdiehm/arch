@@ -23,6 +23,8 @@ edit() {
 }
 
 rebuild() {
+  if ((UID != 0)); then exec sudo "$0" rebuild "$@"; fi
+
   local OPTIND OPTARG opt
   local help=0 clean=0 dry=0
 
@@ -51,7 +53,7 @@ rebuild() {
 
   if ((clean)); then export CLEAN=1; fi
   if ((dry)); then export DRY=1; fi
-  exec sudo --preserve-env=CLEAN --preserve-env=DRY bin/apply.sh "$HOSTNAME"
+  exec bin/apply.sh "$HOSTNAME"
 }
 
 secrets() {
