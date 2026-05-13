@@ -9,8 +9,8 @@ HOSTKIND="$HOST_KIND"
 EOF
 
 package zsh zsh-autosuggestions zsh-completions zsh-syntax-highlighting
-run chsh -s /usr/bin/zsh pascal
 write -a /etc/zsh/zshenv "ZDOTDIR=\"\$HOME/.config/zsh\""
+run chsh -s /usr/bin/zsh pascal
 symlink -u res/zsh .config/zsh
 
 package vim
