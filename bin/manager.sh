@@ -25,7 +25,7 @@ edit() {
 rebuild() {
   if ((UID)); then exec sudo "$0" rebuild "$@"; fi
 
-  local OPTIND OPTARG opt
+  local OPTIND opt
   local help=0 clean=0 dry=0
 
   while getopts "hcd" opt; do
@@ -257,7 +257,7 @@ sync() {
 upgrade() {
   if ((UID)); then exec sudo "$0" upgrade; fi
 
-  trap 'unmount "$TMP/root"; unmount "$TMP/boot"; rm -rf --one-file-system "$TMP"' EXIT
+  trap 'unmount "$TMP/root"; unmount "$TMP/boot"; rmdir "$TMP"' EXIT
   TMP="$(mktemp -d)"
   chmod 700 "$TMP"
 

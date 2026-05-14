@@ -14,18 +14,12 @@ trap cleanup EXIT
 TMP="$(mktemp -d)"
 chmod 700 "$TMP"
 
-PHASE=""
 STAGE=0
 
 cleanup() {
   if mountpoint --quiet "$TMP/root"; then unmount "$TMP/root"; fi
   if mountpoint --quiet "$TMP/boot"; then unmount "$TMP/boot"; fi
   rm -rf --one-file-system "$TMP"
-}
-
-command_not_found_handle() {
-  if [[ $PHASE == declare ]]; then return; fi
-  error "Command not found: $1"
 }
 
 # error <message>
@@ -76,8 +70,6 @@ import() {
 
 # run <command> ...
 run() {
-  if [[ $PHASE != build ]]; then return; fi
-
   printf "%s\n" "${*@Q}" >> "$TMP/stages/$STAGE/build.sh"
   sha <<< "$*" >> "$TMP/stages/$STAGE/hash"
 }
@@ -85,8 +77,6 @@ run() {
 # use [path]
 use() {
   local path="${1:--}"
-  if [[ $PHASE != build ]]; then return; fi
-
   path="$(resolve "$path")"
   if [[ $path == /* && $path != /dev/stdin ]]; then error "Cannot use absolute path '$path'"; fi
 
@@ -115,7 +105,7 @@ use() {
 
 # secret [-fq] <name>
 secret() {
-  local OPTIND OPTARG opt
+  local OPTIND opt
   local file=0 query=0
 
   while getopts "fq" opt; do
@@ -188,9 +178,7 @@ if [[ ! -f $TMP/secrets ]]; then
 fi
 
 mkdir -p "$TMP/stages/$STAGE/res"
-PHASE="declare" import main
-PHASE="define" import main
-PHASE="build" import main
+import main
 
 if [[ -n ${DRY:+x} ]]; then
   (cd "$TMP" && bash)

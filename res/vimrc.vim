@@ -14,7 +14,6 @@ set smartindent
 set nowrap
 set linebreak
 
-set hlsearch
 set ignorecase
 set smartcase
 

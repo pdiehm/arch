@@ -238,13 +238,13 @@ package() {
   if ((aur)); then
     run sudo -u pkgbuild paru --noconfirm --sync --sysupgrade --refresh --needed "$@"
   elif ((custom)); then
-    local name
-    for name; do
-      copy "pkgs/$name" "/var/lib/syscfg/pkgs/$name"
-      run chown -R pkgbuild:pkgbuild "/var/lib/syscfg/pkgs/$name"
+    local pkg
+    for pkg; do
+      copy "pkgs/$pkg" "/var/lib/syscfg/pkgs/$pkg"
+      run chown -R pkgbuild:pkgbuild "/var/lib/syscfg/pkgs/$pkg"
 
-      run sudo -u pkgbuild env -C "/var/lib/syscfg/pkgs/$name" makepkg --clean --install --rmdeps --syncdeps --noconfirm
-      upgrade sudo -u pkgbuild env -C "/var/lib/syscfg/pkgs/$name" makepkg --clean --install --rmdeps --syncdeps --noconfirm
+      run sudo -u pkgbuild env -C "/var/lib/syscfg/pkgs/$pkg" makepkg --clean --install --rmdeps --syncdeps --noconfirm
+      upgrade sudo -u pkgbuild env -C "/var/lib/syscfg/pkgs/$pkg" makepkg --clean --install --rmdeps --syncdeps --noconfirm
     done
   else
     run pacman --noconfirm --sync --sysupgrade --refresh --needed "$@"

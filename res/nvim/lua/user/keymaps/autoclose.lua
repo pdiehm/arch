@@ -2,7 +2,7 @@ local function map(key, fn)
   vim.keymap.set("i", key, function()
     local line = vim.api.nvim_get_current_line()
     local col = vim.api.nvim_win_get_cursor(0)[2]
-    return fn(line:sub(col, col + 1), line:sub(1, col), line:sub(col + 2))
+    return fn(line:sub(col, col + 1), line:sub(1, col), line:sub(col + 1))
   end, { expr = true })
 end
 
@@ -14,10 +14,10 @@ map("<BS>", function(pair)
   end
 end)
 
-map("<CR>", function(pair, pre)
+map("<CR>", function(pair, pre, post)
   if vim.list_contains({ '""', "''", "``", "()", "[]", "{}", "><" }, pair) then
     return "<CR><Esc>O"
-  elseif pre:match("```%w+$") then
+  elseif pre:match("```%w+$") and post:sub(1, 3) == "```" then
     return "<CR><Esc>O"
   else
     return "<CR>"
