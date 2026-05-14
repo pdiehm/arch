@@ -1,5 +1,5 @@
 package -c dynhostmgr
-run systemctl enable dynhostmgr.service
+systemd dynhostmgr.service
 write /etc/hostname "$HOST_NAME"
 
 write /etc/hosts << EOF
@@ -16,8 +16,8 @@ bowser 192.168.1.88
 EOF
 
 copy res/nftables.conf /etc/nftables.conf
-run systemctl enable nftables.service
+systemd nftables.service
 
 copy res/systemd/resolved.conf /etc/systemd/resolved.conf
 copy res/systemd/system/resolvconf.service /etc/systemd/system/resolvconf.service
-run systemctl enable systemd-resolved.service resolvconf.service
+systemd systemd-resolved.service resolvconf.service

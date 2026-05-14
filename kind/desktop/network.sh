@@ -1,5 +1,5 @@
 package networkmanager nm-connection-editor
-run systemctl enable NetworkManager.service
+systemd NetworkManager.service
 
 env NAME hotspot
 env PRIORITY 25

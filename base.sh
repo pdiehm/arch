@@ -260,6 +260,76 @@ upgrade() {
   fi
 }
 
+# systemd [-u] [-t target] <unit> ...
+#   -u   enable user units
+#   -t   specify target (for user units)
+systemd() {
+  local OPTIND OPTARG opt
+  local user=0 target=""
+
+  while getopts "ut:" opt; do
+    case "$opt" in
+      u) user=1 ;;
+      t) target="$OPTARG" ;;
+      *) error "Invalid option: -$opt" ;;
+    esac
+  done
+
+  shift $((OPTIND - 1))
+  if [[ -n $target ]] && ((!user)); then error "Option '-t' requires '-u'"; fi
+
+  if ((user)); then
+    local unit
+    target="${target:-default.target}"
+
+    for unit; do
+      if [[ $unit == /* ]]; then
+        symlink -u "$unit" ".config/systemd/user/$target.wants/${unit##*/}"
+      else
+        symlink -u "/home/pascal/.config/systemd/user/$unit" ".config/systemd/user/$target.wants/$unit"
+      fi
+    done
+  else
+    run systemctl enable "$@"
+  fi
+}
+
+# timer [-nu] <name> <time> <command> ...
+#   -n   wait for network
+#   -u   for user manager
+timer() {
+  local OPTIND opt
+  local network=0 user=0
+
+  while getopts "nu" opt; do
+    case "$opt" in
+      n) network=1 ;;
+      u) user=1 ;;
+      *) error "Invalid option: -$opt" ;;
+    esac
+  done
+
+  shift $((OPTIND - 1))
+  local name="$1" time="$2" command="$3" args=("${@:4}")
+
+  local lf=$'\n'
+  local timer="[Timer]${lf}Persistent=true${lf}OnCalendar=$time${lf}${lf}[Install]${lf}WantedBy=timers.target"
+
+  local service="[Service]${lf}Type=oneshot"
+  if ((network)); then service+="${lf}ExecStartPre=/usr/bin/sh -c 'until ping -c 1 1.1.1.1; do sleep 1; done'"; fi
+  service+="${lf}ExecStart=$command ${args[*]@Q}"
+
+  if ((user)); then
+    write -u ".config/systemd/user/$name.service" "$service"
+    write -u ".config/systemd/user/$name.timer" "$timer"
+    systemd -ut timers.target "$name.timer"
+  else
+    write "/etc/systemd/system/$name.service" "$service"
+    write "/etc/systemd/system/$name.timer" "$timer"
+    systemd "$name.timer"
+  fi
+}
+
 persist /var/lib/systemd
 copy -s "keys/$HOST_NAME" /var/lib/syscfg/key
 if secret -q keys/master; then copy -s keys/master /var/lib/syscfg/master; fi
@@ -278,6 +348,7 @@ write -a /etc/sudoers "pkgbuild ALL=(ALL:ALL) NOPASSWD: ALL"
 
 package -c paru
 conf -e /etc/paru.conf BottomUp CleanAfter RemoveMake SudoLoop
+timer pacman-gc monthly /usr/bin/paru --noconfirm --sync --clean
 
 upgrade sudo -u pkgbuild paru --noconfirm --newsonupgrade --sync --sysupgrade --refresh
 upgrade pacman --files --refresh
@@ -291,4 +362,5 @@ git --git-dir .config/syscfg/.git remote set-url origin git@github.com:pdiehm/ar
 EOF
 
 persist -u .config/syscfg
+persist -u .local/share/systemd
 symlink -u bin/manager.sh .local/bin/sm

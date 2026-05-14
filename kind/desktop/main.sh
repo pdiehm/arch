@@ -6,14 +6,12 @@ import ./nvim
 import ./ssh
 import ./yubikey
 
-persist -u .local/share/systemd
-symlink -u res/systemd/user .config/systemd/user
-
 package git git-delta
 symlink -u res/git.conf .config/git/config
 
 persist -u /home/pascal/Repos
 symlink -u res/bin/repo.sh .local/bin/repo
+timer -nu repo-fetch hourly "%h/.local/bin/repo" fetch
 
 package firefox
 persist -u .config/mozilla/firefox

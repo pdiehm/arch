@@ -23,11 +23,7 @@ copy res/ssh/known_hosts /etc/ssh/ssh_known_hosts
 copy -ns "ssh/$HOST_NAME/host" /etc/ssh/host_key
 copy -sm 444 "ssh/$HOST_NAME/auth" /etc/ssh/authorized_keys
 run systemctl mask sshdgenkeys.service
-run systemctl enable sshd.service
-
-copy res/systemd/system/gc.timer /etc/systemd/system/gc.timer
-copy res/systemd/system/gc.service /etc/systemd/system/gc.service
-run systemctl enable gc.timer
+systemd sshd.service
 
 package \
   man-db man-pages \

@@ -1,6 +1,6 @@
 package yubikey-manager
 write -a /etc/gnupg/scdaemon.conf disable-ccid
-run systemctl enable pcscd.service
+systemd pcscd.service
 
 package evtest
 copy -x res/bin/yubikey-lock.sh /usr/local/libexec/yubikey/lock
