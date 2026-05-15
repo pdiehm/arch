@@ -344,7 +344,7 @@ package base-devel linux linux-firmware arch-install-scripts btrfs-progs git
 run pacman --files --refresh
 
 run useradd --create-home --system --home-dir /var/lib/syscfg/pkgs --skel /var/empty --shell /usr/bin/nologin pkgbuild
-write -a /etc/sudoers "pkgbuild ALL=(ALL:ALL) NOPASSWD: ALL"
+write -a /etc/sudoers "pkgbuild ALL=(root) NOPASSWD: /usr/bin/pacman"
 
 package -c paru
 conf -e /etc/paru.conf BottomUp CleanAfter RemoveMake SudoLoop
