@@ -229,5 +229,11 @@ _sm() {
   fi
 }
 
+if [[ -n ${KITTY_INSTALLATION_DIR:+x} ]]; then
+  autoload -Uz "$KITTY_INSTALLATION_DIR/shell-integration/zsh/kitty-integration"
+  kitty-integration
+  unfunction kitty-integration
+fi
+
 source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
