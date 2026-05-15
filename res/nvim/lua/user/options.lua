@@ -29,3 +29,4 @@ vim.o.scrolloff = 8
 vim.o.shell = "zsh --interactive"
 vim.o.showmode = false
 vim.o.updatetime = 250
+vim.opt.guicursor = { "n-v-sm:block", "i-c-ci-t:ver25", "o-r-cr:hor20" }
