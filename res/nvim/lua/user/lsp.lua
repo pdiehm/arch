@@ -22,6 +22,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
     vim.keymap.set("n", "gr", ts.lsp_references)
     vim.keymap.set("n", "gt", ts.lsp_type_definitions)
     vim.keymap.set("n", "za", vim.lsp.buf.code_action)
+    vim.keymap.set("i", "<A-Space>", vim.lsp.buf.signature_help)
 
     vim.keymap.set("n", "zr", function()
       vim.ui.input({ prompt = "New Name: " }, function(name)
