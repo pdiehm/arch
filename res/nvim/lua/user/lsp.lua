@@ -30,3 +30,14 @@ vim.api.nvim_create_autocmd("LspAttach", {
     end)
   end,
 })
+
+vim.api.nvim_create_autocmd("FileType", {
+  callback = function()
+    if pcall(vim.treesitter.start) then
+      local lang = vim.treesitter.language.get_lang(vim.bo.filetype)
+      if lang and vim.treesitter.query.get(lang, "indents") then
+        vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+      end
+    end
+  end,
+})
