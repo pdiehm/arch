@@ -10,4 +10,4 @@ systemd -eu home-pascal-Shared.mount
 
 write -au .config/dropin/env.sh "SSH_AUTH_SOCK=\"\$XDG_RUNTIME_DIR/ssh-agent.socket\""
 systemd -ou ssh-agent.service
-systemd -eut sockets.target /usr/lib/systemd/user/ssh-agent.socket
+systemd -eu /usr/lib/systemd/user/ssh-agent.service
