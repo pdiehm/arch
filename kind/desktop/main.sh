@@ -6,6 +6,9 @@ import ./nvim
 import ./ssh
 import ./yubikey
 
+copy res/systemd/logind.conf /etc/systemd/logind.conf
+write /etc/sysctl.d/sysrq.conf "kernel.sysrq = 1"
+
 package git git-delta
 symlink -u res/git.conf .config/git/config
 
