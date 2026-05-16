@@ -23,8 +23,8 @@ copy res/ssh/sshd_config /etc/ssh/sshd_config
 copy res/ssh/known_hosts /etc/ssh/ssh_known_hosts
 copy -ns "ssh/$HOST_NAME/host" /etc/ssh/host_key
 copy -sm 444 "ssh/$HOST_NAME/auth" /etc/ssh/authorized_keys
-run systemctl mask sshdgenkeys.service
-systemd sshd.service
+systemd -m sshdgenkeys.service
+systemd -e sshd.service
 
 package \
   man-db man-pages \

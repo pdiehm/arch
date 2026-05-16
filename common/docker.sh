@@ -11,6 +11,6 @@ net.ipv6.conf.default.forwarding = 1
 EOF
 
 if [[ $HOST_KIND == desktop ]]; then
-  copy res/systemd/system/docker.conf /etc/systemd/system/docker.service.d/override.conf
-  systemd docker.socket
+  systemd -o docker.service
+  systemd -e docker.socket
 fi

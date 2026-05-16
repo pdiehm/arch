@@ -1,4 +1,2 @@
 [Service]
 ExecStop=/usr/bin/sh -c "docker container ls --all --quiet | xargs --no-run-if-empty docker container rm --force"
-
-; vim: ft=systemd

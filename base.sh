@@ -260,15 +260,32 @@ upgrade() {
   fi
 }
 
-# systemd [-u] [-t target] <unit> ...
-#   -u   enable user units
-#   -t   specify target (for user units)
+# systemd [-eu] [-t target] <unit> ...
+#   -e   enable units
+#   -u   in user manager
+#   -t   for specific target
+#
+# systemd [-iu] <unit> ...
+#   -i   install units
+#   -u   in user manager
+#
+# systemd [-mu] <unit> ...
+#   -m   mask units
+#   -u   in user manager
+#
+# systemd [-ou] <unit> ...
+#   -o   override units
+#   -u   in user manager
 systemd() {
   local OPTIND OPTARG opt
-  local user=0 target=""
+  local enable=0 install=0 mask=0 override=0 user=0 target=""
 
-  while getopts "ut:" opt; do
+  while getopts "eimout:" opt; do
     case "$opt" in
+      e) enable=1 ;;
+      i) install=1 ;;
+      m) mask=1 ;;
+      o) override=1 ;;
       u) user=1 ;;
       t) target="$OPTARG" ;;
       *) error "Invalid option: -$opt" ;;
@@ -276,21 +293,55 @@ systemd() {
   done
 
   shift $((OPTIND - 1))
-  if [[ -n $target ]] && ((!user)); then error "Option '-t' requires '-u'"; fi
+  if ((enable + install + mask + override > 1)); then error "Options '-e', '-i', '-m' and '-o' are mutually exclusive"; fi
 
-  if ((user)); then
-    local unit
-    target="${target:-default.target}"
+  if ((enable)); then
+    if [[ -n $target ]] && ((!user)); then error "Option '-t' requires '-u'"; fi
 
-    for unit; do
-      if [[ $unit == /* ]]; then
-        symlink -u "$unit" ".config/systemd/user/$target.wants/${unit##*/}"
-      else
-        symlink -u "/home/pascal/.config/systemd/user/$unit" ".config/systemd/user/$target.wants/$unit"
-      fi
-    done
+    if ((user)); then
+      local unit target="${target:-default.target}"
+
+      for unit; do
+        if [[ $unit == /* ]]; then
+          symlink -u "$unit" ".config/systemd/user/$target.wants/${unit##*/}"
+        else
+          symlink -u "/home/pascal/.config/systemd/user/$unit" ".config/systemd/user/$target.wants/$unit"
+        fi
+      done
+    else
+      run systemctl enable "$@"
+    fi
+  elif ((install)); then
+    if [[ -n $target ]]; then error "Option '-t' cannot be used with '-i'"; fi
+
+    if ((user)); then
+      local unit
+      for unit; do copy -u "res/systemd/user/$unit" ".config/systemd/user/$unit"; done
+    else
+      local unit
+      for unit; do copy "res/systemd/system/$unit" "/etc/systemd/system/$unit"; done
+    fi
+  elif ((mask)); then
+    if [[ -n $target ]]; then error "Option '-t' cannot be used with '-m'"; fi
+
+    if ((user)); then
+      local unit
+      for unit; do symlink -u /dev/null ".config/systemd/user/$unit"; done
+    else
+      run systemctl mask "$@"
+    fi
+  elif ((override)); then
+    if [[ -n $target ]]; then error "Option '-t' cannot be used with '-o'"; fi
+
+    if ((user)); then
+      local unit
+      for unit; do copy -u "res/systemd/user/$unit" ".config/systemd/user/$unit.d/override.conf"; done
+    else
+      local unit
+      for unit; do copy "res/systemd/system/$unit" "/etc/systemd/system/$unit.d/override.conf"; done
+    fi
   else
-    run systemctl enable "$@"
+    error "One of '-e', '-i', '-m' or '-o' is required"
   fi
 }
 
@@ -322,11 +373,11 @@ timer() {
   if ((user)); then
     write -u ".config/systemd/user/$name.service" "$service"
     write -u ".config/systemd/user/$name.timer" "$timer"
-    systemd -ut timers.target "$name.timer"
+    systemd -eut timers.target "$name.timer"
   else
     write "/etc/systemd/system/$name.service" "$service"
     write "/etc/systemd/system/$name.timer" "$timer"
-    systemd "$name.timer"
+    systemd -e "$name.timer"
   fi
 }
 
