@@ -1,10 +1,14 @@
 package docker docker-compose docker-buildx
-copy res/docker.json /etc/docker/daemon.json
-write /etc/sysctl.d/docker.conf "net.ipv4.ip_forward = 1"
-
 persist /var/lib/docker
+copy res/docker.json /etc/docker/daemon.json
 run usermod --append --groups docker pascal
 timer docker-gc monthly /usr/bin/docker system prune --all --force --volumes
+
+write /etc/sysctl.d/docker.conf << EOF
+net.ipv4.ip_forward = 1
+net.ipv6.conf.all.forwarding = 1
+net.ipv6.conf.default.forwarding = 1
+EOF
 
 if [[ $HOST_KIND == desktop ]]; then
   copy res/systemd/system/docker.conf /etc/systemd/system/docker.service.d/override.conf
