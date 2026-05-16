@@ -18,6 +18,9 @@ package vim
 write -a /etc/environment "EDITOR=vim"
 copy res/vimrc.vim /etc/vimrc
 
+package htop
+symlink -u res/htop.conf .config/htop/htoprc
+
 package openssh
 copy res/ssh/sshd_config /etc/ssh/sshd_config
 copy res/ssh/known_hosts /etc/ssh/ssh_known_hosts
