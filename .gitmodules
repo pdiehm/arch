@@ -1,6 +1,3 @@
-[submodule "pkgs/paru"]
-	path = pkgs/paru
-	url = https://aur.archlinux.org/paru.git
 [submodule "res/nvim/pack/plugins/start/onedark.nvim"]
 	path = res/nvim/pack/plugins/start/onedark.nvim
 	url = https://github.com/navarasu/onedark.nvim

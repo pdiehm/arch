@@ -1,4 +1,4 @@
-package -c dynhostmgr
+package dynhostmgr
 systemd -e dynhostmgr.service
 write /etc/hostname "$HOST_NAME"
 

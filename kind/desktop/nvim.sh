@@ -4,8 +4,8 @@ package neovim vim-spell-de tree-sitter-cli \
   bash-language-server shellcheck shfmt \
   lua-language-server stylua
 
-package -a cmake-language-server cmake-format prettier-plugin-xml
-package -c prettier-plugin-css-order
+package cmake-language-server cmake-format prettier-plugin-xml
+package prettier-plugin-css-order
 
 symlink -u res/nvim .config/nvim
 write -au .config/dropin/env.sh "EDITOR=nvim"

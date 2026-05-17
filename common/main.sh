@@ -9,6 +9,9 @@ HOSTNAME="$HOST_NAME"
 HOSTKIND="$HOST_KIND"
 EOF
 
+package paru base-devel
+conf -e /etc/paru.conf BottomUp CleanAfter RemoveMake SudoLoop
+
 package zsh zsh-autosuggestions zsh-completions zsh-syntax-highlighting
 write -a /etc/zsh/zshenv "ZDOTDIR=\"\$HOME/.config/zsh\""
 run chsh --shell /usr/bin/zsh pascal

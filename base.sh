@@ -217,38 +217,9 @@ conf() {
   done
 }
 
-# package [-ac] <name> ...
-#   -a   from AUR
-#   -c   custom package
+# package <name> ...
 package() {
-  local OPTIND opt
-  local aur=0 custom=0
-
-  while getopts "ac" opt; do
-    case "$opt" in
-      a) aur=1 ;;
-      c) custom=1 ;;
-      *) error "Invalid option: -$opt" ;;
-    esac
-  done
-
-  shift $((OPTIND - 1))
-  if ((aur + custom > 1)); then error "Options '-a' and '-c' are mutually exclusive"; fi
-
-  if ((aur)); then
-    run sudo -u pkgbuild paru --noconfirm --sync --sysupgrade --refresh --needed "$@"
-  elif ((custom)); then
-    local pkg
-    for pkg; do
-      copy "pkgs/$pkg" "/var/lib/syscfg/pkgs/$pkg"
-      run chown -R pkgbuild:pkgbuild "/var/lib/syscfg/pkgs/$pkg"
-
-      run sudo -u pkgbuild env -C "/var/lib/syscfg/pkgs/$pkg" makepkg --clean --install --rmdeps --syncdeps --noconfirm
-      upgrade sudo -u pkgbuild env -C "/var/lib/syscfg/pkgs/$pkg" makepkg --clean --install --rmdeps --syncdeps --noconfirm
-    done
-  else
-    run pacman --noconfirm --sync --sysupgrade --refresh --needed "$@"
-  fi
+  run pacman --noconfirm --sync --refresh --sysupgrade --needed "$@"
 }
 
 # upgrade [command ...]
@@ -390,19 +361,19 @@ sha256sum /var/lib/syscfg/key | head -c 32 > /etc/machine-id
 printf '\n' >> /etc/machine-id
 EOF
 
+write -a /etc/pacman.conf << EOF
+[aur]
+SigLevel = Never
+Server = https://pdiehm.github.io/aur
+EOF
+
 conf -e /etc/pacman.conf Color
-package base-devel linux linux-firmware arch-install-scripts btrfs-progs git
+package linux linux-firmware arch-install-scripts btrfs-progs sudo git
 run pacman --files --refresh
 
-run useradd --create-home --system --home-dir /var/lib/syscfg/pkgs --skel /var/empty --shell /usr/bin/nologin pkgbuild
-write -a /etc/sudoers "pkgbuild ALL=(root) NOPASSWD: /usr/bin/pacman"
-
-package -c paru
-conf -e /etc/paru.conf BottomUp CleanAfter RemoveMake SudoLoop
-timer pacman-gc monthly /usr/bin/paru --noconfirm --sync --clean
-
-upgrade sudo -u pkgbuild paru --noconfirm --newsonupgrade --sync --sysupgrade --refresh
+upgrade pacman --noconfirm --sync --refresh --sysupgrade
 upgrade pacman --files --refresh
+timer pacman-gc monthly /usr/bin/pacman --noconfirm --sync --clean
 
 run useradd --create-home --groups wheel --skel /var/empty --password "$(secret password)" --uid 1000 pascal
 write -a /etc/sudoers "pascal ALL=(ALL:ALL) ALL"
