@@ -338,7 +338,7 @@ timer() {
   local timer="[Timer]${lf}Persistent=true${lf}OnCalendar=$time${lf}${lf}[Install]${lf}WantedBy=timers.target"
 
   local service="[Service]${lf}Type=oneshot"
-  if ((network)); then service+="${lf}ExecStartPre=/usr/bin/sh -c 'until ping -c 1 1.1.1.1; do sleep 1; done'"; fi
+  if ((network)); then service+="${lf}ExecStartPre=/bin/sh -c 'until ping -c 1 1.1.1.1; do sleep 1; done'"; fi
   service+="${lf}ExecStart=$command ${args[*]@Q}"
 
   if ((user)); then
