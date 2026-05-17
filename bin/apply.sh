@@ -141,15 +141,15 @@ if [[ ! -f secrets/$HOST_NAME ]]; then
   fatal "No secrets for host '$HOST_NAME'"
 fi
 
-if [[ -f /var/lib/syscfg/key ]]; then
-  if ! load_secrets "secrets/$HOST_NAME" "$TMP/secrets" "$(< /var/lib/syscfg/key)"; then
+if [[ -f /var/local/syscfg/key ]]; then
+  if ! load_secrets "secrets/$HOST_NAME" "$TMP/secrets" "$(< /var/local/syscfg/key)"; then
     warn "Stale host key"
   fi
 fi
 
 if [[ ! -f $TMP/secrets ]]; then
-  if [[ -f /var/lib/syscfg/master ]]; then
-    if ! load_secrets secrets/master "$TMP/master" "$(< /var/lib/syscfg/master)"; then
+  if [[ -f /var/local/syscfg/master ]]; then
+    if ! load_secrets secrets/master "$TMP/master" "$(< /var/local/syscfg/master)"; then
       warn "Stale master password"
     fi
   fi

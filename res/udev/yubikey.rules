@@ -1,5 +1,5 @@
 ACTION=="add|change", ATTRS{idVendor}=="1050", ATTRS{idProduct}=="0010|0110|0111|0114|0116|0401|0403|0405|0407|0410", ENV{ID_SECURITY_TOKEN}="1"
-ACTION=="add", SUBSYSTEM=="usb", ENV{PRODUCT}=="1050/407/543", RUN+="/usr/local/libexec/yubikey/unlock"
-ACTION=="remove", SUBSYSTEM=="usb", ENV{PRODUCT}=="1050/407/543", RUN+="/usr/local/libexec/yubikey/lock"
+ACTION=="add", SUBSYSTEM=="usb", ENV{PRODUCT}=="1050/407/543", RUN+="/usr/local/lib/yubikey/unlock"
+ACTION=="remove", SUBSYSTEM=="usb", ENV{PRODUCT}=="1050/407/543", RUN+="/usr/local/lib/yubikey/lock"
 
 # vim: ft=udevrules

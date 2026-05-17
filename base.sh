@@ -225,9 +225,9 @@ package() {
 # upgrade [command ...]
 upgrade() {
   if (($#)); then
-    write -a /var/lib/syscfg/upgrade.sh "${*@Q}"
+    write -a /var/local/syscfg/upgrade.sh "${*@Q}"
   else
-    write -a /var/lib/syscfg/upgrade.sh
+    write -a /var/local/syscfg/upgrade.sh
   fi
 }
 
@@ -353,11 +353,11 @@ timer() {
 }
 
 persist /var/lib/systemd
-copy -s "keys/$HOST_NAME" /var/lib/syscfg/key
-if secret -q keys/master; then copy -s keys/master /var/lib/syscfg/master; fi
+copy -s "keys/$HOST_NAME" /var/local/syscfg/key
+if secret -q keys/master; then copy -s keys/master /var/local/syscfg/master; fi
 
 script << EOF
-sha256sum /var/lib/syscfg/key | head -c 32 > /etc/machine-id
+sha256sum /var/local/syscfg/key | head -c 32 > /etc/machine-id
 printf '\n' >> /etc/machine-id
 EOF
 

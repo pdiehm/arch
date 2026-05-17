@@ -3,8 +3,8 @@ write -a /etc/gnupg/scdaemon.conf disable-ccid
 systemd -e pcscd.service
 
 package evtest
-copy -x res/bin/yubikey-lock.sh /usr/local/libexec/yubikey/lock
-copy -x res/bin/yubikey-unlock.sh /usr/local/libexec/yubikey/unlock
+copy -x res/bin/yubikey-lock.sh /usr/local/lib/yubikey/lock
+copy -x res/bin/yubikey-unlock.sh /usr/local/lib/yubikey/unlock
 copy res/udev/yubikey.rules /etc/udev/rules.d/yubikey.rules
 
 package pam-u2f

@@ -66,8 +66,8 @@ secrets() {
   local -A secrets=()
   local keys=()
 
-  if [[ -f secrets/master && -f /var/lib/syscfg/master ]]; then
-    secrets["keys/master"]="$(< /var/lib/syscfg/master)"
+  if [[ -f secrets/master && -f /var/local/syscfg/master ]]; then
+    secrets["keys/master"]="$(< /var/local/syscfg/master)"
 
     if ! load_secrets secrets/master "$TMP/secrets" "${secrets["keys/master"]}"; then
       warn "Stale master password"
@@ -271,7 +271,7 @@ upgrade() {
   btrfs subvolume snapshot "$TMP/root/latest" "$build"
   mount --bind "$build" "$build"
   mount --bind "$TMP/root/pkgs" "$build/var/cache/pacman/pkg"
-  arch-chroot "$build" bash -eu /var/lib/syscfg/upgrade.sh
+  arch-chroot "$build" bash -eu /var/local/syscfg/upgrade.sh
 
   touch "$build"
   unmount "$build"
