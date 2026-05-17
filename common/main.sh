@@ -9,7 +9,7 @@ HOSTNAME="$HOST_NAME"
 HOSTKIND="$HOST_KIND"
 EOF
 
-package paru base-devel
+package paru base-devel devtools nvchecker
 conf -e /etc/paru.conf BottomUp CleanAfter RemoveMake SudoLoop
 
 package zsh zsh-autosuggestions zsh-completions zsh-syntax-highlighting
@@ -32,8 +32,8 @@ copy -sm 444 "ssh/$HOST_NAME/auth" /etc/ssh/authorized_keys
 systemd -m sshdgenkeys.service
 systemd -e sshd.service
 
-package \
-  man-db man-pages \
-  bat eza fd ripgrep pv fzf parallel \
-  fastfetch duf ncdu \
-  openbsd-netcat doggo mtr xh
+package bat eza fd ripgrep pv fzf parallel
+package lsof usbutils pciutils fastfetch duf ncdu
+package openbsd-netcat doggo mtr xh tcpdump
+package btrfs-progs e2fsprogs exfatprogs dosfstools
+package man-db man-pages zip unzip
