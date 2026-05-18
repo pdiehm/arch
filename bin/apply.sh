@@ -236,7 +236,7 @@ ln -s "images/$HASH" "$TMP/root/latest"
 find "$TMP/root/images" -mindepth 1 -maxdepth 1 -mtime +1 -exec btrfs subvolume delete --recursive "{}" +
 
 mount --mkdir --label BOOT "$TMP/boot"
-find "$TMP/boot" -mindepth 1 -delete
+rm -rf "${TMP:?}/boot"/*
 cp -r "$TMP/root/latest/boot/." "$TMP/boot"
 
 for path in "$TMP/root/latest/perm"/*; do

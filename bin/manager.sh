@@ -281,7 +281,7 @@ upgrade() {
   ln -s "images/$hash" "$TMP/root/latest"
 
   mount --mkdir --label BOOT "$TMP/boot"
-  find "$TMP/boot" -mindepth 1 -delete
+  rm -rf "${TMP:?}/boot"/*/*
   cp -r "$TMP/root/latest/boot/." "$TMP/boot"
 }
 
