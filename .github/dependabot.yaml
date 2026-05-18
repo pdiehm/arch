@@ -7,6 +7,11 @@ multi-ecosystem-groups:
       cronjob: 0 0 * * 0
 
 updates:
+  - package-ecosystem: github-actions
+    multi-ecosystem-group: main
+    patterns: ["*"]
+    directory: /
+
   - package-ecosystem: gitsubmodule
     multi-ecosystem-group: main
     patterns: ["*"]

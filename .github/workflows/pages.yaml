@@ -1,0 +1,21 @@
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  pages:
+    runs-on: ubuntu-latest
+
+    permissions:
+      pages: write
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v6.0.2
+
+      - name: Copy install script
+        run: mkdir _site && cp bin/install.sh _site/index.html
+
+      - uses: actions/upload-pages-artifact@v5.0.0
+      - uses: actions/configure-pages@v6.0.0
+      - uses: actions/deploy-pages@v5.0.0
