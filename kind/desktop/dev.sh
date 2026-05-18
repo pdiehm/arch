@@ -2,6 +2,9 @@ package make cmake ninja gcc gdb rust python python-pip nodejs npm jdk-openjdk s
   texlive-basic texlive-latex texlive-latexrecommended texlive-fontsrecommended texlive-langgerman \
   texlive-binextra perl-file-homedir perl-yaml-tiny
 
+package paru base-devel devtools nvchecker
+conf -e /etc/paru.conf BottomUp CleanAfter RemoveMake SudoLoop
+
 write -au .config/dropin/env.sh << EOF
 CMAKE_GENERATOR="Ninja"
 CMAKE_EXPORT_COMPILE_COMMANDS="ON"
