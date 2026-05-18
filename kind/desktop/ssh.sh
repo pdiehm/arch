@@ -3,6 +3,7 @@ copy -su ssh/arch .ssh/arch
 copy -su ssh/bowser .ssh/bowser
 copy -su ssh/goomba .ssh/goomba
 copy -su ssh/github .ssh/github
+copy -su ssh/uni-gitlab .ssh/uni-gitlab
 
 package sshfs
 systemd -iu home-pascal-Shared.mount
