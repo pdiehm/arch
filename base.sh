@@ -126,8 +126,8 @@ symlink() {
     target="${target/#$PWD//home/pascal/.config/syscfg}"
   fi
 
-  local cmd="if [[ -e ${link@Q} ]]; then echo 'Cannot create symlink' ${link@Q} '- File exists' >&2; exit 1; fi"
-  cmd+=" && mkdir -p ${dir@Q} && ln -s ${target@Q} ${link@Q}"
+  local cmd="if [[ -e ${link@Q} ]]; then echo 'Cannot create symlink' ${link@Q} '- File exists' >&2; exit 1; fi && "
+  cmd+="mkdir -p ${dir@Q} && ln -s ${target@Q} ${link@Q}"
 
   if ((user)); then
     run sudo -u pascal env -C /home/pascal bash -c "$cmd"
@@ -162,8 +162,8 @@ persist() {
   target="${target//[^a-zA-Z0-9._+-]/_}"
   if [[ $target == +* ]]; then target="/perm/${target:1}"; else target="/perm/home+pascal+$target"; fi
 
-  local cmd="if [[ -e ${target@Q} ]]; then echo 'Cannot persist' ${path@Q} '- Already persisted' >&2; exit 1; fi"
-  cmd+=" && mkdir -p ${dir@Q} && if [[ -e ${path@Q} ]]; then mv ${path@Q} ${target@Q}; fi && ln -s ${target@Q} ${path@Q}"
+  local cmd="if [[ -e ${target@Q} ]]; then echo 'Cannot persist' ${path@Q} '- Already persisted' >&2; exit 1; fi && "
+  cmd+="mkdir -p ${dir@Q} && if [[ -e ${path@Q} ]]; then mv ${path@Q} ${target@Q}; fi && ln -s ${target@Q} ${path@Q}"
 
   cmd+=" && if [[ ! -e ${target@Q} ]]; then "
   if ((file)); then cmd+="touch ${target@Q}; "; else cmd+="mkdir ${target@Q}; "; fi
