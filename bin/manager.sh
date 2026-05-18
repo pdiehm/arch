@@ -205,7 +205,7 @@ secrets() {
           else
             text="$(IFS=$'\n' && encode_secret "${value[*]}")"
 
-            for host in master "${hosts[@]}"; do
+            for host in "master" "${hosts[@]}"; do
               if [[ ! -f $TMP/secrets/$host ]]; then
                 error="Host '$host' not in hosts list"
               else
