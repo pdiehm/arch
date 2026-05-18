@@ -13,5 +13,8 @@ package firefox
 persist -u .config/mozilla/firefox
 symlink res/firefox.json /etc/firefox/policies/policies.json
 
+package android-file-transfer sshfs
+symlink -u res/bin/mnt.sh .local/bin/mnt
+
 package wl-clipboard
 write -a /etc/fstab "tmpfs /home/pascal/Temp tmpfs defaults 0 0"
