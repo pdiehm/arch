@@ -15,7 +15,7 @@ fi
 if [[ ! -f bin/lib.sh ]]; then
   TMP="$(mktemp -d)"
   pacman --noconfirm --sync --refresh --needed git
-  git clone --recurse-submodules --depth 1 https://github.com/pdiehm/arch.git "$TMP"
+  git clone --depth 1 https://github.com/pdiehm/arch.git "$TMP"
 
   cd "$TMP"
   exec bin/install.sh < /dev/tty
