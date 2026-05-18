@@ -14,7 +14,7 @@ package neovim vim-spell-de tree-sitter-cli \
   vscode-css-languageserver vscode-html-languageserver vscode-json-languageserver
 
 symlink -u res/nvim .config/nvim
-write -au .config/dropin/env.sh "EDITOR=nvim"
+write -au .config/env.sh "EDITOR=nvim"
 
 script -u << EOF
 echo "Installing nvim treesitter parsers..."

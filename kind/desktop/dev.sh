@@ -2,7 +2,7 @@ package make cmake ninja gdb strace gcc rust python python-pip nodejs npm jdk-op
   texlive-basic texlive-latex texlive-latexrecommended texlive-fontsrecommended texlive-langgerman \
   texlive-binextra perl-file-homedir perl-yaml-tiny
 
-write -au .config/dropin/env.sh << EOF
+write -au .config/env.sh << EOF
 CMAKE_GENERATOR="Ninja"
 CMAKE_EXPORT_COMPILE_COMMANDS="ON"
 EOF

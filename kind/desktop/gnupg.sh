@@ -8,7 +8,7 @@ gpg --import "$(use res/key.gpg)"
 gpg --quick-set-ownertrust 32104A99C1849AF79B2C92FCE85EB0566C779A2F ultimate
 EOF
 
-write -au .config/dropin/env.sh << "EOF"
+write -au .config/env.sh << "EOF"
 GNUPGHOME="$HOME/.local/share/gnupg"
 GPG_TTY="$(tty)"
 EOF
