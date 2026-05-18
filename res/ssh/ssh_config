@@ -5,8 +5,12 @@ Host *
   IdentitiesOnly yes
   SetEnv TERM=xterm-256color
 
-Host arch
-  IdentityFile ~/.ssh/arch
+Host pascal-pc
+  IdentityFile ~/.ssh/pascal-pc
+  Port 1970
+
+Host pascal-laptop
+  IdentityFile ~/.ssh/pascal-laptop
   Port 1970
 
 Host bowser

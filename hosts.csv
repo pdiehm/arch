@@ -1,2 +1,3 @@
 name,kind,boot,cpu
-arch,desktop,EFI,amd
+pascal-pc,desktop,EFI,amd
+pascal-laptop,desktop,EFI,amd

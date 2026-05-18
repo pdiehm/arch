@@ -5,7 +5,8 @@ write /etc/hosts << EOF
 ::1                  localhost
 192.168.1.88         bowser
 192.168.1.89         homeassistant
-192.168.1.90         arch
+192.168.1.90         pascal-pc
+192.168.1.91         pascal-laptop
 91.99.52.233         goomba
 2a01:4f8:c0c:988b::1 goomba
 EOF
