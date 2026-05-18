@@ -1,0 +1,7 @@
+[General]
+BrowseThroughArchives=true
+RememberOpenedTabs=false
+TerminalApplication=kitty
+
+[PreviewSettings]
+MaximumRemoteSize=67108864

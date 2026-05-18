@@ -1,0 +1,5 @@
+[General]
+BackgroundColorMode=DocumentView::Dark
+
+[ImageView]
+MouseWheelBehavior=MouseWheelBehavior::Zoom
