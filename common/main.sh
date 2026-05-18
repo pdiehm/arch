@@ -1,8 +1,8 @@
 import ./boot
-import ./bwrap
-import ./docker
 import ./locale
 import ./network
+import ./docker
+import ./bwrap
 
 write -a /etc/environment << EOF
 HOSTNAME="$HOST_NAME"

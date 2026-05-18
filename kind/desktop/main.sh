@@ -1,9 +1,9 @@
-import ./dev
-import ./gnupg
 import ./hypr
 import ./network
-import ./nvim
+import ./gnupg
 import ./ssh
+import ./dev
+import ./nvim
 import ./yubikey
 
 copy res/systemd/logind.conf /etc/systemd/logind.conf
