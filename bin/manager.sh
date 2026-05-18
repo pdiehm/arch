@@ -126,8 +126,8 @@ secrets() {
     rm "$TMP/secrets"
   done
 
-  printf "HOSTS %s\n" "${hosts[*]}" > "$TMP/edit"
-  printf "MASTER %s\n" "${access["keys/master"]:-}" >> "$TMP/edit"
+  echo "HOSTS ${hosts[*]}" > "$TMP/edit"
+  echo "MASTER ${access["keys/master"]:-}" >> "$TMP/edit"
 
   for key in "${keys[@]}"; do
     if [[ $key == keys/* ]]; then continue; fi
@@ -142,7 +142,7 @@ secrets() {
 
     rm -rf "$TMP/secrets"
     mkdir "$TMP/secrets"
-    printf "keys/master %s\n" "${secrets["keys/master"]}" > "$TMP/secrets/master"
+    echo "keys/master ${secrets["keys/master"]}" > "$TMP/secrets/master"
 
     local error="" name="" hosts=() value=()
     while read -r line; do
@@ -168,8 +168,8 @@ secrets() {
                 secrets["keys/$host"]="$(head -c 32 /dev/urandom | encode_secret)"
               fi
 
-              printf "keys/%s %s\n" "$host" "${secrets["keys/$host"]}" >> "$TMP/secrets/master"
-              printf "keys/%s %s\n" "$host" "${secrets["keys/$host"]}" > "$TMP/secrets/$host"
+              echo "keys/$host ${secrets["keys/$host"]}" >> "$TMP/secrets/master"
+              echo "keys/$host ${secrets["keys/$host"]}" > "$TMP/secrets/$host"
             fi
           done
           ;;
@@ -179,7 +179,7 @@ secrets() {
             if [[ ! -f $TMP/secrets/$host ]]; then
               error="Host '$host' not in hosts list"
             else
-              printf "keys/master %s\n" "${secrets["keys/master"]}" >> "$TMP/secrets/$host"
+              echo "keys/master ${secrets["keys/master"]}" >> "$TMP/secrets/$host"
             fi
           done
           ;;
@@ -209,7 +209,7 @@ secrets() {
               if [[ ! -f $TMP/secrets/$host ]]; then
                 error="Host '$host' not in hosts list"
               else
-                printf "%s %s\n" "$name" "$text" >> "$TMP/secrets/$host"
+                echo "$name $text" >> "$TMP/secrets/$host"
               fi
             done
 

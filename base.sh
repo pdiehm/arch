@@ -65,19 +65,17 @@ write() {
 
 # copy [-ensux] [-m mode] <src> <dst>
 #   -e   substitute environment variables
-#   -n   insert final newline
 #   -s   interpret src as secret name
 #   -u   as user to home directory
 #   -x   set executable
 #   -m   set mode
 copy() {
   local OPTIND OPTARG opt
-  local envsubst=0 newline=0 secret=0 user=0 executable=0 mode=""
+  local envsubst=0 secret=0 user=0 executable=0 mode=""
 
-  while getopts "ensuxm:" opt; do
+  while getopts "esuxm:" opt; do
     case "$opt" in
       e) envsubst=1 ;;
-      n) newline=1 ;;
       s) secret=1 ;;
       u) user=1 ;;
       x) executable=1 ;;
@@ -101,10 +99,8 @@ copy() {
 
   if ((user)); then
     run sudo -u pascal env -C /home/pascal bash -c "$cmd"
-    if ((newline)); then run env -C /home/pascal bash -c "printf '\n' >> ${dst@Q}"; fi
   else
     run bash -c "$cmd"
-    if ((newline)); then run bash -c "printf '\n' >> ${dst@Q}"; fi
   fi
 }
 
@@ -358,7 +354,7 @@ if secret -q keys/master; then copy -s keys/master /var/local/syscfg/master; fi
 
 script << EOF
 sha256sum /var/local/syscfg/key | head -c 32 > /etc/machine-id
-printf '\n' >> /etc/machine-id
+echo >> /etc/machine-id
 EOF
 
 write -a /etc/pacman.conf << EOF

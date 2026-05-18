@@ -117,15 +117,15 @@ mkcd() {
 }
 
 watch() (
-  trap "echo -en '\e[?25h\e[?1049l'" EXIT
+  trap "printf '\e[?25h\e[?1049l'" EXIT
   trap "exit 0" INT
 
-  echo -en "\e[?25l\e[?1049h"
+  printf "\e[?25l\e[?1049h"
   while true; do
     echo -e "\e[H\e[2mWatching: $*\e[m\n"
     script --quiet --command "zsh --interactive -c $(printf "%q" "$*")" /dev/null | sed $'s/^/\e[K/'
 
-    echo -en "\e[J"
+    printf "\e[J"
     sleep 1
   done
 )

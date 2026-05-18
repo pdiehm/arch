@@ -26,7 +26,7 @@ conflict() {
 
 git-url() {
   if ! git remote get-url origin 2> /dev/null; then
-    printf "local"
+    echo "local"
   fi
 }
 
@@ -34,7 +34,7 @@ git-head() {
   if git rev-parse HEAD &> /dev/null; then
     git rev-parse --abbrev-ref HEAD
   else
-    printf "NULL"
+    echo "NULL"
   fi
 }
 
@@ -48,17 +48,17 @@ git-branches() {
 }
 
 git-status() {
-  if [[ -n "$(git status --porcelain)" ]]; then printf "change\n"; fi
-  if [[ -n "$(git stash list)" ]]; then printf "stash\n"; fi
+  if [[ -n "$(git status --porcelain)" ]]; then echo "change"; fi
+  if [[ -n "$(git stash list)" ]]; then echo "stash"; fi
 
   local branch ahead behind
   while read -r branch; do
     if git-is-local "$branch"; then
-      printf "local 0 0 %s\n" "$branch"
+      echo "local 0 0 $branch"
     else
       ahead="$(git rev-list --count "$branch@{upstream}..$branch")"
       behind="$(git rev-list --count "$branch..$branch@{upstream}")"
-      printf "branch %d %d %s\n" "$ahead" "$behind" "$branch"
+      echo "branch $ahead $behind $branch"
     fi
   done < <(git-branches)
 }
@@ -123,9 +123,9 @@ list() {
     head="$(git-head)"
 
     if [[ $head == NULL ]]; then
-      echo -e "\e[1;34m$repo \e[0;31mN/A \e[0;2m$url\e[m"
+      printf "\e[1;34m%s \e[0;31m%s \e[0;2m%s\e[m\n" "$repo" "N/A" "$url"
     elif [[ $head == HEAD ]]; then
-      echo -e "\e[1;34m$repo \e[0;33m$(git rev-parse --short HEAD) \e[0;2m$url\e[m"
+      printf "\e[1;34m%s \e[0;33m%s \e[0;2m%s\e[m\n" "$repo" "$(git rev-parse --short HEAD)" "$url"
     else
       local icon=""
 
@@ -138,7 +138,7 @@ list() {
         esac
       done < <(git-status)
 
-      echo -e "\e[1;34m$repo \e[0;32m$head\e[36m$icon \e[0;2m$url\e[m"
+      printf "\e[1;34m%s \e[0;32m%s\e[36m%s \e[0;2m%s\e[m\n" "$repo" "$head" "$icon" "$url"
     fi
 
     cd ..
@@ -161,7 +161,7 @@ remove() {
 
   if ((${#changes[@]})); then
     echo "The repository contains local changes:"
-    for change in "${changes[@]}"; do echo "  - $change"; done
+    printf "  - %s\n" "${changes[@]}"
     echo
 
     read -rp "Are you sure you want to remove this repository? [y/N] " read
@@ -210,11 +210,11 @@ status() {
   head="$(git-head)"
 
   if [[ $head == NULL ]]; then
-    echo -e "\e[1mRepo: \e[34m$name \e[m(\e[31mempty\e[m, \e[2m$url\e[m)\n"
+    printf "\e[1mRepo: \e[34m%s \e[m(\e[31m%s\e[m, \e[2m%s\e[m)\n\n" "$name" "empty" "$url"
   elif [[ $head == HEAD ]]; then
-    echo -e "\e[1mRepo: \e[34m$name \e[m(\e[33m$(git rev-parse --short HEAD)\e[m, \e[2m$url\e[m)\n"
+    printf "\e[1mRepo: \e[34m%s \e[m(\e[33m%s\e[m, \e[2m%s\e[m)\n\n" "$name" "$(git rev-parse --short HEAD)" "$url"
   else
-    echo -e "\e[1mRepo: \e[34m$name \e[m(\e[32m$head\e[m, \e[2m$url\e[m)\n"
+    printf "\e[1mRepo: \e[34m%s \e[m(\e[32m%s\e[m, \e[2m%s\e[m)\n\n" "$name" "$head" "$url"
   fi
 
   git-status | while read -r state ahead behind branch; do
@@ -223,8 +223,8 @@ status() {
     fi
 
     case "$state" in
-      local) echo -e "\e[32m$branch\x09\e[36mlocal\x09\e[33m$hash \e[m$message" ;;
-      branch) echo -e "\e[32m$branch\x09\e[36m\u2191\e[m$ahead \e[36m\u2193\e[m$behind\x09\e[33m$hash \e[m$message" ;;
+      local) printf "\e[32m%s\x09\e[36mlocal\x09\e[33m%s \e[m%s\n" "$branch" "$hash" "$message" ;;
+      branch) printf "\e[32m%s\x09\e[36m\u2191\e[m%d \e[36m\u2193\e[m%d\x09\e[33m%s \e[m%s\n" "$branch" "$ahead" "$behind" "$hash" "$message" ;;
     esac
   done | column --table --separator $'\x09'
 

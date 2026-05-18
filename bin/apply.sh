@@ -39,12 +39,12 @@ resolve() {
   local path="$1"
 
   if [[ $path == - ]]; then
-    printf "/dev/stdin"
+    echo "/dev/stdin"
   elif [[ $path == ./* ]]; then
     path="$(dirname "$MODULE")/${path#./}"
-    printf "%s" "${path#./}"
+    echo "${path#./}"
   else
-    printf "%s" "$path"
+    echo "$path"
   fi
 }
 
@@ -70,7 +70,7 @@ import() {
 
 # run <command> ...
 run() {
-  printf "%s\n" "${*@Q}" >> "$TMP/stages/$STAGE/build.sh"
+  echo "${*@Q}" >> "$TMP/stages/$STAGE/build.sh"
   sha <<< "$*" >> "$TMP/stages/$STAGE/hash"
 }
 
@@ -100,7 +100,7 @@ use() {
     error "Cannot hash resource '$path'"
   fi
 
-  printf "%s" "${target/#"$TMP/stages/$STAGE"//stage}"
+  echo "${target/#"$TMP/stages/$STAGE"//stage}"
 }
 
 # secret [-fq] <name>
@@ -125,9 +125,9 @@ secret() {
     if [[ $key != keys/* ]]; then value="$(decode_secret "$value")"; fi
 
     if ((file)); then
-      printf "%s" "$value" | use
+      echo "$value" | use
     elif ((!query)); then
-      printf "%s" "$value"
+      echo "$value"
     fi
 
     return

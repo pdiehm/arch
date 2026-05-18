@@ -12,7 +12,7 @@ warn() {
 # sha [data ...]
 sha() {
   if (($#)); then
-    printf "%s" "$*" | sha256sum | cut -d " " -f 1
+    echo -n "$*" | sha256sum | cut -d " " -f 1
   else
     sha256sum | cut -d " " -f 1
   fi
@@ -21,7 +21,7 @@ sha() {
 # encode_secret [data ...]
 encode_secret() {
   if (($#)); then
-    printf "%s" "$*" | base64 -w 0
+    echo -n "$*" | base64 -w 0
   else
     base64 -w 0
   fi
@@ -30,7 +30,7 @@ encode_secret() {
 # decode_secret [data ...]
 decode_secret() {
   if (($#)); then
-    printf "%s" "$*" | base64 -d
+    echo -n "$*" | base64 -d
   else
     base64 -d
   fi
