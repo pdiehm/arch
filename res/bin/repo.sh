@@ -80,9 +80,15 @@ help() {
 }
 
 clone() {
-  local url="$1" name="${2:-}"
+  local url="${1%.git}.git" name="${2:-}"
 
-  if [[ -z $name ]]; then
+  for url in "$url" "gh:/$url" "gh:$url" ""; do
+    if git ls-remote "$url" &> /dev/null; then break; fi
+  done
+
+  if [[ -z $url ]]; then
+    fatal "Repo '$1' not found"
+  elif [[ -z $name ]]; then
     git clone "$url"
   else
     git clone "$url" "$name"
