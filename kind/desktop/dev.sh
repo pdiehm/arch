@@ -1,4 +1,4 @@
-package make cmake ninja gcc gdb rust python python-pip nodejs npm jdk-openjdk sqlite \
+package make cmake ninja gdb strace gcc rust python python-pip nodejs npm jdk-openjdk sqlite \
   texlive-basic texlive-latex texlive-latexrecommended texlive-fontsrecommended texlive-langgerman \
   texlive-binextra perl-file-homedir perl-yaml-tiny
 
