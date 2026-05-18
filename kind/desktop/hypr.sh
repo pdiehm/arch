@@ -9,7 +9,7 @@ package hyprland hyprpaper hyprlock hypridle hyprshot hyprpicker xdg-desktop-por
 symlink -u res/hypr .config/hypr
 symlink -u res/wallpaper.jpg .local/share/wallpaper.jpg
 
-package pipewire pipewire-alsa wireplumber alsa-utils wiremix
+package pipewire pipewire-alsa wireplumber alsa-utils
 persist -u .local/state/wireplumber
 symlink -u res/bin/wp-toggle.sh .local/bin/wp-toggle
 
