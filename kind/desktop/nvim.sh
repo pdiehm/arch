@@ -1,19 +1,17 @@
-package neovim vim-spell-de tree-sitter-cli
-package clang rust-analyzer yaml-language-server
-
-package bash-language-server shellcheck shfmt
-package cmake-language-server cmake-format
-package dockerfile-language-server dockerfmt
-package java-language-server google-java-format
-package lua-language-server stylua
-package nixd nixfmt
-package phpactor prettier-plugin-php
-package python-lsp-server python-black python-isort
-package texlab bibtex-tidy
-
-package typescript-language-server eslint-language-server
-package prettier prettier-plugin-css-order prettier-plugin-xml
-package vscode-css-languageserver vscode-html-languageserver vscode-json-languageserver
+package neovim vim-spell-de tree-sitter-cli \
+  clang rust-analyzer yaml-language-server \
+  bash-language-server shellcheck shfmt \
+  cmake-language-server cmake-format \
+  dockerfile-language-server dockerfmt \
+  java-language-server google-java-format \
+  lua-language-server stylua \
+  nixd nixfmt \
+  phpactor prettier-plugin-php \
+  python-lsp-server python-black python-isort \
+  texlab bibtex-tidy \
+  typescript-language-server eslint-language-server \
+  prettier prettier-plugin-css-order prettier-plugin-xml \
+  vscode-css-languageserver vscode-html-languageserver vscode-json-languageserver
 
 symlink -u res/nvim .config/nvim
 write -au .config/dropin/env.sh "EDITOR=nvim"

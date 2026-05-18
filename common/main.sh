@@ -32,8 +32,8 @@ copy -sm 444 "ssh/$HOST_NAME/auth" /etc/ssh/authorized_keys
 systemd -m sshdgenkeys.service
 systemd -e sshd.service
 
-package bat eza fd ripgrep pv fzf parallel
-package lsof usbutils pciutils fastfetch duf ncdu
-package openbsd-netcat doggo mtr xh tcpdump
-package btrfs-progs e2fsprogs exfatprogs dosfstools
-package man-db man-pages zip unzip
+package man-db man-pages zip unzip \
+  bat eza fd ripgrep pv fzf parallel \
+  lsof usbutils pciutils fastfetch duf ncdu \
+  openbsd-netcat doggo mtr xh tcpdump \
+  btrfs-progs e2fsprogs exfatprogs dosfstools

@@ -1,6 +1,6 @@
-package make cmake ninja gcc gdb rust python python-pip nodejs npm jdk-openjdk sqlite
-package texlive-basic texlive-latex texlive-latexrecommended texlive-fontsrecommended texlive-langgerman
-package texlive-binextra perl-file-homedir perl-yaml-tiny
+package make cmake ninja gcc gdb rust python python-pip nodejs npm jdk-openjdk sqlite \
+  texlive-basic texlive-latex texlive-latexrecommended texlive-fontsrecommended texlive-langgerman \
+  texlive-binextra perl-file-homedir perl-yaml-tiny
 
 write -au .config/dropin/env.sh << EOF
 CMAKE_GENERATOR="Ninja"
