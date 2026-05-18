@@ -25,6 +25,8 @@ Host goomba
 
 Host github.com
   IdentityFile ~/.ssh/github
+  User git
 
 Host gitlab.informatik.uni-wuerzburg.de
   IdentityFile ~/.ssh/uni-gitlab
+  User git
