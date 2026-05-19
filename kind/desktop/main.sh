@@ -1,5 +1,5 @@
-import ./hypr
 import ./network
+import ./hypr
 import ./applications
 import ./gnupg
 import ./ssh
@@ -13,5 +13,5 @@ write /etc/sysctl.d/sysrq.conf "kernel.sysrq = 1"
 package android-file-transfer sshfs
 symlink -u res/bin/mnt.sh .local/bin/mnt
 
-package ffmpeg wiremix wl-clipboard
+package ffmpeg wl-clipboard
 write -a /etc/fstab "tmpfs /home/pascal/Temp tmpfs defaults 0 0"

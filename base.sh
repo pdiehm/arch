@@ -215,7 +215,7 @@ conf() {
 
 # package <name> ...
 package() {
-  run pacman --noconfirm --sync --refresh --sysupgrade --needed "$@"
+  run pacman --noconfirm --sync --refresh --sysupgrade "$@"
 }
 
 # upgrade [command ...]
@@ -364,7 +364,7 @@ Server = https://pdiehm.github.io/aur
 EOF
 
 conf -e /etc/pacman.conf Color
-package linux linux-firmware arch-install-scripts btrfs-progs sudo git
+package linux linux-firmware arch-install-scripts btrfs-progs cryptsetup sudo git
 run pacman --files --refresh
 
 upgrade pacman --noconfirm --sync --refresh --sysupgrade
