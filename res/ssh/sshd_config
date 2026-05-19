@@ -1,10 +1,12 @@
-AllowUsers pascal
-AuthorizedKeysFile /etc/ssh/authorized_keys
-GatewayPorts yes
 HostKey /etc/ssh/host_key
+AuthorizedKeysFile /etc/ssh/authorized_keys
+Subsystem sftp /usr/lib/ssh/sftp-server
+
+AllowUsers pascal
 KbdInteractiveAuthentication no
-MaxAuthTries 1
 PasswordAuthentication no
 PermitRootLogin no
+MaxAuthTries 1
+
 Port 1970
-Subsystem sftp /usr/lib/ssh/sftp-server
+GatewayPorts yes
