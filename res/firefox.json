@@ -155,13 +155,13 @@
         },
         {
           "Name": "Arch Packages",
-          "Alias": "@archpkgs",
+          "Alias": "@ap",
           "URLTemplate": "https://archlinux.org/packages?q={searchTerms}",
           "IconURL": "https://archlinux.org/favicon.ico"
         },
         {
           "Name": "Arch Wiki",
-          "Alias": "@archwiki",
+          "Alias": "@aw",
           "URLTemplate": "https://wiki.archlinux.org/index.php?search={searchTerms}",
           "IconURL": "https://wiki.archlinux.org/favicon.ico"
         },
@@ -191,8 +191,14 @@
         },
         {
           "Name": "GitHub",
-          "Alias": "@github",
+          "Alias": "@gh",
           "URLTemplate": "https://github.com/search?q={searchTerms}",
+          "IconURL": "https://github.com/favicon.ico"
+        },
+        {
+          "Name": "GitHub Actions",
+          "Alias": "@gha",
+          "URLTemplate": "https://github.com/marketplace?type=actions&query={searchTerms}",
           "IconURL": "https://github.com/favicon.ico"
         },
         {
@@ -215,19 +221,19 @@
         },
         {
           "Name": "Nix Packages",
-          "Alias": "@nixpkgs",
+          "Alias": "@np",
           "URLTemplate": "https://search.nixos.org/packages?channel=unstable&query={searchTerms}",
           "IconURL": "https://search.nixos.org/favicon-96x96.png"
         },
         {
           "Name": "NixOS Options",
-          "Alias": "@nixopts",
+          "Alias": "@no",
           "URLTemplate": "https://search.nixos.org/options?channel=unstable&query={searchTerms}",
           "IconURL": "https://search.nixos.org/favicon-96x96.png"
         },
         {
           "Name": "NixOS Wiki",
-          "Alias": "@nixwiki",
+          "Alias": "@nw",
           "URLTemplate": "https://wiki.nixos.org/w/index.php?search={searchTerms}",
           "IconURL": "https://wiki.nixos.org/favicon.ico"
         },
@@ -245,13 +251,13 @@
         },
         {
           "Name": "YouTube",
-          "Alias": "@youtube",
+          "Alias": "@yt",
           "URLTemplate": "https://youtube.com/results?search_query={searchTerms}",
           "IconURL": "https://youtube.com/favicon.ico"
         },
         {
           "Name": "YouTube Music",
-          "Alias": "@music",
+          "Alias": "@ytm",
           "URLTemplate": "https://music.youtube.com/search?q={searchTerms}",
           "IconURL": "https://music.youtube.com/favicon.ico"
         }
