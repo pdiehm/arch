@@ -15,8 +15,8 @@ run chsh --shell /usr/bin/zsh pascal
 symlink -u res/zsh .config/zsh
 
 package vim
-write -a /etc/environment "EDITOR=vim"
 copy res/vimrc.vim /etc/vimrc
+write -a /etc/environment "EDITOR=vim"
 
 package htop
 copy -u res/htop.conf .config/htop/htoprc

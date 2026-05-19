@@ -1,5 +1,5 @@
 package yubikey-manager
-write -a /etc/gnupg/scdaemon.conf disable-ccid
+write -a /etc/gnupg/scdaemon.conf "disable-ccid"
 systemd -e pcscd.service
 
 package evtest

@@ -14,4 +14,5 @@ package android-file-transfer sshfs
 symlink -u res/bin/mnt.sh .local/bin/mnt
 
 package ffmpeg wl-clipboard
+script -u <<< "mkdir Downloads"
 write -a /etc/fstab "tmpfs /home/pascal/Temp tmpfs defaults 0 0"

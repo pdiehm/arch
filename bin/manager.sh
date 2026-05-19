@@ -23,7 +23,9 @@ edit() {
 }
 
 rebuild() {
-  if ((UID)); then exec sudo "$0" rebuild "$@"; fi
+  if ((UID)); then
+    exec sudo "$0" rebuild "$@"
+  fi
 
   local OPTIND opt
   local help=0 clean=0 dry=0
@@ -57,7 +59,9 @@ rebuild() {
 }
 
 secrets() {
-  if ((UID)); then exec sudo "$0" secrets; fi
+  if ((UID)); then
+    exec sudo "$0" secrets
+  fi
 
   trap 'rm -rf "$TMP"' EXIT
   TMP="$(mktemp -d)"
@@ -68,7 +72,6 @@ secrets() {
 
   if [[ -f secrets/master && -f /var/local/syscfg/master ]]; then
     secrets["keys/master"]="$(< /var/local/syscfg/master)"
-
     if ! load_secrets secrets/master "$TMP/secrets" "${secrets["keys/master"]}"; then
       warn "Stale master password"
     fi
@@ -100,9 +103,7 @@ secrets() {
 
   for host in secrets/*; do
     host="${host##*/}"
-
     if [[ $host == master ]]; then continue; fi
-    hosts+=("$host")
 
     if [[ -z ${secrets["keys/$host"]:+x} ]]; then
       warn "No key for host '$host', skipping..."
@@ -117,12 +118,12 @@ secrets() {
     while read -r key value; do
       if [[ -z ${secrets[$key]:+x} ]]; then
         warn "Secret '$key' for host '$host' not in master, skipping..."
-        continue
+      else
+        access[$key]+="$host "
       fi
-
-      access[$key]+="$host "
     done < "$TMP/secrets"
 
+    hosts+=("$host")
     rm "$TMP/secrets"
   done
 
@@ -251,37 +252,42 @@ secrets() {
 
 sync() {
   git pull
-  git push
+  ahead="$(git rev-list --count "@{upstream}..")"
+  if ((ahead == 0)); then return; fi
+
+  read -rp "Push local commits? [y/N] " read
+  if [[ $read == y ]]; then git push; fi
 }
 
 upgrade() {
-  if ((UID)); then exec sudo "$0" upgrade; fi
+  if ((UID)); then
+    exec sudo "$0" upgrade
+  fi
 
   trap 'unmount "$TMP/root"; unmount "$TMP/boot"; rmdir "$TMP"' EXIT
   TMP="$(mktemp -d)"
   chmod 700 "$TMP"
 
   mount --mkdir --label root "$TMP/root"
+  if [[ -f $TMP/root/build ]]; then btrfs subvolume delete --recursive "$TMP/root/build"; fi
+
+  btrfs subvolume snapshot "$TMP/root/latest" "$TMP/root/build"
+  mount --bind "$TMP/root/build" "$TMP/root/build"
+  mount --bind "$TMP/root/pkgs" "$TMP/root/build/var/cache/pacman/pkg"
+  arch-chroot "$TMP/root/build" bash -eu /var/local/syscfg/upgrade.sh
+
   hash="$(readlink "$TMP/root/latest")"
   hash="$(sha "${hash##*/}++")"
 
-  local build="$TMP/root/build"
-  if [[ -d $build ]]; then btrfs subvolume delete --recursive "$build"; fi
-
-  btrfs subvolume snapshot "$TMP/root/latest" "$build"
-  mount --bind "$build" "$build"
-  mount --bind "$TMP/root/pkgs" "$build/var/cache/pacman/pkg"
-  arch-chroot "$build" bash -eu /var/local/syscfg/upgrade.sh
-
-  touch "$build"
-  unmount "$build"
-  mv "$build" "$TMP/root/images/$hash"
+  touch "$TMP/root/build"
+  unmount "$TMP/root/build"
+  mv "$TMP/root/build" "$TMP/root/images/$hash"
 
   rm -f "$TMP/root/latest"
   ln -s "images/$hash" "$TMP/root/latest"
 
   mount --mkdir --label BOOT "$TMP/boot"
-  rm -rf "${TMP:?}/boot"/*/*
+  rm -rf "${TMP:?}/boot"/*
   cp -r "$TMP/root/latest/boot/." "$TMP/boot"
 }
 

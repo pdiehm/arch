@@ -164,13 +164,13 @@ if [[ ! -f $TMP/secrets ]]; then
   fi
 
   while read -r key value; do
-    if [[ $key != keys/$HOST_NAME ]]; then continue; fi
-
-    if ! load_secrets "secrets/$HOST_NAME" "$TMP/secrets" "$value"; then
-      fatal "Incorrect host key"
+    if [[ $key == keys/$HOST_NAME ]]; then
+      if ! load_secrets "secrets/$HOST_NAME" "$TMP/secrets" "$value"; then
+        fatal "Incorrect host key"
+      else
+        break
+      fi
     fi
-
-    break
   done < "$TMP/master"
 
   if [[ ! -f $TMP/secrets ]]; then fatal "No key for host '$HOST_NAME'"; fi
@@ -186,45 +186,44 @@ if [[ -n ${DRY:+x} ]]; then
 fi
 
 mount --mkdir --label root "$TMP/root"
-BUILD="$TMP/root/build"
 HASH="$(sha base)"
 
 btrfs property set "$TMP/root" compression zstd
 if [[ ! -d $TMP/root/images ]]; then mkdir "$TMP/root/images"; fi
 if [[ ! -d $TMP/root/perm ]]; then btrfs subvolume create "$TMP/root/perm"; fi
 if [[ ! -d $TMP/root/pkgs ]]; then btrfs subvolume create "$TMP/root/pkgs"; fi
-if [[ -d $BUILD ]]; then btrfs subvolume delete --recursive "$BUILD"; fi
-if [[ -n ${CLEAN:+x} && -d $TMP/root/images/$HASH ]]; then btrfs subvolume delete --recursive "$TMP/root/images/$HASH"; fi
+if [[ -d $TMP/root/build ]]; then btrfs subvolume delete --recursive "$TMP/root/build"; fi
 
-if [[ ! -d $TMP/root/images/$HASH ]]; then
-  btrfs subvolume create "$BUILD"
-  mount --bind "$BUILD" "$BUILD"
-  mount --mkdir --bind "$TMP/root/pkgs" "$BUILD/var/cache/pacman/pkg"
+if [[ -n ${CLEAN:+x} || ! -d $TMP/root/images/$HASH ]]; then
+  btrfs subvolume create "$TMP/root/build"
+  mount --bind "$TMP/root/build" "$TMP/root/build"
+  mount --mkdir --bind "$TMP/root/pkgs" "$TMP/root/build/var/cache/pacman/pkg"
 
-  pacstrap -G "$BUILD"
-  arch-chroot "$BUILD" bash -c "pacman-key --init && pacman-key --populate"
-  arch-chroot "$BUILD" mkdir -m 1777 /perm
+  pacstrap -G "$TMP/root/build"
+  arch-chroot "$TMP/root/build" bash -c "pacman-key --init && pacman-key --populate"
+  arch-chroot "$TMP/root/build" mkdir -m 1777 /perm
+  unmount "$TMP/root/build"
 
-  unmount "$BUILD"
-  mv "$BUILD" "$TMP/root/images/$HASH"
+  if [[ -d $TMP/root/images/$HASH ]]; then btrfs subvolume delete --recursive "$TMP/root/images/$HASH"; fi
+  mv "$TMP/root/build" "$TMP/root/images/$HASH"
 fi
 
-touch "$TMP/root/images/$HASH"
 for ((stage = 0; stage < STAGE; stage++)); do
   hash="$(sha "$HASH+$(sha < "$TMP/stages/$stage/hash")")"
+  touch "$TMP/root/images/$HASH"
 
   if [[ -n ${CLEAN:+x} || ! -d $TMP/root/images/$hash ]]; then
-    btrfs subvolume snapshot "$TMP/root/images/$HASH" "$BUILD"
-    mount --bind "$BUILD" "$BUILD"
-    mount --bind "$TMP/root/pkgs" "$BUILD/var/cache/pacman/pkg"
-    mount --mkdir --bind "$TMP/stages/$stage" "$BUILD/stage"
+    btrfs subvolume snapshot "$TMP/root/images/$HASH" "$TMP/root/build"
+    mount --bind "$TMP/root/build" "$TMP/root/build"
+    mount --bind "$TMP/root/pkgs" "$TMP/root/build/var/cache/pacman/pkg"
+    mount --mkdir --bind "$TMP/stages/$stage" "$TMP/root/build/stage"
 
-    arch-chroot "$BUILD" env -i SHELL=/bin/bash SYSTEMD_IN_CHROOT=1 bash -eu /stage/build.sh
-    unmount "$BUILD"
-    rmdir "$BUILD/stage"
+    arch-chroot "$TMP/root/build" env -i SHELL=/bin/bash SYSTEMD_IN_CHROOT=1 bash -eu /stage/build.sh
+    unmount "$TMP/root/build"
+    rmdir "$TMP/root/build/stage"
 
     if [[ -d $TMP/root/images/$hash ]]; then btrfs subvolume delete --recursive "$TMP/root/images/$hash"; fi
-    mv "$BUILD" "$TMP/root/images/$hash"
+    mv "$TMP/root/build" "$TMP/root/images/$hash"
   fi
 
   HASH="$hash"
@@ -233,7 +232,6 @@ done
 
 rm -f "$TMP/root/latest"
 ln -s "images/$HASH" "$TMP/root/latest"
-find "$TMP/root/images" -mindepth 1 -maxdepth 1 -mtime +1 -exec btrfs subvolume delete --recursive "{}" +
 
 mount --mkdir --label BOOT "$TMP/boot"
 rm -rf "${TMP:?}/boot"/*
@@ -245,4 +243,5 @@ for path in "$TMP/root/latest/perm"/*; do
   touch "$target"
 done
 
+find "$TMP/root/images" -mindepth 1 -maxdepth 1 -mtime +1 -exec btrfs subvolume delete --recursive "{}" +
 find "$TMP/root/perm" -mindepth 1 -maxdepth 1 -mtime +1 -exec rm -rf "{}" +

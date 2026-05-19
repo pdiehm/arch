@@ -33,9 +33,9 @@ _prompt_git() {
   fi
 
   if [[ -n "$(git remote show)" && $branch != HEAD ]]; then
-    if git rev-parse "@{u}" &> /dev/null; then
-      local ahead="$(git rev-list --count "@{u}..")"
-      local behind="$(git rev-list --count "..@{u}")"
+    if git rev-parse "@{upstream}" &> /dev/null; then
+      local ahead="$(git rev-list --count "@{upstream}..")"
+      local behind="$(git rev-list --count "..@{upstream}")"
 
       if ((ahead && behind)); then
         echo -en " %F{6}\u296f%f"
