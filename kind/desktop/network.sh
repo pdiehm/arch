@@ -15,4 +15,4 @@ env PASSWORD "$(secret network/eduroam/password)"
 copy -s network/eduroam/private-key /etc/NetworkManager/system-connections/eduroam/private-key
 copy -s network/eduroam/client-cert /etc/NetworkManager/system-connections/eduroam/client-cert
 copy -s network/eduroam/ca-cert /etc/NetworkManager/system-connections/eduroam/ca-cert
-copy -em 400 res/NetworkManager/wifi-enterprise.nmconnection /etc/NetworkManager/system-connections/eduroam.nmconnection
+copy -em 400 res/NetworkManager/wifi-eap.nmconnection /etc/NetworkManager/system-connections/eduroam.nmconnection
