@@ -1,16 +1,16 @@
 {
-  "modules-left": ["hyprland/workspaces", "group/hardware"],
+  "modules-left": ["hyprland/workspaces", "group/left"],
   "modules-center": ["mpris"],
-  "modules-right": ["group/settings", "clock"],
+  "modules-right": ["group/right", "clock"],
 
   "hyprland/workspaces": {
     "all-outputs": true,
     "move-to-monitor": true
   },
 
-  "group/hardware": {
+  "group/left": {
     "orientation": "inherit",
-    "modules": ["cpu", "memory", "disk"]
+    "modules": ["cpu", "memory", "disk", "temperature", "systemd-failed-units"]
   },
 
   "mpris": {
@@ -23,9 +23,9 @@
     "dynamic-len": 32
   },
 
-  "group/settings": {
+  "group/right": {
     "orientation": "inherit",
-    "modules": ["systemd-failed-units", "network", "wireplumber"]
+    "modules": ["network", "wireplumber", "backlight", "battery"]
   },
 
   "clock": {
@@ -53,24 +53,33 @@
   },
 
   "cpu": {
-    "interval": 1,
     "format": "  {usage}%",
-    "states": { "load": 20, "crit": 80 }
+    "states": { "load": 20, "crit": 80 },
+    "interval": 1
   },
 
   "memory": {
-    "interval": 1,
     "format": "  {percentage}%",
     "tooltip-format": "Memory: {used:.1f} / {total:.1f} GiB\nSwap: {swapUsed:.1f} / {swapTotal:.1f} GiB",
-    "states": { "warn": 50, "crit": 80 }
+    "states": { "warn": 50, "crit": 80 },
+    "interval": 1
   },
 
   "disk": {
-    "interval": 1,
     "format": "  {percentage_used}%",
     "tooltip-format": "{specific_used:.1f} / {specific_total:.1f} GiB",
+    "states": { "warn": 80, "crit": 95 },
     "unit": "GiB",
-    "states": { "warn": 80, "crit": 95 }
+    "interval": 1
+  },
+
+  "temperature": {
+    "format": "{icon} {temperatureC}°C",
+    "format-icons": ["", "", "", "", ""],
+    "tooltip": false,
+    "warning-threshold": 40,
+    "critical-threshold": 50,
+    "interval": 1
   },
 
   "systemd-failed-units": {
@@ -78,16 +87,16 @@
   },
 
   "network": {
-    "interval": 1,
     "format": " 󰛵 ",
     "format-ethernet": "󰈀  {ipaddr}/{cidr}",
-    "format-wifi": "{icon}  {ipaddr}/{cidr}",
+    "format-wifi": "{icon}   {ipaddr}/{cidr}",
     "format-disconnected": " 󰲛 ",
-    "format-icons": ["󰤯", "󰤟", "󰤢", "󰤥", "󰤨"],
     "tooltip-format": "{ifname}: Unknown",
     "tooltip-format-ethernet": "{ifname}: Ethernet\nGateway: {gwaddr}\nUp: {bandwidthUpBits}\nDown: {bandwidthDownBits}",
     "tooltip-format-wifi": "{ifname}: {essid} ({frequency}GHz WiFi)\nGateway: {gwaddr}\nUp: {bandwidthUpBits}\nDown: {bandwidthDownBits}",
-    "tooltip-format-disconnected": "{ifname}: Disconnected"
+    "tooltip-format-disconnected": "{ifname}: Disconnected",
+    "format-icons": ["󰤯", "󰤟", "󰤢", "󰤥", "󰤨"],
+    "interval": 1
   },
 
   "wireplumber": {
@@ -97,5 +106,26 @@
     "on-click": "wpctl set-mute @DEFAULT_SINK@ toggle",
     "on-click-right": "wpctl set-volume @DEFAULT_SINK@ 40%",
     "on-click-middle": "~/.local/bin/wp-toggle"
+  },
+
+  "backlight": {
+    "format": "{icon}  {percent}%",
+    "tooltip": false,
+    "format-icons": ["󰃞", "󰃟", "󰃠"],
+    "on-click": "brightnessctl set 50%",
+    "on-click-right": "brightnessctl set 50%",
+    "interval": 1
+  },
+
+  "battery": {
+    "format": "{icon}  {capacity}%",
+    "format-charging": "󰂄  {capacity}%",
+    "format-full": " 󱟢 ",
+    "tooltip-format": "{timeTo}\nPower: {power:.1f}W\nCycles: {cycles}\nHealth: {health}%",
+    "format-icons": ["󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"],
+    "format-time": "{H}:{m}",
+    "states": { "warn": 20, "crit": 10 },
+    "full-at": 95,
+    "interval": 1
   }
 }

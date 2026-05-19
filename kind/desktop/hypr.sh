@@ -13,8 +13,10 @@ package pipewire pipewire-alsa wireplumber alsa-utils
 persist -u .local/state/wireplumber
 symlink -u res/bin/wp-toggle.sh .local/bin/wp-toggle
 
-package kitty waybar rofi mako
-symlink -u res/kitty.conf .config/kitty/kitty.conf
+package waybar brightnessctl
 symlink -u res/waybar .config/waybar
+
+package kitty rofi mako
+symlink -u res/kitty.conf .config/kitty/kitty.conf
 symlink -u res/rofi.rasi .config/rofi/config.rasi
 symlink -u res/mako.conf .config/mako/config

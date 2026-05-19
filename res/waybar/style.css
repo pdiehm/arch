@@ -4,17 +4,17 @@ window#waybar {
 }
 
 box#workspaces,
-box#hardware,
+box#left,
 label#mpris,
-box#settings,
+box#right,
 label#clock {
   margin: 0.5rem 0.5rem 0;
 }
 
 box#workspaces,
-box#hardware label,
+box#left label,
 label#mpris,
-box#settings label,
+box#right label,
 label#clock {
   border: 1px solid #111;
   background-color: #333;
@@ -23,18 +23,18 @@ label#clock {
 }
 
 box#workspaces,
-box#hardware widget:first-child label,
+box#left widget:first-child label,
 label#mpris,
-box#settings widget:first-child label,
+box#right widget:first-child label,
 label#clock {
   border-top-left-radius: 10rem;
   border-bottom-left-radius: 10rem;
 }
 
 box#workspaces,
-box#hardware widget:last-child label,
+box#left widget:last-child label,
 label#mpris,
-box#settings widget:last-child label,
+box#right widget:last-child label,
 label#clock {
   border-top-right-radius: 10rem;
   border-bottom-right-radius: 10rem;
@@ -51,20 +51,29 @@ box#workspaces button.active {
   font-weight: bold;
 }
 
-label#cpu.load {
+label#cpu.load,
+label#battery.charging {
   color: #0074d9;
 }
 
 label#memory.warn,
 label#disk.warn,
-label#network:not(.disconnected):not(.wifi):not(.ethernet) {
+label#temperature.warning,
+label#network:not(.disconnected):not(.wifi):not(.ethernet),
+label#battery.discharging.warn {
   color: #ffdc00;
 }
 
 label#cpu.crit,
 label#memory.crit,
 label#disk.crit,
+label#temperature.critical,
 label#systemd-failed-units.degraded,
-label#network.disconnected {
+label#network.disconnected,
+label#battery.discharging.crit {
   color: #ff4136;
+}
+
+label#battery.full {
+  color: #2ecc40;
 }
