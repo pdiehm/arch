@@ -12,7 +12,7 @@ copy res/nix.conf /etc/nix/nix.conf
 systemd -e nix-daemon.service
 timer nix-gc monthly /usr/bin/nix-collect-garbage --delete-old
 
-run mkdir /perm/nix
+run mv /nix /perm/nix
 write -a /etc/fstab "/perm/nix /nix none bind 0 0"
 write -au .config/env.sh "NIX_PATH=nixpkgs=flake:nixpkgs"
 
