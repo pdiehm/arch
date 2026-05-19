@@ -46,7 +46,8 @@ box#workspaces button {
   color: #ddd;
 }
 
-box#workspaces button.active {
+box#workspaces button.active,
+box#workspaces button.special.visible {
   color: #0074d9;
   font-weight: bold;
 }

@@ -4,8 +4,23 @@
   "modules-right": ["group/right", "clock"],
 
   "hyprland/workspaces": {
+    "format": "{icon}",
     "all-outputs": true,
-    "move-to-monitor": true
+    "show-special": true,
+    "move-to-monitor": true,
+
+    "format-icons": {
+      "1": "1",
+      "2": "2",
+      "3": "3",
+      "4": "4",
+      "5": "5",
+      "6": "6",
+      "7": "7",
+      "8": "8",
+      "9": "9",
+      "special": "S"
+    }
   },
 
   "group/left": {
@@ -40,6 +55,7 @@
     },
 
     "calendar": {
+      "iso8601": true,
       "mode-mon-col": 3,
       "weeks-pos": "left",
 
@@ -83,7 +99,7 @@
   },
 
   "systemd-failed-units": {
-    "format": ""
+    "format": " "
   },
 
   "network": {
@@ -112,8 +128,9 @@
     "format": "{icon}  {percent}%",
     "tooltip": false,
     "format-icons": ["󰃞", "󰃟", "󰃠"],
-    "on-click": "brightnessctl set 50%",
+    "on-click": "sleep 1 && hyprctl dispatch dpms off",
     "on-click-right": "brightnessctl set 50%",
+    "min-brightness": 10,
     "interval": 1
   },
 

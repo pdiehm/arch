@@ -41,8 +41,7 @@
       { "Title": "Nixpkgs Manual", "URL": "https://nixos.org/manual/nixpkgs/stable", "Placement": "menu" },
       { "Title": "PayPal", "URL": "https://paypal.com", "Placement": "menu" },
       { "Title": "Sparkasse", "URL": "https://sparkasse-mainfranken.de", "Placement": "menu" },
-      { "Title": "Unicode Table", "URL": "https://symbl.cc/en/unicode-table/", "Placement": "menu" },
-      { "Title": "Waybar Wiki", "URL": "https://github.com/Alexays/Waybar/wiki/Configuration", "Placement": "menu" }
+      { "Title": "Unicode Table", "URL": "https://symbl.cc/en/unicode-table/", "Placement": "menu" }
     ],
 
     "ExtensionSettings": {
