@@ -128,7 +128,7 @@
     "format": "{icon}  {percent}%",
     "tooltip": false,
     "format-icons": ["󰃞", "󰃟", "󰃠"],
-    "on-click": "sleep 1 && hyprctl dispatch dpms off",
+    "on-click": "sleep 1 && hyprctl dispatch 'hl.dsp.dpms()'",
     "on-click-right": "brightnessctl set 50%",
     "min-brightness": 10,
     "interval": 1
