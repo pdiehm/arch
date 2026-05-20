@@ -264,26 +264,30 @@ upgrade() {
     exec sudo "$0" upgrade
   fi
 
-  trap 'unmount "$TMP/root"; unmount "$TMP/boot"; rmdir "$TMP"' EXIT
+  trap 'unmount "$TMP/root"; unmount "$TMP/boot"; rm -rf --one-file-system "$TMP"' EXIT
   TMP="$(mktemp -d)"
   chmod 700 "$TMP"
 
   mount --mkdir --label root "$TMP/root"
-  if [[ -f $TMP/root/build ]]; then btrfs subvolume delete --recursive "$TMP/root/build"; fi
+  if [[ -d $TMP/root/build ]]; then btrfs subvolume delete --recursive "$TMP/root/build"; fi
 
   btrfs subvolume snapshot "$TMP/root/latest" "$TMP/root/build"
   mount --bind "$TMP/root/build" "$TMP/root/build"
   mount --bind "$TMP/root/pkgs" "$TMP/root/build/var/cache/pacman/pkg"
   mount --bind -o ro "$TMP/root/perm" "$TMP/root/build/perm"
-  arch-chroot "$TMP/root/build" bash -eu /var/local/syscfg/upgrade.sh
 
-  hash="$(readlink "$TMP/root/latest")"
-  hash="$(sha "${hash##*/}++")"
+  if ! arch-chroot "$TMP/root/build" bash -eu /var/local/syscfg/upgrade.sh; then
+    fatal "Upgrade failed"
+  fi
 
   touch "$TMP/root/build"
   unmount "$TMP/root/build"
-  mv "$TMP/root/build" "$TMP/root/images/$hash"
 
+  hash="$(readlink "$TMP/root/latest")"
+  hash="$(sha "${hash##*/}++")"
+  if [[ -d $TMP/root/images/$hash ]]; then btrfs subvolume delete --recursive "$TMP/root/images/$hash"; fi
+
+  mv "$TMP/root/build" "$TMP/root/images/$hash"
   rm -f "$TMP/root/latest"
   ln -s "images/$hash" "$TMP/root/latest"
 
