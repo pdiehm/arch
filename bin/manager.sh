@@ -14,7 +14,7 @@ help() {
   echo "  edit             Open editor in configuration repository"
   echo "  fix              Edit latest image"
   echo "  rebuild [-hcd]   Rebuild system configuration"
-  echo "  secrets          Manage secrets"
+  echo "  secrets [-hr]    Manage secrets"
   echo "  sync             Sync configuration repository"
   echo "  upgrade          Upgrade system"
 }
@@ -98,7 +98,27 @@ rebuild() {
 
 secrets() {
   if ((UID)); then
-    exec sudo "$0" secrets
+    exec sudo "$0" secrets "$@"
+  fi
+
+  local OPTIND opt
+  local help=0 rotate=0
+
+  while getopts "hr" opt; do
+    case "$opt" in
+      h) help=1 ;;
+      r) rotate=1 ;;
+      *) fatal "Invalid option: -$opt" ;;
+    esac
+  done
+
+  if ((help)); then
+    echo "Usage: manager.sh secrets [-hr]"
+    echo
+    echo "Options:"
+    echo "  -h   Print this help message"
+    echo "  -r   Rotate master password"
+    return
   fi
 
   trap 'rm -rf "$TMP"' EXIT
@@ -134,6 +154,12 @@ secrets() {
     done < "$TMP/secrets"
 
     rm "$TMP/secrets"
+  fi
+
+  if ((rotate)); then
+    read -rsp "Enter new master password: " read
+    echo
+    secrets["keys/master"]="$(encode_secret "$read")"
   fi
 
   local -A access=()
@@ -344,7 +370,7 @@ case "$1" in
   edit) edit ;;
   fix) fix ;;
   rebuild) rebuild "${@:2}" ;;
-  secrets) secrets ;;
+  secrets) secrets "${@:2}" ;;
   sync) sync ;;
   upgrade) upgrade ;;
   *) fatal "Unknown command: $1" ;;

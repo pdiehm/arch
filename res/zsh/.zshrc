@@ -227,6 +227,9 @@ _sm() {
   elif [[ ${words[2]} == rebuild ]]; then
     compset -n 2
     _arguments "-h[help]" "-c[clean]" "-d[dry]"
+  elif [[ ${words[2]} == secrets ]]; then
+    compset -n 2
+    _arguments "-h[help]" "-r[rotate]"
   fi
 }
 
