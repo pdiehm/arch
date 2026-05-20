@@ -1,3 +1,5 @@
+dropin hyprland.lua 'hl.monitor({ output = "eDP-1", scale = 1.33 })'
+
 env NAME home-wifi
 env PRIORITY 50
 env SSID "$(secret network/home-wifi/ssid)"
