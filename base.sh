@@ -231,10 +231,10 @@ upgrade() {
 dropin() {
   local file="$1"
 
-  if (($#)); then
-    write -au ".config/dropin/$file" "${*:2}"
-  else
+  if (($# == 1)); then
     write -au ".config/dropin/$file"
+  else
+    write -au ".config/dropin/$file" "${*:2}"
   fi
 }
 
