@@ -71,6 +71,7 @@ resolve_host() {
 # unmount <path>
 unmount() {
   local path="$1"
+  if ! mountpoint -q "$path"; then return; fi
 
   for _ in {0..9}; do
     if umount --recursive "$path"; then return; fi
