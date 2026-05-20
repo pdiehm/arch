@@ -227,6 +227,17 @@ upgrade() {
   fi
 }
 
+# dropin <file> [text ...]
+dropin() {
+  local file="$1"
+
+  if (($#)); then
+    write -au ".config/dropin/$file" "${*:2}"
+  else
+    write -au ".config/dropin/$file"
+  fi
+}
+
 # systemd [-eu] [-t target] <unit> ...
 #   -e   enable units
 #   -u   in user manager

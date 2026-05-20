@@ -2,7 +2,7 @@ package make gdb strace cmake ninja gcc rust python python-pip nodejs npm jdk-op
   texlive-basic texlive-latex texlive-latexrecommended texlive-fontsrecommended texlive-langgerman \
   texlive-binextra perl-file-homedir perl-yaml-tiny
 
-write -au .config/env.sh << EOF
+dropin env.sh << EOF
 CMAKE_GENERATOR="Ninja"
 CMAKE_EXPORT_COMPILE_COMMANDS="ON"
 EOF
@@ -14,7 +14,7 @@ timer nix-gc monthly /usr/bin/nix-collect-garbage --delete-old
 
 run mv /nix /perm/nix
 write -a /etc/fstab "/perm/nix /nix none bind 0 0"
-write -au .config/env.sh "NIX_PATH=nixpkgs=flake:nixpkgs"
+dropin env.sh "NIX_PATH=nixpkgs=flake:nixpkgs"
 
 package paru base-devel devtools nvchecker
 conf -e /etc/paru.conf BottomUp CleanAfter RemoveMake SudoLoop
