@@ -251,7 +251,7 @@ secrets() {
 }
 
 sync() {
-  git pull
+  git pull --recurse-submodules=on-demand
   ahead="$(git rev-list --count "@{upstream}..")"
   if ((ahead == 0)); then return; fi
 

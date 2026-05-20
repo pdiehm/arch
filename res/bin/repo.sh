@@ -262,10 +262,10 @@ update() {
 
     if [[ -n "$(git status --porcelain)" ]]; then
       git stash push --include-untracked
-      git pull || conflict
+      git pull --recurse-submodules=on-demand || conflict
       git stash pop || conflict
     else
-      git pull || conflict
+      git pull --recurse-submodules=on-demand || conflict
     fi
   done
 
