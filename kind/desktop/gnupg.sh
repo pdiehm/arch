@@ -10,5 +10,5 @@ EOF
 
 dropin env.sh << "EOF"
 GNUPGHOME="$HOME/.local/share/gnupg"
-GPG_TTY="$(tty)"
+GPG_TTY="$TTY"
 EOF
