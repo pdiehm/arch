@@ -1,4 +1,4 @@
-dropin hyprland.lua 'hl.monitor({ output = "eDP-1", scale = 1.33 })'
+dropin hyprland.lua 'hl.monitor({ output = "eDP-1", mode = "preferred", position = "auto", scale = 1.33 })'
 
 env NAME home-wifi
 env PRIORITY 50
