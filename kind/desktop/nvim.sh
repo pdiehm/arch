@@ -17,12 +17,13 @@ symlink -u res/nvim .config/nvim
 dropin env.sh "EDITOR=nvim"
 
 script -u << EOF
-echo "Installing nvim treesitter parsers..."
+echo "Setting up neovim..."
+git -C .config/syscfg pull --recurse-submodules=on-demand
 nvim -es --cmd "lua require('nvim-treesitter').install({ 'stable', 'unstable' }):wait(60000)" --cmd q
 EOF
 
 upgrade << EOF
-echo "Upgrading nvim treesitter parsers..."
+echo "Setting up neovim..."
 sudo -u pascal nvim -es --cmd "lua require('nvim-treesitter').install({ 'stable', 'unstable' }):wait(60000)" --cmd q
 sudo -u pascal nvim -es --cmd "lua require('nvim-treesitter').update():wait(60000)" --cmd q
 EOF
