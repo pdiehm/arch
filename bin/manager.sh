@@ -12,6 +12,7 @@ help() {
   echo "Commands:"
   echo "  help             Print this help message"
   echo "  edit             Open editor in configuration repository"
+  echo "  fix              Edit latest image"
   echo "  rebuild [-hcd]   Rebuild system configuration"
   echo "  secrets          Manage secrets"
   echo "  sync             Sync configuration repository"
@@ -20,6 +21,43 @@ help() {
 
 edit() {
   exec "$EDITOR" .
+}
+
+fix() {
+  if ((UID)); then
+    exec sudo "$0" fix
+  fi
+
+  trap 'unmount "$TMP/root"; unmount "$TMP/boot"; rm -rf --one-file-system "$TMP"' EXIT
+  TMP="$(mktemp -d)"
+  chmod 700 "$TMP"
+
+  mount --mkdir --label root "$TMP/root"
+  if [[ -d $TMP/root/build ]]; then btrfs subvolume delete --recursive "$TMP/root/build"; fi
+
+  btrfs subvolume snapshot "$TMP/root/latest" "$TMP/root/build"
+  mount --bind "$TMP/root/build" "$TMP/root/build"
+  mount --bind "$TMP/root/pkgs" "$TMP/root/build/var/cache/pacman/pkg"
+  mount --bind -o ro "$TMP/root/perm" "$TMP/root/build/perm"
+
+  if ! arch-chroot "$TMP/root/build"; then
+    fatal "Shell exited with non-zero status, aborting..."
+  fi
+
+  touch "$TMP/root/build"
+  unmount "$TMP/root/build"
+
+  hash="$(readlink "$TMP/root/latest")"
+  hash="$(sha "${hash##*/}++")"
+  if [[ -d $TMP/root/images/$hash ]]; then btrfs subvolume delete --recursive "$TMP/root/images/$hash"; fi
+
+  mv "$TMP/root/build" "$TMP/root/images/$hash"
+  rm -f "$TMP/root/latest"
+  ln -s "images/$hash" "$TMP/root/latest"
+
+  mount --mkdir --label BOOT "$TMP/boot"
+  rm -rf "${TMP:?}/boot"/*
+  cp -r "$TMP/root/latest/boot/." "$TMP/boot"
 }
 
 rebuild() {
@@ -304,6 +342,7 @@ fi
 case "$1" in
   help) help ;;
   edit) edit ;;
+  fix) fix ;;
   rebuild) rebuild "${@:2}" ;;
   secrets) secrets ;;
   sync) sync ;;
