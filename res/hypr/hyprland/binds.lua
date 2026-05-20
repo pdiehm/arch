@@ -1,7 +1,7 @@
 for id = 1, 9 do
   hl.bind("SUPER + " .. id, hl.dsp.focus({ workspace = id }))
   hl.bind("SUPER + SHIFT + " .. id, hl.dsp.window.move({ workspace = id }))
-  hl.bind("CTRL + SUPER + SHIFT + " .. id, hl.dsp.window.move({ workspace = id, follow = false }))
+  hl.bind("CTRL + SUPER + " .. id, hl.dsp.window.move({ workspace = id, follow = false }))
 end
 
 for key, dir in pairs({ H = "left", J = "down", K = "up", L = "right" }) do
