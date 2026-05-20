@@ -274,6 +274,7 @@ upgrade() {
   btrfs subvolume snapshot "$TMP/root/latest" "$TMP/root/build"
   mount --bind "$TMP/root/build" "$TMP/root/build"
   mount --bind "$TMP/root/pkgs" "$TMP/root/build/var/cache/pacman/pkg"
+  mount --bind -o ro "$TMP/root/perm" "$TMP/root/build/perm"
   arch-chroot "$TMP/root/build" bash -eu /var/local/syscfg/upgrade.sh
 
   hash="$(readlink "$TMP/root/latest")"
