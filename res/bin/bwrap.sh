@@ -4,8 +4,19 @@ if (($# == 0)); then
   set /usr/bin/bash
 fi
 
-exec bwrap --new-session --die-with-parent --unshare-all --share-net --dev /dev --proc /proc \
-  --ro-bind /bin /bin --ro-bind /sbin /sbin --ro-bind /lib /lib --ro-bind /lib64 /lib64 \
-  --ro-bind /etc /etc --ro-bind /usr /usr --ro-bind /var /var \
-  --ro-bind-try "$(realpath /etc/resolv.conf)" "$(realpath /etc/resolv.conf)" \
-  --bind "$PWD" "$PWD" "$@"
+FLAGS=("--new-session" "--die-with-parent" "--unshare-all" "--share-net")
+FLAGS+=("--dev" "/dev" "--proc" "/proc" "--bind" "/perm" "/perm" "--bind" "$PWD" "$PWD")
+
+for path in "/bin" "/etc" "/lib" "/lib64" "/sbin" "/usr" "/var" "$(realpath /etc/resolv.conf)"; do
+  FLAGS+=("--ro-bind" "$path" "$path")
+done
+
+for path in "/perm/home+pascal+.config+mozilla+firefox" "/perm/home+pascal+.local+share+gnupg"; do
+  FLAGS+=("--ro-bind" "/var/empty" "$path")
+done
+
+for path in "$HOME/.ssh" "$HOME/.cache/mozilla"; do
+  FLAGS+=("--ro-bind" "/var/empty" "$path")
+done
+
+exec bwrap "${FLAGS[@]}" "$@"
