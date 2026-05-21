@@ -15,7 +15,7 @@ for path in "/perm/home+pascal+.config+mozilla+firefox" "/perm/home+pascal+.loca
   FLAGS+=("--ro-bind" "/var/empty" "$path")
 done
 
-for path in "$HOME/.ssh" "$HOME/.cache/mozilla"; do
+for path in "$HOME/.ssh" "$HOME/.local/keys" "$HOME/.cache/mozilla"; do
   FLAGS+=("--ro-bind" "/var/empty" "$path")
 done
 
