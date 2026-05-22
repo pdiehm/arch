@@ -11,7 +11,7 @@ end
 
 hl.bind("SUPER + 0", hl.dsp.workspace.toggle_special("special"))
 hl.bind("SUPER + SHIFT + 0", hl.dsp.window.move({ workspace = "special:special" }))
-hl.bind("CTRL + SUPER + SHIFT + 0", hl.dsp.window.move({ workspace = "special:special", follow = false }))
+hl.bind("CTRL + SUPER + 0", hl.dsp.window.move({ workspace = "special:special", follow = false }))
 
 hl.bind("SUPER + F", hl.dsp.window.fullscreen({ action = "toggle" }))
 hl.bind("SUPER + SHIFT + F", hl.dsp.window.float({ action = "toggle" }))
