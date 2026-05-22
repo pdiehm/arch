@@ -167,8 +167,6 @@ autoload -Uz compinit
 compinit -d ~/.local/state/zsh/compdump
 
 compdef '_arguments ":cmd:_command_names" "*::args:_normal"' bw
-compdef _files ed
-compdef _files mkcd
 compdef _sm sm
 compdef '_arguments ":cmd:_command_names" "*::args:_normal"' watch
 compdef _xh xhs
