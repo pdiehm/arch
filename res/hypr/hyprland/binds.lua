@@ -1,3 +1,9 @@
+local function dpms()
+  hl.timer(function()
+    hl.dispatch(hl.dsp.dpms({ action = "off" }))
+  end, { timeout = 1000, type = "oneshot" })
+end
+
 for id = 1, 9 do
   hl.bind("SUPER + " .. id, hl.dsp.focus({ workspace = id }))
   hl.bind("SUPER + SHIFT + " .. id, hl.dsp.window.move({ workspace = id }))
@@ -21,6 +27,10 @@ hl.bind("CTRL + SUPER + SHIFT + Q", hl.dsp.window.kill(), { bypass = true })
 hl.bind("SUPER + Return", hl.dsp.exec_cmd("kitty"))
 hl.bind("SUPER + Space", hl.dsp.exec_cmd("rofi -show drun"))
 hl.bind("SUPER + E", hl.dsp.exec_cmd("dolphin"))
+
+hl.bind("SUPER + Escape", dpms, { locked = true })
+hl.bind("SUPER + SHIFT + Escape", hl.dsp.exec_cmd("loginctl lock-session"))
+hl.bind("CTRL + SUPER + SHIFT + Escape", hl.dsp.exit(), { bypass = true })
 
 hl.bind("Print", hl.dsp.exec_cmd("hyprshot --mode active --mode output --output-folder /home/pascal/Temp"))
 hl.bind("SUPER + Print", hl.dsp.exec_cmd("hyprshot --mode active --mode window --output-folder /home/pascal/Temp"))
