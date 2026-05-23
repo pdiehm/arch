@@ -13,12 +13,8 @@ package hyprland hyprpaper hyprlock hypridle hyprshot hyprpicker xdg-desktop-por
 symlink -u res/hypr .config/hypr
 symlink -u res/wallpaper.jpg .local/share/wallpaper.jpg
 
-package waybar brightnessctl playerctl
-symlink -u res/waybar .config/waybar
-
-package mako libnotify
-symlink -u res/mako.conf .config/mako/config
-
-package kitty rofi
+package kitty rofi waybar mako brightnessctl playerctl libnotify
 symlink -u res/kitty.conf .config/kitty/kitty.conf
 symlink -u res/rofi.rasi .config/rofi/config.rasi
+symlink -u res/waybar .config/waybar
+symlink -u res/mako.conf .config/mako/config

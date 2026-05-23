@@ -11,9 +11,9 @@ write /etc/hosts << EOF
 2a01:4f8:c0c:988b::1 goomba
 EOF
 
-copy res/nftables.conf /etc/nftables.conf
-systemd -e nftables.service
-
 copy res/systemd/resolved.conf /etc/systemd/resolved.conf
 systemd -i resolvconf.service
 systemd -e systemd-resolved.service resolvconf.service
+
+copy res/nftables.conf /etc/nftables.conf
+systemd -e nftables.service
