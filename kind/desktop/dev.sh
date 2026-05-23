@@ -18,10 +18,9 @@ package paru base-devel devtools nvchecker
 conf -e /etc/paru.conf BottomUp CleanAfter RemoveMake SudoLoop
 
 package nix
-copy res/nix.conf /etc/nix/nix.conf
-systemd -e nix-daemon.service
-timer nix-gc monthly /usr/bin/nix-collect-garbage --delete-old
-
 run mv /nix /perm/nix
 write -a /etc/fstab "/perm/nix /nix none bind 0 0"
+copy res/nix.conf /etc/nix/nix.conf
 dropin env.sh "NIX_PATH=nixpkgs=flake:nixpkgs"
+systemd -e nix-daemon.service
+timer nix-gc monthly /usr/bin/nix-collect-garbage --delete-old
