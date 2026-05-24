@@ -166,14 +166,17 @@ SAVEHIST=9999
 autoload -Uz compinit
 compinit -d ~/.local/state/zsh/compdump
 
-compdef '_arguments ":cmd:_command_names" "*::args:_normal"' bw
+compdef _files ed
+compdef _files mkcd
+compdef _files mnt
 compdef _sm sm
-compdef '_arguments ":cmd:_command_names" "*::args:_normal"' watch
 compdef _xh xhs
+compdef '_arguments ":cmd:_command_names" "*::args:_normal"' bw
+compdef '_arguments ":cmd:_command_names" "*::args:_normal"' watch
 
 if [[ $HOSTKIND == desktop ]]; then
-  compdef _repo repo
   compdef _nothing wp-toggle
+  compdef _repo repo
 fi
 
 _repo() {
