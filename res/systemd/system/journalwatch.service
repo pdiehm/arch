@@ -1,0 +1,11 @@
+[Unit]
+Description=Watch journalctl and report relevant events to ntfy
+After=network-online.target
+Requires=network-online.target
+
+[Service]
+ExecStartPre=/bin/sh -c 'until nc -z ntfy.pdiehm.dev 80; do sleep 1; done'
+ExecStart=/usr/local/lib/journalwatch
+
+[Install]
+WantedBy=multi-user.target
