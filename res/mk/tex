@@ -1,0 +1,11 @@
+\documentclass[parskip=half]{scrartcl}
+\usepackage[margin=1cm, bottom=2cm]{geometry}
+\usepackage[colorlinks=true, pdftitle=TITLE]{hyperref}
+\usepackage{amsmath, amssymb, amsthm}
+
+\title{TITLE}
+\author{Pascal Diehm}
+
+\begin{document}
+\maketitle
+\end{document}

@@ -10,10 +10,6 @@ EOF
 package git git-delta
 symlink -u res/git.conf .config/git/config
 
-persist -u Repos
-symlink -u res/bin/repo.sh .local/bin/repo
-timer -nu repo-fetch hourly "%h/.local/bin/repo" fetch
-
 package paru base-devel devtools nvchecker
 conf -e /etc/paru.conf BottomUp CleanAfter RemoveMake SudoLoop
 

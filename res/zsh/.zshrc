@@ -192,6 +192,7 @@ compdef _nothing ntfy
 compdef _files ed
 compdef _files mkcd
 compdef _files mnt
+compdef _mk mk
 compdef _sm sm
 compdef _xh xhs
 compdef '_arguments ":cmd:_command_names" "*::args:_normal"' await
@@ -202,6 +203,15 @@ if [[ $HOSTKIND == desktop ]]; then
   compdef _nothing wp-toggle
   compdef _repo repo
 fi
+
+_mk() {
+  if ((CURRENT == 2)); then
+    local sources=(~/.local/share/mk/*)
+    if ((${#sources[@]})); then _values source "${sources[@]##*/}"; fi
+  elif ((CURRENT == 3)); then
+    _files
+  fi
+}
 
 _repo() {
   local repos=(~/Repos/*)
