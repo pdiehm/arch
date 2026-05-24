@@ -29,6 +29,10 @@ copy -sm 444 "ssh/$HOST_NAME/auth" /etc/ssh/authorized_keys
 systemd -m sshdgenkeys.service
 systemd -e sshd.service
 
+copy -sm 444 ntfy /usr/local/lib/ntfy/token
+copy -x res/bin/ntfy.sh /usr/local/bin/ntfy
+symlink -u res/bin/ntfy.sh .local/bin/ntfy
+
 package man-db man-pages rsync zip unzip libarchive pkgstats \
   bat eza fd ripgrep jq pv fzf parallel \
   lsof usbutils pciutils fastfetch duf ncdu \

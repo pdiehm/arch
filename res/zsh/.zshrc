@@ -166,6 +166,7 @@ SAVEHIST=9999
 autoload -Uz compinit
 compinit -d ~/.local/state/zsh/compdump
 
+compdef _nothing ntfy
 compdef _files ed
 compdef _files mkcd
 compdef _files mnt
