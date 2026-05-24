@@ -138,10 +138,6 @@ mkcd() {
   cd "$1"
 }
 
-mktex() {
-  latexmk -cd -pdf -outdir="$PWD/build" "$1"
-}
-
 watch() (
   trap "printf '\e[?25h\e[?1049l'" EXIT
   trap "exit 0" INT
@@ -153,6 +149,20 @@ watch() (
     sleep 1
   done
 )
+
+if [[ $HOSTKIND == desktop ]]; then
+  mktex() {
+    latexmk -cd -pdf -outdir="$PWD/build" "$1"
+  }
+elif [[ $HOSTKIND == server ]]; then
+  service() {
+    if (($#)); then
+      docker compose --file "$HOME/docker/$HOSTNAME/$1/compose.yaml" "${@:2}"
+    else
+      docker compose ls
+    fi
+  }
+fi
 
 bindkey -rp ""
 bindkey -R " "-"~" self-insert
@@ -205,6 +215,8 @@ compdef '_arguments ":cmd:_command_names" "*::args:_normal"' watch
 if [[ $HOSTKIND == desktop ]]; then
   compdef _nothing wp-toggle
   compdef _repo repo
+elif [[ $HOSTKIND == server ]]; then
+  compdef _service service
 fi
 
 _mk() {
@@ -257,6 +269,17 @@ _repo() {
     if ((CURRENT == 3)); then
       if ((${#repos[@]})); then _values name "${repos[@]}"; fi
     fi
+  fi
+}
+
+_service() {
+  if ((CURRENT == 2)); then
+    local services=(~/docker/*)
+    if ((${#services[@]})); then _values service "${sources[@]##*/}"; fi
+  elif [[ -f "$HOME/docker/$HOSTNAME/${words[2]}/compose.yaml" ]]; then
+    words=("docker" "compose" "--file" "$HOME/docker/$HOSTNAME/${words[2]}/compose.yaml" "${words[3,-1]}")
+    CURRENT=$((CURRENT + 2))
+    _docker
   fi
 }
 
