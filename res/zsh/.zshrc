@@ -94,6 +94,28 @@ if [[ $HOSTKIND == desktop ]]; then
   alias py="python3"
 fi
 
+await() {
+  local pre="$(date "+%s%3N")"
+  eval "$*"
+
+  local result="$?"
+  local post="$(date "+%s%3N")"
+  local time="$((post - pre))"
+
+  if ((time < 1000)); then
+    time="${time}ms"
+  elif ((time < 60000)); then
+    time="$((time / 1000))s"
+  elif ((time < 3600000)); then
+    time="$((time / 60000))m $((time / 1000 % 60))s"
+  else
+    time="$((time / 3600000))h $((time / 60000 % 60))m $((time / 1000 % 60))s"
+  fi
+
+  ntfy "Command '$*' finished in $time with exit code $result"
+  return "$result"
+}
+
 ed() {
   if (($# == 0)); then
     "$EDITOR"
@@ -172,6 +194,7 @@ compdef _files mkcd
 compdef _files mnt
 compdef _sm sm
 compdef _xh xhs
+compdef '_arguments ":cmd:_command_names" "*::args:_normal"' await
 compdef '_arguments ":cmd:_command_names" "*::args:_normal"' bw
 compdef '_arguments ":cmd:_command_names" "*::args:_normal"' watch
 
