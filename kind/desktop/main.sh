@@ -16,6 +16,9 @@ symlink -u res/aerc .config/aerc
 copy -su mail/gmail .local/keys/aerc/gmail
 copy -su mail/uni .local/keys/aerc/uni
 
-package ffmpeg wl-clipboard
 script -u <<< "mkdir Downloads"
 write -a /etc/fstab "tmpfs /home/pascal/Temp tmpfs defaults 0 0"
+
+package dmidecode hexedit nmap vhs \
+  wl-clipboard wf-recorder wl-mirror \
+  imagemagick poppler ffmpeg perl-image-exiftool yt-dlp

@@ -10,4 +10,4 @@ package firefox
 persist -u .config/mozilla/firefox
 symlink res/firefox.json /etc/firefox/policies/policies.json
 
-package mpv mpv-mpris
+package inkscape gimp pdfpc mpv mpv-mpris tenacity
