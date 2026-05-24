@@ -138,6 +138,10 @@ mkcd() {
   cd "$1"
 }
 
+mktex() {
+  latexmk -cd -pdf -outdir="$PWD/build" "$1"
+}
+
 watch() (
   trap "printf '\e[?25h\e[?1049l'" EXIT
   trap "exit 0" INT
@@ -191,6 +195,7 @@ compinit -d ~/.local/state/zsh/compdump
 compdef _nothing ntfy
 compdef _files ed
 compdef _files mkcd
+compdef _files mktex
 compdef _files mnt
 compdef _mk mk
 compdef _sm sm
