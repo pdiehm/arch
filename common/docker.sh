@@ -14,4 +14,7 @@ EOF
 if [[ $HOST_KIND == desktop ]]; then
   systemd -o docker.service
   systemd -e docker.socket
+elif [[ $HOST_KIND == server ]]; then
+  persist -u docker
+  systemd -e docker.service
 fi

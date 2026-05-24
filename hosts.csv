@@ -1,3 +1,5 @@
 name,kind,boot,cpu
 pascal-pc,desktop,EFI,amd
 pascal-laptop,desktop,EFI,amd
+bowser,server,EFI,amd
+goomba,server,BIOS,amd

@@ -1,0 +1,7 @@
+[Match]
+Kind=!*
+Type=ether
+
+[Network]
+Address=$ADDRESS
+Gateway=$GATEWAY
