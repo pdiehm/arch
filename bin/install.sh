@@ -50,8 +50,10 @@ done
 
 if [[ $HOST_BOOT == EFI ]]; then
   CFG=("label: gpt" "size=1GiB, type=uefi, name=BOOT, bootable" "size=8GiB, type=swap, name=swap" "type=linux, name=root")
-else
+elif [[ $HOST_BOOT == BIOS ]]; then
   CFG=("label: dos" "size=1GiB, type=0c, name=BOOT, bootable" "size=8GiB, type=swap, name=swap" "type=linux, name=root")
+else
+  fatal "Unknown boot method: $HOST_BOOT"
 fi
 
 wipefs --all "$DISK"
