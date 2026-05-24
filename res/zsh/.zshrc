@@ -274,8 +274,8 @@ _repo() {
 
 _service() {
   if ((CURRENT == 2)); then
-    local services=(~/docker/*)
-    if ((${#services[@]})); then _values service "${sources[@]##*/}"; fi
+    local services=("$HOME/docker/$HOSTNAME"/*)
+    if ((${#services[@]})); then _values service "${services[@]##*/}"; fi
   elif [[ -f "$HOME/docker/$HOSTNAME/${words[2]}/compose.yaml" ]]; then
     words=("docker" "compose" "--file" "$HOME/docker/$HOSTNAME/${words[2]}/compose.yaml" "${words[3,-1]}")
     CURRENT=$((CURRENT + 2))
