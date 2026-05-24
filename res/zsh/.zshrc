@@ -215,43 +215,44 @@ _mk() {
 
 _repo() {
   local repos=(~/Repos/*)
+  repos=("${repos[@]##*/}")
 
   if ((CURRENT == 2)); then
     _values command help clone edit fetch list remove run shell status update
   elif [[ ${words[2]} == edit ]]; then
     if ((CURRENT == 3)); then
-      if ((${#repos[@]})); then _values name "${repos[@]##*/}"; fi
+      if ((${#repos[@]})); then _values name "${repos[@]}"; fi
     elif ((CURRENT == 4)); then
       _files -W "$HOME/Repos/${words[3]}"
     fi
   elif [[ ${words[2]} == fetch ]]; then
     if ((CURRENT == 3)); then
-      if ((${#repos[@]})); then _values name "${repos[@]##*/}"; fi
+      if ((${#repos[@]})); then _values name "${repos[@]}"; fi
     fi
   elif [[ ${words[2]} == remove ]]; then
     if ((CURRENT == 3)); then
-      if ((${#repos[@]})); then _values name "${repos[@]##*/}"; fi
+      if ((${#repos[@]})); then _values name "${repos[@]}"; fi
     fi
   elif [[ ${words[2]} == run ]]; then
     if ((CURRENT == 3)); then
-      if ((${#repos[@]})); then _values name "${repos[@]##*/}"; fi
+      if ((${#repos[@]})); then _values name "${repos[@]}"; fi
     else
       compset -n 4
       _normal
     fi
   elif [[ ${words[2]} == shell ]]; then
     if ((CURRENT == 3)); then
-      if ((${#repos[@]})); then _values name "${repos[@]##*/}"; fi
+      if ((${#repos[@]})); then _values name "${repos[@]}"; fi
     elif ((CURRENT == 4)); then
       _files -/ -W "$HOME/Repos/${words[3]}"
     fi
   elif [[ ${words[2]} == status ]]; then
     if ((CURRENT == 3)); then
-      if ((${#repos[@]})); then _values name "${repos[@]##*/}"; fi
+      if ((${#repos[@]})); then _values name "${repos[@]}"; fi
     fi
   elif [[ ${words[2]} == update ]]; then
     if ((CURRENT == 3)); then
-      if ((${#repos[@]})); then _values name "${repos[@]##*/}"; fi
+      if ((${#repos[@]})); then _values name "${repos[@]}"; fi
     fi
   fi
 }
