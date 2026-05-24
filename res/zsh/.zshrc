@@ -145,13 +145,11 @@ mktex() {
 watch() (
   trap "printf '\e[?25h\e[?1049l'" EXIT
   trap "exit 0" INT
-
   printf "\e[?25l\e[?1049h"
+
   while true; do
     echo -e "\e[H\e[2mWatching: $*\e[m\n"
-    script --quiet --command "zsh --interactive -c $(printf "%q" "$*")" /dev/null | sed $'s/^/\e[K/'
-
-    printf "\e[J"
+    printf "\e[J%s\n" "$(script --quiet --command "zsh --interactive -c $(printf "%q" "$*")" /dev/null)"
     sleep 1
   done
 )
