@@ -91,7 +91,7 @@ alias type="type -as"
 
 if [[ $HOSTKIND == desktop ]]; then
   alias open="xdg-open"
-  alias play="ffplay -autoexit -nodisp"
+  alias play="mpv --no-audio-display"
   alias py="python3"
 fi
 
