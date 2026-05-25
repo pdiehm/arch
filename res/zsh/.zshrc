@@ -203,9 +203,6 @@ compinit -d ~/.local/state/zsh/compdump
 compdef _nothing ntfy
 compdef _files ed
 compdef _files mkcd
-compdef _files mktex
-compdef _files mnt
-compdef _mk mk
 compdef _sm sm
 compdef _xh xhs
 compdef '_arguments ":cmd:_command_names" "*::args:_normal"' await
@@ -214,6 +211,9 @@ compdef '_arguments ":cmd:_command_names" "*::args:_normal"' watch
 
 if [[ $HOSTKIND == desktop ]]; then
   compdef _nothing wp-toggle
+  compdef _files mktex
+  compdef _mk mk
+  compdef _mnt mnt
   compdef _repo repo
 elif [[ $HOSTKIND == server ]]; then
   compdef _service service
@@ -221,9 +221,18 @@ fi
 
 _mk() {
   if ((CURRENT == 2)); then
-    local sources=(~/.local/share/mk/*)
-    if ((${#sources[@]})); then _values source "${sources[@]##*/}"; fi
+    local cmp=(~/.local/share/mk/*)
+    compadd "${cmp[@]##*/}"
   elif ((CURRENT == 3)); then
+    _files
+  fi
+}
+
+_mnt() {
+  if ((CURRENT == 2)); then
+    local cmp=("tmpfs" "android" /dev/{sd,hd,md,vd,sr,nvme,loop}* /dev/disk/by-label/* /dev/disk/by-partlabel/*)
+    compadd "${cmp[@]##*/}"
+    compadd -S "" "ssh://"
     _files
   fi
 }
@@ -233,49 +242,41 @@ _repo() {
   repos=("${repos[@]##*/}")
 
   if ((CURRENT == 2)); then
-    _values command help clone edit fetch list remove run shell status update
+    compadd help clone edit fetch list remove run shell status update
   elif [[ ${words[2]} == edit ]]; then
     if ((CURRENT == 3)); then
-      if ((${#repos[@]})); then _values name "${repos[@]}"; fi
+      compadd "${repos[@]}"
     elif ((CURRENT == 4)); then
       _files -W "$HOME/Repos/${words[3]}"
     fi
   elif [[ ${words[2]} == fetch ]]; then
-    if ((CURRENT == 3)); then
-      if ((${#repos[@]})); then _values name "${repos[@]}"; fi
-    fi
+    if ((CURRENT == 3)); then compadd "${repos[@]}"; fi
   elif [[ ${words[2]} == remove ]]; then
-    if ((CURRENT == 3)); then
-      if ((${#repos[@]})); then _values name "${repos[@]}"; fi
-    fi
+    if ((CURRENT == 3)); then compadd "${repos[@]}"; fi
   elif [[ ${words[2]} == run ]]; then
     if ((CURRENT == 3)); then
-      if ((${#repos[@]})); then _values name "${repos[@]}"; fi
+      compadd "${repos[@]}"
     else
       compset -n 4
       _normal
     fi
   elif [[ ${words[2]} == shell ]]; then
     if ((CURRENT == 3)); then
-      if ((${#repos[@]})); then _values name "${repos[@]}"; fi
+      compadd "${repos[@]}"
     elif ((CURRENT == 4)); then
       _files -/ -W "$HOME/Repos/${words[3]}"
     fi
   elif [[ ${words[2]} == status ]]; then
-    if ((CURRENT == 3)); then
-      if ((${#repos[@]})); then _values name "${repos[@]}"; fi
-    fi
+    if ((CURRENT == 3)); then compadd "${repos[@]}"; fi
   elif [[ ${words[2]} == update ]]; then
-    if ((CURRENT == 3)); then
-      if ((${#repos[@]})); then _values name "${repos[@]}"; fi
-    fi
+    if ((CURRENT == 3)); then compadd "${repos[@]}"; fi
   fi
 }
 
 _service() {
   if ((CURRENT == 2)); then
-    local services=("$HOME/docker/$HOSTNAME"/*)
-    if ((${#services[@]})); then _values service "${services[@]##*/}"; fi
+    local cmp=("$HOME/docker/$HOSTNAME"/*)
+    compadd "${cmp[@]##*/}"
   elif [[ -f "$HOME/docker/$HOSTNAME/${words[2]}/compose.yaml" ]]; then
     words=("docker" "compose" "--file" "$HOME/docker/$HOSTNAME/${words[2]}/compose.yaml" "${words[3,-1]}")
     CURRENT=$((CURRENT + 2))
@@ -285,7 +286,7 @@ _service() {
 
 _sm() {
   if ((CURRENT == 2)); then
-    _values command help edit fix rebuild secrets sync upgrade
+    compadd help edit fix rebuild secrets sync upgrade
   elif [[ ${words[2]} == rebuild ]]; then
     compset -n 2
     _arguments "-h[help]" "-c[clean]" "-d[dry]"
