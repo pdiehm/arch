@@ -8,7 +8,6 @@ timer docker-gc monthly /usr/bin/docker system prune --all --force --volumes
 write /etc/sysctl.d/docker.conf << EOF
 net.ipv4.ip_forward = 1
 net.ipv6.conf.all.forwarding = 1
-net.ipv6.conf.default.forwarding = 1
 EOF
 
 if [[ $HOST_KIND == desktop ]]; then
