@@ -243,5 +243,5 @@ for path in "$TMP/root/latest/perm"/*; do
   touch "$target"
 done
 
-find "$TMP/root/images" -mindepth 1 -maxdepth 1 -mtime +1 -exec btrfs subvolume delete --recursive "{}" +
-find "$TMP/root/perm" -mindepth 1 -maxdepth 1 -mtime +1 -exec rm -rf "{}" +
+find "$TMP/root/images" -mindepth 1 -maxdepth 1 -mtime +0 -exec btrfs subvolume delete --recursive "{}" +
+find "$TMP/root/perm" -mindepth 1 -maxdepth 1 -mtime +0 -exec rm -rf "{}" +
