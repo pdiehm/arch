@@ -117,200 +117,77 @@ secrets() {
     echo
     echo "Options:"
     echo "  -h   Print this help message"
-    echo "  -r   Rotate master password"
+    echo "  -r   Rotate keys"
     return
   fi
 
   trap 'rm -rf "$TMP"' EXIT
   TMP="$(mktemp -d)"
-  chmod 700 "$TMP"
 
-  local -A secrets=()
-  local keys=()
+  chmod 700 "$TMP"
+  mkdir "$TMP/store"
 
   if [[ -f secrets/master && -f /var/local/syscfg/master ]]; then
-    secrets["keys/master"]="$(< /var/local/syscfg/master)"
-    if ! load_secrets secrets/master "$TMP/secrets" "${secrets["keys/master"]}"; then
+    if ! load_secrets secrets/master "$TMP/store" "$(< /var/local/syscfg/master)"; then
       warn "Stale master password"
     fi
   fi
 
-  if [[ ! -f $TMP/secrets ]]; then
+  if [[ ! -f $TMP/store/ACL ]]; then
     read -rsp "Enter master password: " read
     echo
 
-    secrets["keys/master"]="$(encode_secret "$read")"
     if [[ -f secrets/master ]]; then
-      if ! load_secrets secrets/master "$TMP/secrets" "${secrets["keys/master"]}"; then
+      if ! load_secrets secrets/master "$TMP/store" "$(sha "$read")"; then
         fatal "Incorrect master password"
       fi
+    else
+      touch "$TMP/store/ACL"
+      mkdir "$TMP/store/keys"
+      sha "$read" > "$TMP/store/keys/master"
     fi
   fi
 
-  if [[ -f $TMP/secrets ]]; then
-    while read -r key value; do
-      secrets[$key]="$value"
-      keys+=("$key")
-    done < "$TMP/secrets"
-
-    rm "$TMP/secrets"
+  if ! env -C "$TMP/store" bash; then
+    fatal "Shell exited with non-zero status, aborting..."
   fi
+
+  mkdir "$TMP/keys"
+  mv "$TMP/store/keys/master" "$TMP/keys"
 
   if ((rotate)); then
     read -rsp "Enter new master password: " read
     echo
-    secrets["keys/master"]="$(encode_secret "$read")"
+
+    sha "$read" > "$TMP/keys/master"
+    rm -rf "$TMP/store/keys"
   fi
 
-  local -A access=()
-  local hosts=()
-
-  for host in secrets/*; do
-    host="${host##*/}"
-    if [[ $host == master ]]; then continue; fi
-
-    if [[ -z ${secrets["keys/$host"]:+x} ]]; then
-      warn "No key for host '$host', skipping..."
-      continue
+  while read -r host _; do
+    if [[ $host == master ]]; then
+      fatal "Host name 'master' is reserved"
+    elif [[ -f $TMP/store/keys/$host ]]; then
+      mv "$TMP/store/keys/$host" "$TMP/keys"
+    else
+      head -c 64 /dev/urandom | sha > "$TMP/keys/$host"
     fi
+  done < "$TMP/store/ACL"
 
-    if ! load_secrets "secrets/$host" "$TMP/secrets" "${secrets["keys/$host"]}"; then
-      warn "Failed to load secrets for host '$host', skipping..."
-      continue
+  rm -rf "$TMP/store/keys"
+  mv "$TMP/keys" "$TMP/store"
+
+  mkdir "$TMP/secrets"
+  store_secrets "$TMP/secrets/master" "$TMP/store" "$(< "$TMP/store/keys/master")" .
+
+  while read -ra line; do
+    if ((${#line[@]})); then
+      local host="${line[0]}" spec=("${line[@]:1}")
+      store_secrets "$TMP/secrets/$host" "$TMP/store" "$(< "$TMP/store/keys/$host")" "keys/$host" "${spec[@]}"
     fi
-
-    while read -r key value; do
-      if [[ -z ${secrets[$key]:+x} ]]; then
-        warn "Secret '$key' for host '$host' not in master, skipping..."
-      else
-        access[$key]+="$host "
-      fi
-    done < "$TMP/secrets"
-
-    hosts+=("$host")
-    rm "$TMP/secrets"
-  done
-
-  echo "HOSTS ${hosts[*]}" > "$TMP/edit"
-  echo "MASTER ${access["keys/master"]:-}" >> "$TMP/edit"
-
-  for key in "${keys[@]}"; do
-    if [[ $key == keys/* ]]; then continue; fi
-    printf "\nSECRET %s %s\n" "$key" "${access[$key]:-}" >> "$TMP/edit"
-    printf "%s\nEOF\n" "$(decode_secret "${secrets[$key]}")" >> "$TMP/edit"
-  done
-
-  while true; do
-    if ! "${EDITOR:-vim}" "$TMP/edit"; then
-      fatal "Editor exited with non-zero status, aborting..."
-    fi
-
-    rm -rf "$TMP/secrets"
-    mkdir "$TMP/secrets"
-    echo "keys/master ${secrets["keys/master"]}" > "$TMP/secrets/master"
-
-    local error="" name="" hosts=() value=()
-    while read -r line; do
-      if [[ -n $name && $line != EOF ]]; then
-        value+=("$line")
-        continue
-      fi
-
-      read -ra cmd <<< "$line"
-      if ((${#cmd[@]} == 0)); then continue; fi
-
-      case "${cmd[0]}" in
-        HOSTS)
-          for host in "${cmd[@]:1}"; do
-            if [[ $host == master ]]; then
-              error="Host name '$host' is reserved"
-            elif [[ $host =~ [^a-zA-Z0-9-] ]]; then
-              error="Host name '$host' contains invalid characters"
-            elif [[ -f $TMP/secrets/$host ]]; then
-              error="Duplicate host name '$host'"
-            else
-              if [[ -z ${secrets["keys/$host"]:+x} ]]; then
-                secrets["keys/$host"]="$(head -c 32 /dev/urandom | encode_secret)"
-              fi
-
-              echo "keys/$host ${secrets["keys/$host"]}" >> "$TMP/secrets/master"
-              echo "keys/$host ${secrets["keys/$host"]}" > "$TMP/secrets/$host"
-            fi
-          done
-          ;;
-
-        MASTER)
-          for host in "${cmd[@]:1}"; do
-            if [[ ! -f $TMP/secrets/$host ]]; then
-              error="Host '$host' not in hosts list"
-            else
-              echo "keys/master ${secrets["keys/master"]}" >> "$TMP/secrets/$host"
-            fi
-          done
-          ;;
-
-        SECRET)
-          name="${cmd[1]:-}"
-
-          if [[ -z $name ]]; then
-            error="SECRET command requires a name"
-          elif [[ $name == keys/* ]]; then
-            error="Secret name cannot start with 'keys/'"
-          elif [[ $name =~ [^a-zA-Z0-9/_-] ]]; then
-            error="Secret name '$name' contains invalid characters"
-          else
-            hosts=("${cmd[@]:2}")
-            value=()
-          fi
-          ;;
-
-        EOF)
-          if [[ -z $name ]]; then
-            error="Unexpected EOF"
-          else
-            text="$(IFS=$'\n' && encode_secret "${value[*]}")"
-
-            for host in "master" "${hosts[@]}"; do
-              if [[ ! -f $TMP/secrets/$host ]]; then
-                error="Host '$host' not in hosts list"
-              else
-                echo "$name $text" >> "$TMP/secrets/$host"
-              fi
-            done
-
-            name=""
-          fi
-          ;;
-
-        *) error="Illegal command: ${cmd[0]}" ;;
-      esac
-
-      if [[ -n $error ]]; then
-        break
-      fi
-    done < "$TMP/edit"
-
-    if [[ -z $error ]]; then
-      if [[ -n $name ]]; then
-        error="Unexpected end of file while reading secret '$name'"
-      else
-        break
-      fi
-    fi
-
-    warn "$error"
-    read -rp "Press enter to continue..."
-  done
+  done < "$TMP/store/ACL"
 
   rm -rf secrets
-  mkdir -m 700 secrets
-
-  for host in "$TMP/secrets"/*; do
-    host="${host##*/}"
-    save_secrets "$TMP/secrets/$host" "secrets/$host" "${secrets["keys/$host"]}"
-  done
-
-  chmod 400 secrets/*
+  mv "$TMP/secrets" .
   chown -R "$(stat -c "%u:%g" .)" secrets
 }
 

@@ -78,7 +78,10 @@ run() {
 use() {
   local path="${1:--}"
   path="$(resolve "$path")"
-  if [[ $path == /* && $path != /dev/stdin ]]; then error "Cannot use absolute path '$path'"; fi
+
+  if [[ $path == /* && $path != /dev/stdin && $path != $TMP/secrets/* ]]; then
+    error "Cannot use absolute path '$path'"
+  fi
 
   local resources=("$TMP/stages/$STAGE/res"/*)
   local target="$TMP/stages/$STAGE/res/${#resources[@]}"
@@ -119,27 +122,18 @@ secret() {
   shift $((OPTIND - 1))
   if ((file + query > 1)); then error "Options '-f' and '-q' are mutually exclusive"; fi
 
-  local name="$1" key value
-  while read -r key value; do
-    if [[ $key != "$name" ]]; then continue; fi
-    if [[ $key != keys/* ]]; then value="$(decode_secret "$value")"; fi
-
-    if ((file)); then
-      echo "$value" | use
-    elif ((!query)); then
-      echo "$value"
-    fi
-
-    return
-  done < "$TMP/secrets"
-
-  if ((query)); then return 1; fi
-  error "Secret '$name' not found"
+  local name="$1"
+  if [[ -f $TMP/secrets/$name ]]; then
+    if ((query)); then return 0; fi
+    if ((file)); then use "$TMP/secrets/$name"; else cat "$TMP/secrets/$name"; fi
+  else
+    if ((query)); then return 1; fi
+    fatal "Secret '$name' not found"
+  fi
 }
 
-if [[ ! -f secrets/$HOST_NAME ]]; then
-  fatal "No secrets for host '$HOST_NAME'"
-fi
+mkdir "$TMP/secrets"
+if [[ ! -f secrets/$HOST_NAME ]]; then fatal "No secrets for host '$HOST_NAME'"; fi
 
 if [[ -f /var/local/syscfg/key ]]; then
   if ! load_secrets "secrets/$HOST_NAME" "$TMP/secrets" "$(< /var/local/syscfg/key)"; then
@@ -147,34 +141,31 @@ if [[ -f /var/local/syscfg/key ]]; then
   fi
 fi
 
-if [[ ! -f $TMP/secrets ]]; then
+if [[ ! -f $TMP/secrets/keys/$HOST_NAME ]]; then
+  mkdir "$TMP/master"
+
   if [[ -f /var/local/syscfg/master ]]; then
     if ! load_secrets secrets/master "$TMP/master" "$(< /var/local/syscfg/master)"; then
       warn "Stale master password"
     fi
   fi
 
-  if [[ ! -f $TMP/master ]]; then
+  if [[ ! -f $TMP/master/ACL ]]; then
     read -rsp "Enter master password: " read
     echo
 
-    if ! load_secrets secrets/master "$TMP/master" "$(encode_secret "$read")"; then
+    if ! load_secrets secrets/master "$TMP/master" "$(sha "$read")"; then
       fatal "Incorrect master password"
     fi
   fi
 
-  while read -r key value; do
-    if [[ $key == keys/$HOST_NAME ]]; then
-      if ! load_secrets "secrets/$HOST_NAME" "$TMP/secrets" "$value"; then
-        fatal "Incorrect host key"
-      else
-        break
-      fi
-    fi
-  done < "$TMP/master"
+  if [[ ! -f $TMP/master/keys/$HOST_NAME ]]; then
+    fatal "No key for host '$HOST_NAME'"
+  elif ! load_secrets "secrets/$HOST_NAME" "$TMP/secrets" "$(< "$TMP/master/keys/$HOST_NAME")"; then
+    fatal "Incorrect host key"
+  fi
 
-  if [[ ! -f $TMP/secrets ]]; then fatal "No key for host '$HOST_NAME'"; fi
-  rm "$TMP/master"
+  rm -rf "$TMP/master"
 fi
 
 mkdir -p "$TMP/stages/$STAGE/res"
