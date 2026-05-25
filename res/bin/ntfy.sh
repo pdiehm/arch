@@ -1,34 +1,36 @@
 #!/usr/bin/env bash
 
 help=0
+channel="$HOSTNAME"
 priority="default"
+title=""
 
-while getopts "hp:" opt; do
+while getopts "hc:p:t:" opt; do
   case "$opt" in
     h) help=1 ;;
+    c) channel="$OPTARG" ;;
     p) priority="$OPTARG" ;;
-
-    *)
-      echo "Invalid option: -$opt"
-      exit 1
-      ;;
+    t) title="$OPTARG" ;;
+    *) exit 1 ;;
   esac
 done
 
 shift $((OPTIND - 1))
 
 if ((help)); then
-  echo "Usage: ntfy [-p priority] <message ...>"
+  echo "Usage: ntfy [-c channel] [-p priority] [-t title] <message ...>"
   echo
   echo "Options:"
   echo "  -h   Print this help message"
+  echo "  -c   Set channel"
   echo "  -p   Set priority (min/low/default/high/max)"
+  echo "  -t   Set title"
   exit
 fi
 
 if (($#)); then
-  curl -fsSL -H "Authorization: Bearer $(< /usr/local/lib/ntfy/token)" -H "Priority: $priority" -d "$*" "https://ntfy.pdiehm.dev/$HOSTNAME"
+  curl -fsSL -H "Authorization: Bearer $(< /usr/local/lib/ntfy/token)" -H "Priority: $priority" ${title:+-H "Title: $title"} -d "$*" "https://ntfy.pdiehm.dev/$channel"
 else
-  echo "Usage: ntfy [-p priority] <message ...>"
+  echo "Usage: ntfy [-c channel] [-p priority] [-t title] <message ...>"
   exit 1
 fi
