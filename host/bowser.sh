@@ -1,5 +1,11 @@
-env ADDRESS 192.168.1.88/16
-env GATEWAY 192.168.1.1
-copy -e res/systemd/network/ethernet.network /etc/systemd/network/main.network
+write /etc/systemd/network/main.network << EOF
+[Match]
+Kind=!*
+Type=ether
+
+[Network]
+Address=192.168.1.88/16
+Gateway=192.168.1.1
+EOF
 
 persist -u shared

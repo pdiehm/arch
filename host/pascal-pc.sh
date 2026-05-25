@@ -1,3 +1,11 @@
-env ADDRESS 192.168.1.90/16
-env GATEWAY 192.168.1.1
-copy -em 400 res/NetworkManager/ethernet.nmconnection /etc/NetworkManager/system-connections/wired.nmconnection
+write -m 400 /etc/NetworkManager/system-connections/wired.nmconnection << EOF
+[connection]
+id=wired
+type=ethernet
+autoconnect-priority=100
+
+[ipv4]
+method=manual
+addresses=192.168.1.90/16
+gateway=192.168.1.1
+EOF

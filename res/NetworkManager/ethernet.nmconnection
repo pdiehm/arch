@@ -1,9 +1,0 @@
-[connection]
-id=wired
-type=ethernet
-autoconnect-priority=100
-
-[ipv4]
-method=manual
-addresses=$ADDRESS
-gateway=$GATEWAY

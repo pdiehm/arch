@@ -1,8 +1,0 @@
-[Match]
-Kind=!*
-Type=ether
-
-[Network]
-DHCP=ipv4
-Address=$ADDRESS
-Gateway=$GATEWAY
