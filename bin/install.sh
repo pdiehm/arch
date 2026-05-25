@@ -53,7 +53,7 @@ if [[ $HOST_BOOT == EFI ]]; then
 elif [[ $HOST_BOOT == BIOS ]]; then
   CFG=("label: dos" "size=1GiB, type=0c, name=BOOT, bootable" "size=8GiB, type=swap, name=swap" "type=linux, name=root")
 else
-  fatal "Unknown boot method: $HOST_BOOT"
+  fatal "Illegal boot method: $HOST_BOOT"
 fi
 
 wipefs --all "$DISK"

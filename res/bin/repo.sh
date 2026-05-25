@@ -290,5 +290,5 @@ case "$1" in
   shell) shell "${@:2}" ;;
   status) status "${@:2}" ;;
   update) update "${@:2}" ;;
-  *) fatal "Unknown command: $1" ;;
+  *) fatal "Illegal command: $1" ;;
 esac

@@ -7,7 +7,7 @@ script() {
   while getopts "u" opt; do
     case "$opt" in
       u) user=1 ;;
-      *) error "Invalid option: -$opt" ;;
+      *) error "Illegal option" ;;
     esac
   done
 
@@ -39,7 +39,7 @@ write() {
       u) user=1 ;;
       x) executable=1 ;;
       m) mode="$OPTARG" ;;
-      *) error "Invalid option: -$opt" ;;
+      *) error "Illegal option" ;;
     esac
   done
 
@@ -80,7 +80,7 @@ copy() {
       u) user=1 ;;
       x) executable=1 ;;
       m) mode="$OPTARG" ;;
-      *) error "Invalid option: -$opt" ;;
+      *) error "Illegal option" ;;
     esac
   done
 
@@ -113,7 +113,7 @@ symlink() {
   while getopts "u" opt; do
     case "$opt" in
       u) user=1 ;;
-      *) error "Invalid option: -$opt" ;;
+      *) error "Illegal option" ;;
     esac
   done
 
@@ -149,7 +149,7 @@ persist() {
       f) file=1 ;;
       u) user=1 ;;
       m) mode="$OPTARG" ;;
-      *) error "Invalid option: -$opt" ;;
+      *) error "Illegal option" ;;
     esac
   done
 
@@ -194,7 +194,7 @@ conf() {
     case "$opt" in
       d) disable=1 ;;
       e) enable=1 ;;
-      *) error "Invalid option: -$opt" ;;
+      *) error "Illegal option" ;;
     esac
   done
 
@@ -266,7 +266,7 @@ systemd() {
       o) override=1 ;;
       u) user=1 ;;
       t) target="$OPTARG" ;;
-      *) error "Invalid option: -$opt" ;;
+      *) error "Illegal option" ;;
     esac
   done
 
@@ -334,7 +334,7 @@ timer() {
     case "$opt" in
       n) network=1 ;;
       u) user=1 ;;
-      *) error "Invalid option: -$opt" ;;
+      *) error "Illegal option" ;;
     esac
   done
 

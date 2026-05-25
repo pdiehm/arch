@@ -73,7 +73,7 @@ rebuild() {
       h) help=1 ;;
       c) clean=1 ;;
       d) dry=1 ;;
-      *) fatal "Invalid option: -$opt" ;;
+      *) fatal "Illegal option" ;;
     esac
   done
 
@@ -108,7 +108,7 @@ secrets() {
     case "$opt" in
       h) help=1 ;;
       r) rotate=1 ;;
-      *) fatal "Invalid option: -$opt" ;;
+      *) fatal "Illegal option" ;;
     esac
   done
 
@@ -223,7 +223,7 @@ secrets() {
         HOSTS)
           for host in "${cmd[@]:1}"; do
             if [[ $host == master ]]; then
-              error="Host name 'master' is reserved"
+              error="Host name '$host' is reserved"
             elif [[ $host =~ [^a-zA-Z0-9-] ]]; then
               error="Host name '$host' contains invalid characters"
             elif [[ -f $TMP/secrets/$host ]]; then
@@ -282,7 +282,7 @@ secrets() {
           fi
           ;;
 
-        *) error="Unknown command: ${cmd[0]}" ;;
+        *) error="Illegal command: ${cmd[0]}" ;;
       esac
 
       if [[ -n $error ]]; then
@@ -373,5 +373,5 @@ case "$1" in
   secrets) secrets "${@:2}" ;;
   sync) sync ;;
   upgrade) upgrade ;;
-  *) fatal "Unknown command: $1" ;;
+  *) fatal "Illegal command: $1" ;;
 esac

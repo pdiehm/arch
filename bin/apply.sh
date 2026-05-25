@@ -112,7 +112,7 @@ secret() {
     case "$opt" in
       f) file=1 ;;
       q) query=1 ;;
-      *) error "Invalid option: -$opt" ;;
+      *) error "Illegal option" ;;
     esac
   done
 

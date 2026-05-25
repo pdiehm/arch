@@ -22,5 +22,5 @@ elif [[ $HOST_BOOT == BIOS ]]; then
   script <<< "cp /usr/share/limine/limine-bios.sys /boot && limine bios-install \"\$(lsblk --noheadings --paths --output PKNAME /dev/disk/by-label/BOOT)\""
   upgrade <<< "cp /usr/share/limine/limine-bios.sys /boot && limine bios-install \"\$(lsblk --noheadings --paths --output PKNAME /dev/disk/by-label/BOOT)\""
 else
-  error "Unknown boot method: $HOST_BOOT"
+  error "Illegal boot method: $HOST_BOOT"
 fi
