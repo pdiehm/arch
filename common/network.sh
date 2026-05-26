@@ -3,12 +3,18 @@ write /etc/hostname "$HOST_NAME"
 write /etc/hosts << EOF
 127.0.0.1            localhost
 ::1                  localhost
-192.168.1.88         bowser
 192.168.1.89         homeassistant
-192.168.1.90         pascal-pc
-192.168.1.91         pascal-laptop
 91.99.52.233         goomba
 2a01:4f8:c0c:988b::1 goomba
+EOF
+
+package dynhostmgr
+systemd -e dynhostmgr.service
+
+write /etc/dynhosts << EOF
+bowser        192.168.1.88 fd42:6c77:9a2f::2
+pascal-pc     192.168.1.90 fd42:6c77:9a2f::1001
+pascal-laptop 192.168.1.91 fd42:6c77:9a2f::1002
 EOF
 
 write /etc/sysctl.d/forwarding.conf << EOF
