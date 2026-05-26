@@ -22,23 +22,25 @@ script() {
   fi
 }
 
-# write [-aeux] [-m mode] <path> [content ...]
+# write [-aeux] [-m mode] [-o owner] <path> [content ...]
 #   -a   append
 #   -e   substitute environment variables
 #   -u   as user in home directory
 #   -x   set executable
 #   -m   set mode
+#   -o   set owner
 write() {
   local OPTIND OPTARG opt
-  local append=0 envsubst=0 user=0 executable=0 mode=""
+  local append=0 envsubst=0 user=0 executable=0 mode="" owner=""
 
-  while getopts "aeuxm:" opt; do
+  while getopts "aeuxm:o:" opt; do
     case "$opt" in
       a) append=1 ;;
       e) envsubst=1 ;;
       u) user=1 ;;
       x) executable=1 ;;
       m) mode="$OPTARG" ;;
+      o) owner="$OPTARG" ;;
       *) error "Illegal option" ;;
     esac
   done
@@ -53,6 +55,7 @@ write() {
   if ((envsubst)); then cmd+="envsubst < ${content@Q} "; else cmd+="cat ${content@Q} "; fi
   if ((append)); then cmd+=">> ${path@Q}"; else cmd+="> ${path@Q}"; fi
 
+  if [[ -n $owner ]]; then cmd+=" && chown ${owner@Q} ${path@Q}"; fi
   if [[ -n $mode ]]; then cmd+=" && chmod ${mode@Q} ${path@Q}"; fi
   if ((executable)); then cmd+=" && chmod +x ${path@Q}"; fi
 
@@ -63,23 +66,25 @@ write() {
   fi
 }
 
-# copy [-ensux] [-m mode] <src> <dst>
+# copy [-ensux] [-m mode] [-o owner] <src> <dst>
 #   -e   substitute environment variables
 #   -s   interpret src as secret name
 #   -u   as user to home directory
 #   -x   set executable
 #   -m   set mode
+#   -o   set owner
 copy() {
   local OPTIND OPTARG opt
-  local envsubst=0 secret=0 user=0 executable=0 mode=""
+  local envsubst=0 secret=0 user=0 executable=0 mode="" owner=""
 
-  while getopts "esuxm:" opt; do
+  while getopts "esuxm:o:" opt; do
     case "$opt" in
       e) envsubst=1 ;;
       s) secret=1 ;;
       u) user=1 ;;
       x) executable=1 ;;
       m) mode="$OPTARG" ;;
+      o) owner="$OPTARG" ;;
       *) error "Illegal option" ;;
     esac
   done
@@ -94,6 +99,7 @@ copy() {
   local cmd="mkdir -p ${dir@Q} && "
   if ((envsubst)); then cmd+="envsubst < ${src@Q} > ${dst@Q}"; else cmd+="cp -r ${src@Q} ${dst@Q}"; fi
 
+  if [[ -n $owner ]]; then cmd+=" && chown ${owner@Q} ${path@Q}"; fi
   if [[ -n $mode ]]; then cmd+=" && chmod ${mode@Q} ${dst@Q}"; fi
   if ((executable)); then cmd+=" && chmod +x ${dst@Q}"; fi
 

@@ -20,7 +20,12 @@ copy res/systemd/resolved.conf /etc/systemd/resolved.conf
 systemd -i resolvconf.service
 systemd -e systemd-resolved.service resolvconf.service
 
-if [[ $PHASE == declare ]]; then PORTS=(1234); fi
-env PORTS "$(IFS=, && echo "${PORTS[*]}")"
+if [[ $PHASE == declare ]]; then
+  TCP=(1234)
+  UDP=()
+fi
+
+env TCP "$(IFS=, && echo "${TCP[*]}")"
+env UDP "$(IFS=, && echo "${UDP[*]}")"
 copy -e res/nftables.conf /etc/nftables.conf
 systemd -e nftables.service

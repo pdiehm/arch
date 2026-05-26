@@ -28,7 +28,7 @@ copy -s "ssh/$HOST_NAME/host" /etc/ssh/host_key
 copy -sm 444 "ssh/$HOST_NAME/auth" /etc/ssh/authorized_keys
 systemd -m sshdgenkeys.service
 systemd -e sshd.service
-PORTS+=(1970)
+TCP+=(1970)
 
 copy -sm 444 ntfy /usr/local/lib/ntfy/token
 copy -x res/bin/ntfy.sh /usr/local/bin/ntfy
