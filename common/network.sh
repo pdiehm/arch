@@ -11,6 +11,11 @@ write /etc/hosts << EOF
 2a01:4f8:c0c:988b::1 goomba
 EOF
 
+write /etc/sysctl.d/forwarding.conf << EOF
+net.ipv4.ip_forward = 1
+net.ipv6.conf.all.forwarding = 1
+EOF
+
 copy res/systemd/resolved.conf /etc/systemd/resolved.conf
 systemd -i resolvconf.service
 systemd -e systemd-resolved.service resolvconf.service
