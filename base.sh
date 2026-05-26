@@ -163,9 +163,8 @@ persist() {
   local path="$1" dir target
   dir="$(dirname "$path")"
 
-  target="${path//+/_}"
+  target="${path//[^a-zA-Z0-9\/._-]/_}"
   target="${target//\//+}"
-  target="${target//[^a-zA-Z0-9._+-]/_}"
   if [[ $target == +* ]]; then target="/perm/${target:1}"; else target="/perm/home+pascal+$target"; fi
 
   local cmd="if [[ -e ${target@Q} ]]; then echo 'Cannot persist' ${path@Q} '- Already persisted' >&2; exit 1; fi && "
