@@ -38,4 +38,5 @@ preshared-key=$(secret wg/psk/main)
 preshared-key-flags=0
 allowed-ips=fd42:6c77:9a2f::/112
 endpoint=goomba:51820
+persistent-keepalive=10
 EOF

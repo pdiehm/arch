@@ -22,6 +22,7 @@ PublicKey=$(secret wg/pub/goomba)
 PresharedKey=$(secret wg/psk/main)
 AllowedIPs=fd42:6c77:9a2f::/112
 Endpoint=goomba:51820
+PersistentKeepalive=10
 EOF
 
 write /etc/systemd/network/wg-main.network << EOF
