@@ -22,7 +22,7 @@ systemd -e systemd-resolved.service resolvconf.service
 
 if [[ $PHASE == declare ]]; then
   TCP=(1234)
-  UDP=()
+  UDP=(1234)
 fi
 
 env TCP "$(IFS=, && echo "${TCP[*]}")"
