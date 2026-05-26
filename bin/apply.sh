@@ -14,6 +14,7 @@ trap cleanup EXIT
 TMP="$(mktemp -d)"
 chmod 700 "$TMP"
 
+PHASE=""
 STAGE=0
 
 cleanup() {
@@ -70,6 +71,7 @@ import() {
 
 # run <command> ...
 run() {
+  if [[ $PHASE != build ]]; then return; fi
   echo "${*@Q}" >> "$TMP/stages/$STAGE/build.sh"
   sha <<< "$*" >> "$TMP/stages/$STAGE/hash"
 }
@@ -78,6 +80,7 @@ run() {
 use() {
   local path="${1:--}"
   path="$(resolve "$path")"
+  if [[ $PHASE != build ]]; then return; fi
 
   if [[ $path == /* && $path != /dev/stdin && $path != $TMP/secrets/* ]]; then
     error "Cannot use absolute path '$path'"
@@ -169,7 +172,8 @@ if [[ ! -f $TMP/secrets/keys/$HOST_NAME ]]; then
 fi
 
 mkdir -p "$TMP/stages/$STAGE/res"
-import main
+PHASE="declare" import main
+PHASE="build" import main
 
 if [[ -n ${DRY:+x} ]]; then
   (cd "$TMP" && bash)

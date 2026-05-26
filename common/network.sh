@@ -20,5 +20,7 @@ copy res/systemd/resolved.conf /etc/systemd/resolved.conf
 systemd -i resolvconf.service
 systemd -e systemd-resolved.service resolvconf.service
 
-copy res/nftables.conf /etc/nftables.conf
+if [[ $PHASE == declare ]]; then PORTS=(1234); fi
+env PORTS "$(IFS=, && echo "${PORTS[*]}")"
+copy -e res/nftables.conf /etc/nftables.conf
 systemd -e nftables.service
