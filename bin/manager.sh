@@ -165,7 +165,7 @@ secrets() {
 
   while read -r host _; do
     if [[ $host == master ]]; then
-      fatal "Host name 'master' is reserved"
+      fatal "Illegal host name: $name"
     elif [[ -f $TMP/store/keys/$host ]]; then
       mv "$TMP/store/keys/$host" "$TMP/keys"
     else

@@ -11,7 +11,7 @@ fatal() {
 
 enter() {
   local name="$1"
-  if [[ ! -d $name ]]; then fatal "Repo '$name' not found"; fi
+  if [[ ! -d $name ]]; then fatal "No such repo: $name"; fi
   cd "$name"
 }
 
@@ -87,7 +87,7 @@ clone() {
   done
 
   if [[ -z $url ]]; then
-    fatal "Repo '$1' not found"
+    fatal "Not found: $1"
   elif [[ -z $name ]]; then
     git clone "$url"
   else
@@ -106,7 +106,7 @@ edit() {
     cd "$(dirname "$path")"
     exec "$EDITOR" "$(basename "$path")"
   else
-    fatal "Path '$path' not found"
+    fatal "No such file or directory: $path"
   fi
 }
 
@@ -116,7 +116,7 @@ fetch() {
   if [[ -z $name ]]; then
     for name in *; do fetch "$name"; done
   elif [[ ! -d $name ]]; then
-    fatal "Repo '$name' not found"
+    fatal "No such repo: $name"
   else
     git -C "$name" fetch
   fi
@@ -190,7 +190,7 @@ shell() {
   local name="$1" path="${2:-.}"
   enter "$name"
 
-  if [[ ! -d $path ]]; then fatal "Path '$path' not found"; fi
+  if [[ ! -d $path ]]; then fatal "No such directory: $path"; fi
   cd "$path"
 
   exec "$SHELL"

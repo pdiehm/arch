@@ -7,8 +7,8 @@ cd "$(dirname "$(realpath "$0")")/.."
 source bin/lib.sh
 
 if (($# != 1)); then fatal "Usage: apply.sh <host>"; fi
+if ! resolve_host "$1"; then fatal "Illegal host: $1"; fi
 if ((UID)); then fatal "This script must be run as root"; fi
-if ! resolve_host "$1"; then fatal "Host '$1' not found"; fi
 
 trap cleanup EXIT
 TMP="$(mktemp -d)"
@@ -53,7 +53,7 @@ resolve() {
 import() {
   local path="$1"
   path="$(resolve "$path")"
-  if [[ $path == /* ]]; then error "Cannot import absolute path '$path'"; fi
+  if [[ $path == /* ]]; then error "Absolute path: $path"; fi
 
   for path in "$path" "$path.sh" "$path/main.sh"; do
     if [[ ! -f $path ]]; then continue; fi
@@ -66,7 +66,7 @@ import() {
     return
   done
 
-  error "Cannot find module '$1'"
+  error "Not found: $1"
 }
 
 # run <command> ...
@@ -83,7 +83,7 @@ use() {
   if [[ $PHASE != build ]]; then return; fi
 
   if [[ $path == /* && $path != /dev/stdin && $path != $TMP/secrets/* ]]; then
-    error "Cannot use absolute path '$path'"
+    error "Absolute path: $path"
   fi
 
   local resources=("$TMP/stages/$STAGE/res"/*)
@@ -95,7 +95,7 @@ use() {
     cp "$path" "$target"
     if [[ $path == /dev/stdin ]]; then chmod 444 "$target"; fi
   else
-    error "Resource '$path' not found"
+    error "No such file or directory: $path"
   fi
 
   if [[ -f $target ]]; then
@@ -103,7 +103,7 @@ use() {
   elif [[ -d $target ]]; then
     find "$target" -type f -exec cat "{}" + | sha >> "$TMP/stages/$STAGE/hash"
   else
-    error "Cannot hash resource '$path'"
+    error "Cannot hash: $path"
   fi
 
   echo "${target/#"$TMP/stages/$STAGE"//stage}"
@@ -131,12 +131,12 @@ secret() {
     if ((file)); then use "$TMP/secrets/$name"; else cat "$TMP/secrets/$name"; fi
   else
     if ((query)); then return 1; fi
-    fatal "Secret '$name' not found"
+    fatal "No such secret: $name"
   fi
 }
 
 mkdir "$TMP/secrets"
-if [[ ! -f secrets/$HOST_NAME ]]; then fatal "No secrets for host '$HOST_NAME'"; fi
+if [[ ! -f secrets/$HOST_NAME ]]; then fatal "No secrets for host"; fi
 
 if [[ -f /var/local/syscfg/key ]]; then
   if ! load_secrets "secrets/$HOST_NAME" "$TMP/secrets" "$(< /var/local/syscfg/key)"; then
@@ -163,7 +163,7 @@ if [[ ! -f $TMP/secrets/keys/$HOST_NAME ]]; then
   fi
 
   if [[ ! -f $TMP/master/keys/$HOST_NAME ]]; then
-    fatal "No key for host '$HOST_NAME'"
+    fatal "No key for host"
   elif ! load_secrets "secrets/$HOST_NAME" "$TMP/secrets" "$(< "$TMP/master/keys/$HOST_NAME")"; then
     fatal "Incorrect host key"
   fi
