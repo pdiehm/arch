@@ -163,7 +163,7 @@ persist() {
   local path="$1" dir target
   dir="$(dirname "$path")"
 
-  target="${path//[^a-zA-Z0-9\/._-]/_}"
+  target="${path//[^a-zA-Z0-9.\/-]/_}"
   target="${target//\//+}"
   if [[ $target == +* ]]; then target="/perm/${target:1}"; else target="/perm/home+pascal+$target"; fi
 
