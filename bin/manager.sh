@@ -13,7 +13,7 @@ help() {
   echo "  help             Print this help message"
   echo "  edit             Open editor in configuration repository"
   echo "  fix              Edit latest image"
-  echo "  rebuild [-hcd]   Rebuild system configuration"
+  echo "  rebuild [-hbc]   Rebuild system configuration"
   echo "  secrets [-hr]    Manage secrets"
   echo "  sync             Sync configuration repository"
   echo "  upgrade          Upgrade system"
@@ -66,33 +66,29 @@ rebuild() {
   fi
 
   local OPTIND opt
-  local help=0 clean=0 dry=0
+  local help=0 break=0 clean=0
 
-  while getopts "hcd" opt; do
+  while getopts "hbc" opt; do
     case "$opt" in
       h) help=1 ;;
+      b) break=1 ;;
       c) clean=1 ;;
-      d) dry=1 ;;
       *) fatal "Illegal option" ;;
     esac
   done
 
   if ((help)); then
-    echo "Usage: manager.sh rebuild [-hcd]"
+    echo "Usage: manager.sh rebuild [-hbc]"
     echo
     echo "Options:"
     echo "  -h   Print this help message"
+    echo "  -b   Break after evaluation"
     echo "  -c   Clean rebuild"
-    echo "  -d   Dry mode"
     return
   fi
 
-  if ((clean + dry > 1)); then
-    fatal "Options '-c' and '-d' are mutually exclusive"
-  fi
-
+  if ((break)); then export BREAK=1; fi
   if ((clean)); then export CLEAN=1; fi
-  if ((dry)); then export DRY=1; fi
   exec bin/apply.sh "$HOSTNAME"
 }
 

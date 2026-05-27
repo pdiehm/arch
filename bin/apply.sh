@@ -171,13 +171,15 @@ if [[ ! -f $TMP/secrets/keys/$HOST_NAME ]]; then
   rm -rf "$TMP/master"
 fi
 
+echo "Evaluating..."
 mkdir -p "$TMP/stages/$STAGE/res"
 PHASE="declare" import main
 PHASE="build" import main
 
-if [[ -n ${DRY:+x} ]]; then
-  (cd "$TMP" && bash)
-  exit
+if [[ -n ${BREAK:+x} ]]; then
+  if ! (cd "$TMP" && bash); then
+    fatal "Shell exited with non-zero status, aborting..."
+  fi
 fi
 
 mount --mkdir --label root "$TMP/root"
