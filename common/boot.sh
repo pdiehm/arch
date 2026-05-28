@@ -13,6 +13,7 @@ run mkinitcpio --allpresets
 
 package limine "$HOST_CPU-ucode"
 env UCODE "$HOST_CPU-ucode.img"
+env INITRAMFS "initramfs-$HOST_KERNEL.img"
 copy -e res/limine.conf /boot/limine.conf
 
 if [[ $HOST_BOOT == EFI ]]; then
