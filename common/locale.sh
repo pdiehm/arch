@@ -6,4 +6,4 @@ symlink /usr/share/zoneinfo/Europe/Berlin /etc/localtime
 run hwclock --systohc
 
 write -a /etc/vconsole.conf "KEYMAP=de"
-run mkinitcpio --preset linux
+run mkinitcpio --allpresets

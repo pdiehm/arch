@@ -9,7 +9,7 @@ EOF
 copy res/initcpio/root/hook.sh /etc/initcpio/hooks/root
 copy res/initcpio/root/install.sh /etc/initcpio/install/root
 conf /etc/mkinitcpio.conf "HOOKS=(base udev autodetect microcode keyboard block encrypt filesystems root fsck)"
-run mkinitcpio --preset linux
+run mkinitcpio --allpresets
 
 package limine "$HOST_CPU-ucode"
 env UCODE "$HOST_CPU-ucode.img"
