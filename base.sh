@@ -12,7 +12,7 @@ script() {
   done
 
   shift $((OPTIND - 1))
-  local path="${1:--}" args=("${@:2}")
+  local path="${1:-/dev/stdin}" args=("${@:2}")
   path="$(use "$path")"
 
   if ((user)); then
@@ -97,9 +97,9 @@ copy() {
   dir="$(dirname "$dst")"
 
   local cmd="mkdir -p ${dir@Q} && "
-  if ((envsubst)); then cmd+="envsubst < ${src@Q} > ${dst@Q}"; else cmd+="cp -r ${src@Q} ${dst@Q}"; fi
+  if ((envsubst)); then cmd+="envsubst < ${src@Q} > ${dst@Q}"; else cmd+="cp ${src@Q} ${dst@Q}"; fi
 
-  if [[ -n $owner ]]; then cmd+=" && chown ${owner@Q} ${path@Q}"; fi
+  if [[ -n $owner ]]; then cmd+=" && chown ${owner@Q} ${dst@Q}"; fi
   if [[ -n $mode ]]; then cmd+=" && chmod ${mode@Q} ${dst@Q}"; fi
   if ((executable)); then cmd+=" && chmod +x ${dst@Q}"; fi
 
@@ -164,8 +164,8 @@ persist() {
   dir="$(dirname "$path")"
 
   target="${path//[^a-zA-Z0-9.\/-]/_}"
-  target="${target//\//+}"
-  if [[ $target == +* ]]; then target="/perm/${target:1}"; else target="/perm/home+pascal+$target"; fi
+  target="${target//\//:}"
+  if [[ $target == :* ]]; then target="/perm/${target:1}"; else target="/perm/home:pascal:$target"; fi
 
   local cmd="if [[ -e ${target@Q} ]]; then echo 'Cannot persist' ${path@Q} '- Already persisted' >&2; exit 1; fi && "
   cmd+="mkdir -p ${dir@Q} && if [[ -e ${path@Q} ]]; then mv ${path@Q} ${target@Q}; fi && ln -s ${target@Q} ${path@Q}"
@@ -218,6 +218,17 @@ conf() {
   done
 }
 
+# dropin <file> [text ...]
+dropin() {
+  local file="$1"
+
+  if (($# == 1)); then
+    write -au ".config/dropin/$file"
+  else
+    write -au ".config/dropin/$file" "${*:2}"
+  fi
+}
+
 # package <name> ...
 package() {
   run pacman --noconfirm --sync --refresh --sysupgrade "$@"
@@ -229,17 +240,6 @@ upgrade() {
     write -a /var/local/syscfg/upgrade.sh "${*@Q}"
   else
     write -a /var/local/syscfg/upgrade.sh
-  fi
-}
-
-# dropin <file> [text ...]
-dropin() {
-  local file="$1"
-
-  if (($# == 1)); then
-    write -au ".config/dropin/$file"
-  else
-    write -au ".config/dropin/$file" "${*:2}"
   fi
 }
 
@@ -276,7 +276,7 @@ systemd() {
   done
 
   shift $((OPTIND - 1))
-  if ((enable + install + mask + override > 1)); then error "Options '-e', '-i', '-m' and '-o' are mutually exclusive"; fi
+  if ((enable + install + mask + override != 1)); then error "Exactly one of '-e', '-i', '-m' or '-o' is required"; fi
 
   if ((enable)); then
     if [[ -n $target ]] && ((!user)); then error "Option '-t' requires '-u'"; fi
@@ -318,13 +318,11 @@ systemd() {
 
     if ((user)); then
       local unit
-      for unit; do copy -u "res/systemd/user/$unit" ".config/systemd/user/$unit.d/override.conf"; done
+      for unit; do copy -u "res/systemd/override/$unit" ".config/systemd/user/$unit.d/override.conf"; done
     else
       local unit
-      for unit; do copy "res/systemd/system/$unit" "/etc/systemd/system/$unit.d/override.conf"; done
+      for unit; do copy "res/systemd/override/$unit" "/etc/systemd/system/$unit.d/override.conf"; done
     fi
-  else
-    error "One of '-e', '-i', '-m' or '-o' is required"
   fi
 }
 

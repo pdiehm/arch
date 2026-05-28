@@ -6,7 +6,7 @@ Requires=network-online.target
 [Service]
 TimeoutStartSec=infinity
 ExecStartPre=/bin/sh -c 'until nc -z ntfy.pdiehm.dev 80; do sleep 1; done'
-ExecStart=/usr/local/lib/journalwatch
+ExecStart=/usr/local/lib/journalwatch/journalwatch
 
 [Install]
 WantedBy=multi-user.target

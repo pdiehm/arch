@@ -30,11 +30,12 @@ systemd -m sshdgenkeys.service
 systemd -e sshd.service
 TCP+=(1970)
 
-copy -sm 444 ntfy /usr/local/lib/ntfy/token
 copy -x res/bin/ntfy.sh /usr/local/bin/ntfy
+copy -sm 444 ntfy /usr/local/lib/ntfy/token
 
-package man-db man-pages rsync zip unzip libarchive pkgstats wireguard-tools \
-  bat eza fd ripgrep jq pv fzf parallel \
+package man-db man-pages pkgstats wireguard-tools \
+  bat eza fd ripgrep jq pv fzf rsync parallel \
   lsof usbutils pciutils fastfetch duf ncdu \
   curl xh openbsd-netcat doggo mtr tcpdump \
-  btrfs-progs e2fsprogs exfatprogs dosfstools
+  btrfs-progs e2fsprogs exfatprogs dosfstools \
+  libarchive zip unzip

@@ -11,12 +11,12 @@ for path in "/bin" "/etc" "/lib" "/lib64" "/sbin" "/usr" "/var" "$(realpath /etc
   FLAGS+=("--ro-bind" "$path" "$path")
 done
 
-for path in "/perm/home+pascal+.config+mozilla+firefox" "/perm/home+pascal+.local+share+gnupg"; do
-  FLAGS+=("--ro-bind" "/var/empty" "$path")
+for path in "/perm/home:pascal:.config:mozilla:firefox" "/perm/home:pascal:.local:share:gnupg"; do
+  FLAGS+=("--tmpfs" "$path")
 done
 
-for path in ".ssh" ".local/keys" ".cache/mozilla"; do
-  FLAGS+=("--ro-bind" "/var/empty" "$HOME/$path")
+for path in ".ssh" ".local/share" ".cache/mozilla"; do
+  FLAGS+=("--tmpfs" "$HOME/$path")
 done
 
 exec bwrap "${FLAGS[@]}" "$@"

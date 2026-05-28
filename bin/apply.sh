@@ -39,9 +39,7 @@ error() {
 resolve() {
   local path="$1"
 
-  if [[ $path == - ]]; then
-    echo "/dev/stdin"
-  elif [[ $path == ./* ]]; then
+  if [[ $path == ./* ]]; then
     path="$(dirname "$MODULE")/${path#./}"
     echo "${path#./}"
   else
@@ -51,62 +49,56 @@ resolve() {
 
 # import <path>
 import() {
-  local path="$1"
+  local path="$1" mod
   path="$(resolve "$path")"
   if [[ $path == /* ]]; then error "Absolute path: $path"; fi
 
-  for path in "$path" "$path.sh" "$path/main.sh"; do
-    if [[ ! -f $path ]]; then continue; fi
+  for mod in "$path" "$path.sh" "$path/main.sh"; do
+    if [[ ! -f $mod ]]; then continue; fi
     if [[ -f $TMP/stages/$STAGE/build.sh ]]; then mkdir -p "$TMP/stages/$((++STAGE))/res"; fi
 
     # shellcheck disable=SC1090
-    MODULE="$path" source "$path"
+    MODULE="$mod" source "$mod"
 
     if [[ -f $TMP/stages/$STAGE/build.sh ]]; then mkdir -p "$TMP/stages/$((++STAGE))/res"; fi
     return
   done
 
-  error "Not found: $1"
+  error "Not found: $path"
 }
 
 # run <command> ...
 run() {
-  if [[ $PHASE != build ]]; then return; fi
+  if [[ $PHASE != build ]]; then
+    return
+  fi
+
   echo "${*@Q}" >> "$TMP/stages/$STAGE/build.sh"
   sha <<< "$*" >> "$TMP/stages/$STAGE/hash"
 }
 
 # use [path]
 use() {
-  local path="${1:--}"
+  if [[ $PHASE != build ]]; then
+    return
+  fi
+
+  local path="${1:-/dev/stdin}" hash
   path="$(resolve "$path")"
-  if [[ $PHASE != build ]]; then return; fi
 
   if [[ $path == /* && $path != /dev/stdin && $path != $TMP/secrets/* ]]; then
     error "Absolute path: $path"
-  fi
-
-  local resources=("$TMP/stages/$STAGE/res"/*)
-  local target="$TMP/stages/$STAGE/res/${#resources[@]}"
-
-  if [[ -d $path ]]; then
-    cp -r "$path" "$target"
-  elif [[ -e $path ]]; then
-    cp "$path" "$target"
-    if [[ $path == /dev/stdin ]]; then chmod 444 "$target"; fi
-  else
+  elif [[ ! -e $path ]]; then
     error "No such file or directory: $path"
   fi
 
-  if [[ -f $target ]]; then
-    sha < "$target" >> "$TMP/stages/$STAGE/hash"
-  elif [[ -d $target ]]; then
-    find "$target" -type f -exec cat "{}" + | sha >> "$TMP/stages/$STAGE/hash"
-  else
-    error "Cannot hash: $path"
-  fi
+  cp "$path" "$TMP/res"
+  hash="$(sha < "$TMP/res")"
+  if [[ $path == /dev/stdin ]]; then chmod 444 "$TMP/res"; fi
 
-  echo "${target/#"$TMP/stages/$STAGE"//stage}"
+  mv "$TMP/res" "$TMP/stages/$STAGE/res/$hash"
+  echo "$hash" >> "$TMP/stages/$STAGE/hash"
+  echo "/stage/res/$hash"
 }
 
 # secret [-fq] <name>
