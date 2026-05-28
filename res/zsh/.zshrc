@@ -16,16 +16,15 @@ _prompt_git() {
     echo -n " %F{8}$branch%f"
   fi
 
-  local changes="$(git status --porcelain)"
-  local staged="$(grep -Ec "^\w." <<< "$changes")"
-  local changed="$(grep -Ec "^.(\w|\?)" <<< "$changes")"
+  local staged="$(git diff --staged --name-only)"
+  local changed="$(git ls-files --modified --others --exclude-standard)"
 
-  if ((changed && staged)); then
+  if [[ -n $staged && -n $changed ]]; then
     echo -en "%F{6}\u203d%f"
-  elif ((changed)); then
-    echo -n "%F{6}?%f"
-  elif ((staged)); then
+  elif [[ -n $staged ]]; then
     echo -n "%F{6}!%f"
+  elif [[ -n $changed ]]; then
+    echo -n "%F{6}?%f"
   fi
 
   if [[ -n "$(git stash list)" ]]; then
