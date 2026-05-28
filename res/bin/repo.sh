@@ -51,8 +51,8 @@ git-status() {
   if [[ -n "$(git status --porcelain)" ]]; then echo "change"; fi
   if [[ -n "$(git stash list)" ]]; then echo "stash"; fi
 
-  local branch ahead behind
-  while read -r branch; do
+  local branch
+  git-branches | while read -r branch; do
     if git-is-local "$branch"; then
       echo "local 0 0 $branch"
     else
@@ -60,7 +60,7 @@ git-status() {
       behind="$(git rev-list --count "$branch..$branch@{upstream}")"
       echo "branch $ahead $behind $branch"
     fi
-  done < <(git-branches)
+  done
 }
 
 help() {
@@ -80,14 +80,14 @@ help() {
 }
 
 clone() {
-  local url="${1%.git}.git" name="${2:-}"
+  local src="${1%.git}.git" name="${2:-}"
 
-  for url in "$url" "gh:/$url" "gh:$url" ""; do
+  for url in "$src" "gh:/$src" "gh:$src" ""; do
     if git ls-remote "$url" &> /dev/null; then break; fi
   done
 
   if [[ -z $url ]]; then
-    fatal "Not found: $1"
+    fatal "Not found: $src"
   elif [[ -z $name ]]; then
     git clone "$url"
   else
@@ -156,8 +156,8 @@ remove() {
   enter "$name"
 
   local changes=()
-  while read -r state ahead behind branch; do
-    case "$state" in
+  while read -r type ahead behind branch; do
+    case "$type" in
       change) changes+=("Uncommited changes") ;;
       stash) changes+=("Stashed changes") ;;
       local) changes+=("Local branch ($branch)") ;;
@@ -223,12 +223,12 @@ status() {
     printf "\e[1mRepo: \e[34m%s \e[m(\e[32m%s\e[m, \e[2m%s\e[m)\n\n" "$name" "$head" "$url"
   fi
 
-  git-status | while read -r state ahead behind branch; do
+  git-status | while read -r type ahead behind branch; do
     if [[ -n $branch ]]; then
       read -r hash message <<< "$(git show --oneline --no-patch "$branch")"
     fi
 
-    case "$state" in
+    case "$type" in
       local) printf "\e[32m%s\x09\e[36mlocal\x09\e[33m%s \e[m%s\n" "$branch" "$hash" "$message" ;;
       branch) printf "\e[32m%s\x09\e[36m\u2191\e[m%d \e[36m\u2193\e[m%d\x09\e[33m%s \e[m%s\n" "$branch" "$ahead" "$behind" "$hash" "$message" ;;
     esac
