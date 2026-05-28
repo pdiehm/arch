@@ -24,7 +24,7 @@ load_secrets() {
   gpg --decrypt --quiet --batch --pinentry-mode loopback --passphrase-fd 3 < "$store" 3<<< "$key" | tar x -C "$target"
 }
 
-# store_secrets <store> <directory> <key> <spec ...>
+# store_secrets <store> <directory> <key> <spec> ...
 store_secrets() {
   local store="$1" directory="$2" key="$3" spec=("${@:4}")
   tar c -C "$directory" "${spec[@]}" | gpg --symmetric --quiet --batch --pinentry-mode loopback --passphrase-fd 3 3<<< "$key" > "$store"

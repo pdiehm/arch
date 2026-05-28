@@ -18,7 +18,7 @@ done
 shift $((OPTIND - 1))
 
 if ((help)); then
-  echo "Usage: ntfy [-c channel] [-p priority] [-t title] <message ...>"
+  echo "Usage: ntfy [-c channel] [-p priority] [-t title] <message> ..."
   echo
   echo "Options:"
   echo "  -h   Print this help message"
@@ -31,6 +31,6 @@ fi
 if (($#)); then
   curl -fsSL -H "Authorization: Bearer $(< /usr/local/lib/ntfy/token)" -H "Priority: $priority" ${title:+-H "Title: $title"} -d "$*" "https://ntfy.pdiehm.dev/$channel"
 else
-  echo "Usage: ntfy [-c channel] [-p priority] [-t title] <message ...>"
+  echo "Usage: ntfy [-c channel] [-p priority] [-t title] <message> ..."
   exit 1
 fi

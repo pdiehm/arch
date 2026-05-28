@@ -73,7 +73,7 @@ help() {
   echo "  fetch [name]            Fetch repo(s)"
   echo "  list                    List repos"
   echo "  remove <name>           Remove repo"
-  echo "  run <name> <cmd ...>    Run command in repo"
+  echo "  run <name> <cmd> ...    Run command in repo"
   echo "  shell <name> [path]     Open shell in repo"
   echo "  status [name]           Print status of repo(s)"
   echo "  update [name]           Update repo(s)"
@@ -180,7 +180,7 @@ remove() {
 
 run() {
   local name="$1" cmd=("${@:2}")
-  if ((${#cmd[@]} == 0)); then fatal "Usage: repo run <name> <cmd ...>"; fi
+  if ((${#cmd[@]} == 0)); then fatal "Usage: repo run <name> <cmd> ..."; fi
 
   enter "$name"
   exec "${cmd[@]}"
