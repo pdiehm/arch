@@ -248,13 +248,11 @@ update() {
   fi
 
   enter "$name"
-  git fetch
+  head="$(git-head)"
+  if [[ $head == HEAD ]]; then head="$(git rev-parse HEAD)"; fi
 
   stashed="$(git status --porcelain | wc -l)"
   if ((stashed)); then git stash push --include-untracked; fi
-
-  head="$(git-head)"
-  if [[ $head == HEAD ]]; then head="$(git rev-parse HEAD)"; fi
 
   git-branches | while read -r branch; do
     if git-is-local "$branch"; then continue; fi
