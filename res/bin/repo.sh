@@ -43,12 +43,18 @@ git-is-local() {
   if git rev-parse "$branch@{upstream}" &> /dev/null; then return 1; else return 0; fi
 }
 
+git-is-dirty() {
+  if [[ -n "$(git diff --staged --name-only)" ]]; then return 0; fi
+  if [[ -n "$(git ls-files --modified --others --exclude-standard)" ]]; then return 0; fi
+  return 1
+}
+
 git-branches() {
   git for-each-ref --format "%(refname:short)" refs/heads
 }
 
 git-status() {
-  if [[ -n "$(git status --porcelain)" ]]; then echo "change"; fi
+  if git-is-dirty; then echo "change"; fi
   if [[ -n "$(git stash list)" ]]; then echo "stash"; fi
 
   local branch
@@ -235,7 +241,7 @@ status() {
   done | column --table --separator $'\x09'
 
   if [[ -n "$(git stash list)" ]]; then echo && git stash list --oneline; fi
-  if [[ -n "$(git status --porcelain)" ]]; then echo && git status --short; fi
+  if git-is-dirty; then echo && git status --short; fi
   cd ..
 }
 
@@ -251,14 +257,17 @@ update() {
   head="$(git-head)"
   if [[ $head == HEAD ]]; then head="$(git rev-parse HEAD)"; fi
 
-  stashed="$(git status --porcelain | wc -l)"
-  if ((stashed)); then git stash push --include-untracked; fi
+  local stashed=0
+  if git-is-dirty; then
+    stashed=1
+    git stash push --include-untracked
+  fi
 
   git-branches | while read -r branch; do
     if git-is-local "$branch"; then continue; fi
     git checkout "$branch"
 
-    if [[ -n "$(git status --porcelain)" ]]; then
+    if git-is-dirty; then
       git stash push --include-untracked
       git pull --recurse-submodules=on-demand || conflict
       git stash pop || conflict
