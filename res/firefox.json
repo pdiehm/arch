@@ -22,6 +22,10 @@
       { "Title": "YouTube", "URL": "https://youtube.com", "Placement": "toolbar", "Folder": "Google" },
       { "Title": "YouTube Music", "URL": "https://music.youtube.com", "Placement": "toolbar", "Folder": "Google" },
 
+      { "Title": "WueStudy", "URL": "https://wuestudy.zv.uni-wuerzburg.de", "Placement": "toolbar", "Folder": "Uni" },
+      { "Title": "WueCampus", "URL": "https://wuecampus.uni-wuerzburg.de", "Placement": "toolbar", "Folder": "Uni" },
+      { "Title": "GitLab", "URL": "https://gitlab.informatik.uni-wuerzburg.de", "Placement": "toolbar", "Folder": "Uni" },
+
       { "Title": "GitHub", "URL": "https://github.com", "Placement": "toolbar" },
       { "Title": "ChatGPT", "URL": "https://chatgpt.com", "Placement": "toolbar" },
       { "Title": "Element", "URL": "https://app.element.io", "Placement": "toolbar" },
