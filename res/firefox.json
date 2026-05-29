@@ -199,6 +199,12 @@
           "IconURL": "https://ipinfo.io/favicon.ico"
         },
         {
+          "Name": "MAC Address",
+          "Alias": "@mac",
+          "URLTemplate": "https://maclookup.app/search/result?mac={searchTerms}",
+          "IconURL": "https://maclookup.app/img/ico/favicon.ico"
+        },
+        {
           "Name": "MDN",
           "Alias": "@mdn",
           "URLTemplate": "https://developer.mozilla.org/search?q={searchTerms}",
