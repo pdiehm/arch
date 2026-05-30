@@ -9,7 +9,7 @@ package neovim vim-spell-de tree-sitter-cli \
   phpactor prettier-plugin-php \
   python-lsp-server python-black python-isort \
   texlab bibtex-tidy \
-  prettier prettier-plugin-css-order prettier-plugin-xml \
+  prettier prettier-plugin-css-order prettier-plugin-organize-imports prettier-plugin-xml \
   typescript-language-server eslint-language-server tailwindcss-language-server \
   vscode-css-languageserver vscode-html-languageserver vscode-json-languageserver
 

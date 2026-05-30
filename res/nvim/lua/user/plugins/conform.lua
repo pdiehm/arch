@@ -10,8 +10,8 @@ require("conform").setup({
     dockerfile = { "dockerfmt" },
     html = { "prettier" },
     java = { "google-java-format" },
-    javascript = { "prettier" },
-    javascriptreact = { "prettier" },
+    javascript = { "prettier-js" },
+    javascriptreact = { "prettier-js" },
     json = { "prettier-cfg" },
     jsonc = { "prettier-cfg" },
     lua = { "stylua" },
@@ -22,8 +22,8 @@ require("conform").setup({
     rust = { "rustfmt" },
     sh = { "shfmt" },
     tex = { "latexindent" },
-    typescript = { "prettier" },
-    typescriptreact = { "prettier" },
+    typescript = { "prettier-js" },
+    typescriptreact = { "prettier-js" },
     xml = { "prettier-xml" },
     yaml = { "prettier-cfg" },
     zsh = { "shfmt" },
@@ -35,7 +35,7 @@ require("conform").setup({
     dockerfmt = { prepend_args = { "--indent=2", "--newline", "--space-redirects" } },
     latexindent = { prepend_args = { "--local=/home/pascal/.config/latexindent.yaml", "--logfile=/dev/null" } },
     nixfmt = { prepend_args = { "--width=120", "--indent=2", "--strict" } },
-    prettier = { prepend_args = { "--print-width=120", "--tab-width=2", "--arrow-parens=avoid" } },
+    prettier = { prepend_args = { "--print-width=120", "--tab-width=2" } },
     shfmt = { prepend_args = { "--indent=2", "--case-indent", "--space-redirects" } },
     stylua = { prepend_args = { "--column-width=120", "--indent-width=2", "--indent-type=Spaces" } },
 
@@ -51,6 +51,17 @@ require("conform").setup({
         "--sort-fields",
         "--trailing-commas",
         "--remove-empty-fields",
+      },
+    },
+
+    ["prettier-js"] = {
+      inherit = "prettier",
+
+      prepend_args = {
+        "--plugin=/usr/lib/node_modules/prettier-plugin-organize-imports/index.js",
+        "--print-width=120",
+        "--tab-width=2",
+        "--arrow-parens=avoid",
       },
     },
 
