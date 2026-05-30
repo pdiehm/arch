@@ -1,6 +1,6 @@
 package neovim vim-spell-de tree-sitter-cli \
-  clang rust-analyzer yaml-language-server \
   bash-language-server shellcheck shfmt \
+  clang rust-analyzer yaml-language-server \
   cmake-language-server cmake-format \
   dockerfile-language-server dockerfmt \
   java-language-server google-java-format \
@@ -9,8 +9,8 @@ package neovim vim-spell-de tree-sitter-cli \
   phpactor prettier-plugin-php \
   python-lsp-server python-black python-isort \
   texlab bibtex-tidy \
-  typescript-language-server eslint-language-server \
   prettier prettier-plugin-css-order prettier-plugin-xml \
+  typescript-language-server eslint-language-server tailwindcss-language-server \
   vscode-css-languageserver vscode-html-languageserver vscode-json-languageserver
 
 symlink -u res/nvim .config/nvim
