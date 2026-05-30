@@ -20,3 +20,6 @@ copy res/nix.conf /etc/nix/nix.conf
 dropin env.sh "NIX_PATH=nixpkgs=flake:nixpkgs"
 systemd -e nix-daemon.service
 timer nix-gc monthly /usr/bin/nix-collect-garbage --delete-old
+
+bwrap /usr/bin/npm
+bwrap /usr/bin/npx
