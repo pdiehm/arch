@@ -1,9 +1,12 @@
+name: Pages
+
 on:
   push:
     branches: ["main"]
 
 jobs:
   pages:
+    name: Pages
     runs-on: ubuntu-latest
 
     permissions:
