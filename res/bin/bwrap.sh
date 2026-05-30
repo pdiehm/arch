@@ -11,7 +11,7 @@ for path in "/bin" "/etc" "/lib" "/lib64" "/sbin" "/usr" "/var" "$(realpath /etc
   FLAGS+=("--ro-bind" "$path" "$path")
 done
 
-for path in "/perm/home:pascal:.config:mozilla:firefox" "/perm/home:pascal:.local:share:gnupg"; do
+for path in "/perm/home-pascal-.config-mozilla-firefox" "/perm/home-pascal-.local-share-gnupg"; do
   FLAGS+=("--tmpfs" "$path")
 done
 
