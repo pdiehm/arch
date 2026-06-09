@@ -391,7 +391,7 @@ run useradd --create-home --groups wheel --skel /var/empty --password "$(secret 
 write -a /etc/sudoers "pascal ALL=(ALL:ALL) ALL"
 
 script -u << EOF
-git clone --recurse-submodules https://github.com/pdiehm/arch.git .config/syscfg
+git clone https://github.com/pdiehm/arch.git .config/syscfg
 git --git-dir .config/syscfg/.git remote set-url origin git@github.com:pdiehm/arch.git
 EOF
 

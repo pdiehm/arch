@@ -11,8 +11,3 @@ updates:
     multi-ecosystem-group: main
     patterns: ["*"]
     directory: /
-
-  - package-ecosystem: gitsubmodule
-    multi-ecosystem-group: main
-    patterns: ["*"]
-    directory: /
