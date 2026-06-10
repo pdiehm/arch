@@ -37,6 +37,7 @@ telescope.setup({
   },
 })
 
+telescope.load_extension("fzf")
 telescope.load_extension("ui-select")
 
 local function map(key, picker, opts)
