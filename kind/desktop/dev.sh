@@ -7,9 +7,6 @@ CMAKE_GENERATOR="Ninja"
 CMAKE_EXPORT_COMPILE_COMMANDS="ON"
 EOF
 
-package git git-delta
-symlink -u res/git.conf .config/git/config
-
 package paru base-devel devtools nvchecker
 conf -e /etc/paru.conf BottomUp CleanAfter RemoveMake SudoLoop
 

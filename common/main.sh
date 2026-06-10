@@ -18,6 +18,9 @@ package vim
 copy res/vimrc.vim /etc/vimrc
 write -a /etc/environment "EDITOR=vim"
 
+package git git-delta
+symlink -u res/git.conf .config/git/config
+
 package htop
 copy -um 444 res/htop.conf .config/htop/htoprc
 
