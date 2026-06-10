@@ -1,35 +1,29 @@
-local cmp = require("cmp")
+require("blink.cmp").setup({
+  cmdline = { enabled = false },
+  signature = { enabled = true },
 
-local function map(primary, secondary)
-  return function(fallback)
-    if cmp.visible() then
-      primary()
-    else
-      (secondary or fallback)()
-    end
-  end
-end
+  completion = {
+    documentation = {
+      auto_show = true,
+      auto_show_delay_ms = 0,
+    },
 
-cmp.setup({
-  preselect = cmp.PreselectMode.None,
-  sources = { { name = "nvim_lsp" }, { name = "path" }, { name = "buffer" } },
-
-  formatting = {
-    fields = { "icon", "abbr" },
-    format = require("lspkind").cmp_format(),
+    list = {
+      selection = {
+        preselect = false,
+      },
+    },
   },
 
-  mapping = {
-    ["<C-Space>"] = map(cmp.mapping.close(), cmp.mapping.complete()),
-    ["<C-Return>"] = map(cmp.mapping.confirm({ select = true })),
-    ["<Tab>"] = map(cmp.mapping.select_next_item()),
-    ["<S-Tab>"] = map(cmp.mapping.select_prev_item()),
-    ["<C-d>"] = map(cmp.mapping.scroll_docs(8)),
-    ["<C-u>"] = map(cmp.mapping.scroll_docs(-8)),
-    ["<C-c>"] = map(cmp.mapping.abort()),
+  keymap = {
+    preset = "none",
+    ["<C-Space>"] = { "show", "hide" },
+    ["<A-Space>"] = { "show_signature", "hide_signature", "fallback" },
+    ["<C-Return>"] = { "accept", "fallback" },
+    ["<Tab>"] = { "snippet_forward", "select_next", "fallback" },
+    ["<S-Tab>"] = { "snippet_backward", "select_prev", "fallback" },
+    ["<C-u>"] = { "scroll_signature_up", "scroll_documentation_up", "fallback" },
+    ["<C-d>"] = { "scroll_signature_down", "scroll_documentation_down", "fallback" },
+    ["<C-c>"] = { "cancel", "fallback" },
   },
-})
-
-vim.lsp.config("*", {
-  capabilities = require("cmp_nvim_lsp").default_capabilities(),
 })
