@@ -6,6 +6,38 @@ shopt -s nullglob
 cd "$(dirname "$(realpath "$0")")/.."
 source bin/lib.sh
 
+build-prepare() {
+  trap 'unmount "$MNT/root"; unmount "$MNT/boot"; rm -rf --one-file-system "$MNT"' EXIT
+  MNT="$(mktemp -d)"
+  chmod 700 "$MNT"
+
+  mount --mkdir --label root "$MNT/root"
+  if [[ -d $MNT/root/build ]]; then btrfs subvolume delete --recursive "$MNT/root/build"; fi
+
+  btrfs subvolume snapshot "$MNT/root/latest" "$MNT/root/build"
+  mount --bind "$MNT/root/build" "$MNT/root/build"
+  mount --bind "$MNT/root/pkgs" "$MNT/root/build/var/cache/pacman/pkg"
+  mount --bind -o ro "$MNT/root/perm" "$MNT/root/build/perm"
+}
+
+build-commit() {
+  touch "$MNT/root/build"
+  unmount "$MNT/root/build"
+
+  local hash
+  hash="$(readlink "$MNT/root/latest")"
+  hash="$(sha "${hash##*/}++")"
+  if [[ -d $MNT/root/images/$hash ]]; then btrfs subvolume delete --recursive "$MNT/root/images/$hash"; fi
+
+  mv "$MNT/root/build" "$MNT/root/images/$hash"
+  rm -f "$MNT/root/latest"
+  ln -s "images/$hash" "$MNT/root/latest"
+
+  mount --mkdir --label BOOT "$MNT/boot"
+  rm -rf "${MNT:?}/boot"/*
+  cp -r "$MNT/root/latest/boot/." "$MNT/boot"
+}
+
 help() {
   echo "Usage: manager.sh <command>"
   echo
@@ -24,47 +56,17 @@ edit() {
 }
 
 fix() {
-  if ((UID)); then
-    exec sudo "$0" fix
-  fi
+  if ((UID)); then exec sudo "$0" fix; fi
+  build-prepare
 
-  trap 'unmount "$TMP/root"; unmount "$TMP/boot"; rm -rf --one-file-system "$TMP"' EXIT
-  TMP="$(mktemp -d)"
-  chmod 700 "$TMP"
-
-  mount --mkdir --label root "$TMP/root"
-  if [[ -d $TMP/root/build ]]; then btrfs subvolume delete --recursive "$TMP/root/build"; fi
-
-  btrfs subvolume snapshot "$TMP/root/latest" "$TMP/root/build"
-  mount --bind "$TMP/root/build" "$TMP/root/build"
-  mount --bind "$TMP/root/pkgs" "$TMP/root/build/var/cache/pacman/pkg"
-  mount --bind -o ro "$TMP/root/perm" "$TMP/root/build/perm"
-
-  if ! arch-chroot "$TMP/root/build"; then
+  if arch-chroot "$MNT/root/build"; then
+    build-commit
+  else
     fatal "Shell exited with non-zero status, aborting..."
   fi
-
-  touch "$TMP/root/build"
-  unmount "$TMP/root/build"
-
-  hash="$(readlink "$TMP/root/latest")"
-  hash="$(sha "${hash##*/}++")"
-  if [[ -d $TMP/root/images/$hash ]]; then btrfs subvolume delete --recursive "$TMP/root/images/$hash"; fi
-
-  mv "$TMP/root/build" "$TMP/root/images/$hash"
-  rm -f "$TMP/root/latest"
-  ln -s "images/$hash" "$TMP/root/latest"
-
-  mount --mkdir --label BOOT "$TMP/boot"
-  rm -rf "${TMP:?}/boot"/*
-  cp -r "$TMP/root/latest/boot/." "$TMP/boot"
 }
 
 rebuild() {
-  if ((UID)); then
-    exec sudo "$0" rebuild "$@"
-  fi
-
   local OPTIND opt
   local help=0 break=0 clean=0
 
@@ -87,16 +89,13 @@ rebuild() {
     return
   fi
 
+  if ((UID)); then exec sudo "$0" rebuild "$@"; fi
   if ((break)); then export BREAK=1; fi
   if ((clean)); then export CLEAN=1; fi
   exec bin/apply.sh "$HOSTNAME"
 }
 
 secrets() {
-  if ((UID)); then
-    exec sudo "$0" secrets "$@"
-  fi
-
   local OPTIND opt
   local help=0 rotate=0
 
@@ -117,6 +116,7 @@ secrets() {
     return
   fi
 
+  if ((UID)); then exec sudo "$0" secrets "$@"; fi
   trap 'rm -rf "$TMP"' EXIT
   TMP="$(mktemp -d)"
 
@@ -197,40 +197,14 @@ sync() {
 }
 
 upgrade() {
-  if ((UID)); then
-    exec sudo "$0" upgrade
-  fi
+  if ((UID)); then exec sudo "$0" upgrade; fi
+  build-prepare
 
-  trap 'unmount "$TMP/root"; unmount "$TMP/boot"; rm -rf --one-file-system "$TMP"' EXIT
-  TMP="$(mktemp -d)"
-  chmod 700 "$TMP"
-
-  mount --mkdir --label root "$TMP/root"
-  if [[ -d $TMP/root/build ]]; then btrfs subvolume delete --recursive "$TMP/root/build"; fi
-
-  btrfs subvolume snapshot "$TMP/root/latest" "$TMP/root/build"
-  mount --bind "$TMP/root/build" "$TMP/root/build"
-  mount --bind "$TMP/root/pkgs" "$TMP/root/build/var/cache/pacman/pkg"
-  mount --bind -o ro "$TMP/root/perm" "$TMP/root/build/perm"
-
-  if ! arch-chroot "$TMP/root/build" bash -eu /var/local/syscfg/upgrade.sh; then
+  if arch-chroot "$MNT/root/build" bash -eu /var/local/syscfg/upgrade.sh; then
+    build-commit
+  else
     fatal "Upgrade failed"
   fi
-
-  touch "$TMP/root/build"
-  unmount "$TMP/root/build"
-
-  hash="$(readlink "$TMP/root/latest")"
-  hash="$(sha "${hash##*/}++")"
-  if [[ -d $TMP/root/images/$hash ]]; then btrfs subvolume delete --recursive "$TMP/root/images/$hash"; fi
-
-  mv "$TMP/root/build" "$TMP/root/images/$hash"
-  rm -f "$TMP/root/latest"
-  ln -s "images/$hash" "$TMP/root/latest"
-
-  mount --mkdir --label BOOT "$TMP/boot"
-  rm -rf "${TMP:?}/boot"/*
-  cp -r "$TMP/root/latest/boot/." "$TMP/boot"
 }
 
 if (($# == 0)); then
