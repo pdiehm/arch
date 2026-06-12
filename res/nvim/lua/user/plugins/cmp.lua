@@ -26,4 +26,14 @@ require("blink.cmp").setup({
     ["<C-d>"] = { "scroll_signature_down", "scroll_documentation_down", "fallback" },
     ["<C-c>"] = { "cancel", "fallback" },
   },
+
+  sources = {
+    providers = {
+      path = {
+        opts = {
+          show_hidden_files_by_default = true,
+        },
+      },
+    },
+  },
 })
