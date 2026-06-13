@@ -6,7 +6,7 @@ shopt -s nullglob
 cd "$(dirname "$(realpath "$0")")/.."
 source bin/lib.sh
 
-build-prepare() {
+overlay() {
   trap 'unmount "$MNT/root"; unmount "$MNT/boot"; rm -rf --one-file-system "$MNT"' EXIT
   MNT="$(mktemp -d)"
   chmod 700 "$MNT"
@@ -18,9 +18,11 @@ build-prepare() {
   mount --bind "$MNT/root/build" "$MNT/root/build"
   mount --bind "$MNT/root/pkgs" "$MNT/root/build/var/cache/pacman/pkg"
   mount --bind -o ro "$MNT/root/perm" "$MNT/root/build/perm"
-}
 
-build-commit() {
+  if ! arch-chroot "$MNT/root/build" "$@"; then
+    fatal "Process '$*' exited with non-zero status, aborting..."
+  fi
+
   touch "$MNT/root/build"
   unmount "$MNT/root/build"
 
@@ -57,13 +59,7 @@ edit() {
 
 fix() {
   if ((UID)); then exec sudo "$0" fix; fi
-  build-prepare
-
-  if arch-chroot "$MNT/root/build"; then
-    build-commit
-  else
-    fatal "Shell exited with non-zero status, aborting..."
-  fi
+  overlay bash
 }
 
 rebuild() {
@@ -198,13 +194,7 @@ sync() {
 
 upgrade() {
   if ((UID)); then exec sudo "$0" upgrade; fi
-  build-prepare
-
-  if arch-chroot "$MNT/root/build" bash -eu /var/local/syscfg/upgrade.sh; then
-    build-commit
-  else
-    fatal "Upgrade failed"
-  fi
+  overlay bash -eu /var/local/syscfg/upgrade.sh
 }
 
 if (($# == 0)); then
