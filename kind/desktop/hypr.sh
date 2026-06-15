@@ -5,7 +5,7 @@ systemd -e greetd.service
 package fontconfig noto-fonts noto-fonts-extra noto-fonts-cjk noto-fonts-emoji ttf-cascadia-code-nerd
 symlink -u res/fontconfig.xml .config/fontconfig/fonts.conf
 
-package pipewire pipewire-alsa wireplumber wiremix alsa-utils
+package pipewire pipewire-alsa pipewire-pulse wireplumber wiremix alsa-utils
 persist -u .local/state/wireplumber
 symlink -u res/bin/wp-toggle.sh .local/bin/wp-toggle
 
