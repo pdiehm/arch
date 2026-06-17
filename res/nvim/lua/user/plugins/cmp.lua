@@ -19,7 +19,7 @@ require("blink.cmp").setup({
     preset = "none",
     ["<C-Space>"] = { "show", "hide" },
     ["<A-Space>"] = { "show_signature", "hide_signature", "fallback" },
-    ["<C-Return>"] = { "accept", "fallback" },
+    ["<C-Return>"] = { "select_and_accept", "fallback" },
     ["<Tab>"] = { "snippet_forward", "select_next", "fallback" },
     ["<S-Tab>"] = { "snippet_backward", "select_prev", "fallback" },
     ["<C-u>"] = { "scroll_signature_up", "scroll_documentation_up", "fallback" },
