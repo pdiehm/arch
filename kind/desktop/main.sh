@@ -16,6 +16,6 @@ write /etc/sysctl.d/sysrq.conf "kernel.sysrq = 1"
 script -u <<< "mkdir Downloads"
 write -a /etc/fstab "tmpfs /home/pascal/Temp tmpfs defaults 0 0"
 
-package dmidecode hexedit nmap vhs \
-  wl-clipboard wf-recorder wl-mirror \
-  imagemagick poppler ffmpeg perl-image-exiftool yt-dlp
+package dmidecode hexedit nmap perl-image-exiftool yt-dlp vhs \
+  ffmpeg mpv mpv-mpris imagemagick gimp inkscape poppler pdfpc \
+  wev wl-clipboard wf-recorder wl-mirror
