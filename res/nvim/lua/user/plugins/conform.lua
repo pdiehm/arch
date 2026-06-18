@@ -9,7 +9,6 @@ require("conform").setup({
     css = { "prettier-css" },
     dockerfile = { "dockerfmt" },
     html = { "prettier" },
-    java = { "google-java-format" },
     javascript = { "prettier-js" },
     javascriptreact = { "prettier-js" },
     json = { "prettier-cfg" },

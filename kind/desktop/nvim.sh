@@ -6,7 +6,6 @@ package neovim vim-spell-de nvim-plugins-pd \
   bash-language-server shellcheck shfmt \
   cmake-language-server cmake-format \
   dockerfile-language-server dockerfmt \
-  java-language-server google-java-format \
   lua-language-server stylua \
   nixd nixfmt \
   phpactor prettier-plugin-php \
