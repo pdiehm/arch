@@ -16,6 +16,4 @@ symlink -u res/nvim .config/nvim
 dropin env.sh "EDITOR=nvim"
 
 symlink -u res/clang/clangd.yaml .config/clangd/config.yaml
-symlink -u res/clang/format.yaml .clang-format
-symlink -u res/clang/tidy.yaml .clang-tidy
 symlink -u res/latexindent.yaml .config/latexindent.yaml
