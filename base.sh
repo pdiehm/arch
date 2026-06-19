@@ -380,7 +380,8 @@ Server = https://pdiehm.github.io/aur
 EOF
 
 conf -e /etc/pacman.conf Color
-package "$HOST_KERNEL" linux-firmware arch-install-scripts btrfs-progs cryptsetup sudo git
+copy res/mirrorlist /etc/pacman.d/mirrorlist
+package "$HOST_KERNEL" linux-firmware sudo git arch-install-scripts btrfs-progs cryptsetup
 run pacman --files --refresh
 
 upgrade pacman --noconfirm --sync --refresh --sysupgrade
