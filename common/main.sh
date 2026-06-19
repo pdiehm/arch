@@ -34,7 +34,7 @@ systemd -e sshd.service
 TCP+=(1970)
 
 copy -x res/bin/ntfy.sh /usr/local/bin/ntfy
-copy -sm 444 ntfy /usr/local/lib/ntfy/token
+copy -sm 444 ntfy /usr/local/share/ntfy/token
 
 package man-db man-pages pkgstats wireguard-tools \
   bat eza fd ripgrep jq pv fzf rsync parallel \

@@ -29,7 +29,7 @@ if ((help)); then
 fi
 
 if (($#)); then
-  curl -fsSL -H "Authorization: Bearer $(< /usr/local/lib/ntfy/token)" -H "Priority: $priority" ${title:+-H "Title: $title"} -d "$*" "https://ntfy.pdiehm.dev/$channel"
+  curl -fsSL -H "Authorization: Bearer $(< /usr/local/share/ntfy/token)" -H "Priority: $priority" ${title:+-H "Title: $title"} -d "$*" "https://ntfy.pdiehm.dev/$channel"
 else
   echo "Usage: ntfy [-c channel] [-p priority] [-t title] <message> ..."
   exit 1
