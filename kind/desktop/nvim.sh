@@ -15,6 +15,5 @@ package neovim vim-spell-de nvim-plugins-pd \
 symlink -u res/nvim .config/nvim
 dropin env.sh "EDITOR=nvim"
 
-symlink -u res/clang/clangd.yaml .config/clangd/config.yaml
-symlink -u res/clang/format.yaml .config/clangd/format.yaml
+symlink -u res/clangd .config/clangd
 symlink -u res/latexindent.yaml .config/latexindent.yaml
