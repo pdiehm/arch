@@ -29,7 +29,7 @@ require("conform").setup({
   },
 
   formatters = {
-    ["clang-format"] = { prepend_args = { "-style=file:/home/pascal/.config/syscfg/res/clang/format.yaml" } },
+    ["clang-format"] = { prepend_args = { "-style=file:/home/pascal/.config/clangd/format.yaml" } },
     black = { prepend_args = { "--line-length=120" } },
     cmake_format = { prepend_args = { "--line-width=120", "--tab-size=2" } },
     dockerfmt = { prepend_args = { "--indent=2", "--newline", "--space-redirects" } },

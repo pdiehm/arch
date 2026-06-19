@@ -11,6 +11,7 @@ symlink -u res/bin/wp-toggle.sh .local/bin/wp-toggle
 
 package hyprland hyprpaper hyprlock hypridle hyprshot hyprpicker xdg-desktop-portal-hyprland adwaita-icon-theme
 symlink -u res/hypr .config/hypr
+symlink -u res/wallpaper.jpg .local/share/wallpaper.jpg
 
 package kitty rofi waybar mako brightnessctl playerctl libnotify
 symlink -u res/kitty.conf .config/kitty/kitty.conf
