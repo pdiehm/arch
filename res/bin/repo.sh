@@ -17,7 +17,7 @@ enter() {
 
 conflict() {
   git status
-  read -rp "Press enter to open editor..."
+  read -rsp "Press enter to open editor..."
 
   if ! "$EDITOR" .; then
     fatal "Editor exited with non-zero status, aborting..."
