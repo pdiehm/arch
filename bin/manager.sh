@@ -171,9 +171,10 @@ secrets() {
   mkdir "$TMP/secrets"
   store_secrets "$TMP/secrets/master" "$TMP/store" "$(< "$TMP/store/keys/master")" .
 
-  while read -r host spec; do
-    read -ra args <<< "$spec"
-    if ! store_secrets "$TMP/secrets/$host" "$TMP/store" "$(< "$TMP/store/keys/$host")" "keys/$host" "${args[@]}"; then
+  while read -ra line; do
+    local host="${line[0]}" spec=("${line[@]:1}")
+
+    if ! store_secrets "$TMP/secrets/$host" "$TMP/store" "$(< "$TMP/store/keys/$host")" "keys/$host" "${spec[@]}"; then
       warn "Illegal ACL for host '$host', store might be incomplete."
     fi
   done < "$TMP/store/ACL"
