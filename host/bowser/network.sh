@@ -8,9 +8,9 @@ Address=192.168.1.88/16
 Gateway=192.168.1.1
 EOF
 
-write -m 400 -o systemd-network /etc/systemd/network/wg-main.netdev << EOF
+write -m 400 -o systemd-network /etc/systemd/network/wg.netdev << EOF
 [NetDev]
-Name=wg-main
+Name=wg
 Kind=wireguard
 
 [WireGuard]
@@ -25,9 +25,9 @@ Endpoint=goomba:51820
 PersistentKeepalive=10
 EOF
 
-write /etc/systemd/network/wg-main.network << EOF
+write /etc/systemd/network/wg.network << EOF
 [Match]
-Name=wg-main
+Name=wg
 
 [Network]
 Address=fd42:6c77:9a2f::2/112

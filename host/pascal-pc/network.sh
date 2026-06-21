@@ -10,11 +10,11 @@ addresses=192.168.1.90/16
 gateway=192.168.1.1
 EOF
 
-write -m 400 /etc/NetworkManager/system-connections/wg-main.nmconnection << EOF
+write -m 400 /etc/NetworkManager/system-connections/wg.nmconnection << EOF
 [connection]
-id=@main
+id=@wg
 type=wireguard
-interface-name=wg-main
+interface-name=wg
 
 [ipv6]
 method=manual

@@ -59,11 +59,11 @@ copy -s net/eduroam/private-key /etc/NetworkManager/system-connections/eduroam/p
 copy -s net/eduroam/client-cert /etc/NetworkManager/system-connections/eduroam/client-cert
 copy -s net/eduroam/ca-cert /etc/NetworkManager/system-connections/eduroam/ca-cert
 
-write -m 400 /etc/NetworkManager/system-connections/wg-main.nmconnection << EOF
+write -m 400 /etc/NetworkManager/system-connections/wg.nmconnection << EOF
 [connection]
-id=@main
+id=@wg
 type=wireguard
-interface-name=wg-main
+interface-name=wg
 
 [ipv6]
 method=manual

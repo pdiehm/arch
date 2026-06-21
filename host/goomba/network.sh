@@ -9,9 +9,9 @@ Address=2a01:4f8:c0c:988b::1/64
 Gateway=fe80::1
 EOF
 
-write -m 400 -o systemd-network /etc/systemd/network/wg-main.netdev << EOF
+write -m 400 -o systemd-network /etc/systemd/network/wg.netdev << EOF
 [NetDev]
-Name=wg-main
+Name=wg
 Kind=wireguard
 
 [WireGuard]
@@ -35,9 +35,9 @@ PresharedKey=$(secret wg/psk/main)
 AllowedIPs=fd42:6c77:9a2f::1002/128
 EOF
 
-write /etc/systemd/network/wg-main.network << EOF
+write /etc/systemd/network/wg.network << EOF
 [Match]
-Name=wg-main
+Name=wg
 
 [Network]
 Address=fd42:6c77:9a2f::1/112
