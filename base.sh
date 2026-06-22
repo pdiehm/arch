@@ -276,13 +276,14 @@ systemd() {
   done
 
   shift $((OPTIND - 1))
+  local unit
+
   if ((enable + install + mask + override != 1)); then error "Exactly one of '-e', '-i', '-m' or '-o' is required"; fi
+  if [[ -n $target ]] && ((enable + user != 2)); then error "Option '-t' requires '-e' and '-u'"; fi
 
   if ((enable)); then
-    if [[ -n $target ]] && ((!user)); then error "Option '-t' requires '-u'"; fi
-
     if ((user)); then
-      local unit target="${target:-default.target}"
+      local target="${target:-default.target}"
 
       for unit; do
         if [[ $unit == /* ]]; then
@@ -295,32 +296,21 @@ systemd() {
       run systemctl enable "$@"
     fi
   elif ((install)); then
-    if [[ -n $target ]]; then error "Option '-t' cannot be used with '-i'"; fi
-
     if ((user)); then
-      local unit
       for unit; do copy -u "res/systemd/user/$unit" ".config/systemd/user/$unit"; done
     else
-      local unit
       for unit; do copy "res/systemd/system/$unit" "/etc/systemd/system/$unit"; done
     fi
   elif ((mask)); then
-    if [[ -n $target ]]; then error "Option '-t' cannot be used with '-m'"; fi
-
     if ((user)); then
-      local unit
       for unit; do symlink -u /dev/null ".config/systemd/user/$unit"; done
     else
       run systemctl mask "$@"
     fi
   elif ((override)); then
-    if [[ -n $target ]]; then error "Option '-t' cannot be used with '-o'"; fi
-
     if ((user)); then
-      local unit
       for unit; do copy -u "res/systemd/override/$unit" ".config/systemd/user/$unit.d/override.conf"; done
     else
-      local unit
       for unit; do copy "res/systemd/override/$unit" "/etc/systemd/system/$unit.d/override.conf"; done
     fi
   fi
