@@ -32,13 +32,12 @@ store_secrets() {
 
 # resolve_host <name>
 resolve_host() {
-  local name="$1" line head
+  local name="$1" line head key
 
   while IFS=, read -ra line; do
     if [[ -z ${head:+x} ]]; then
       head=("${line[@]}")
     elif [[ ${line[0]} == "$name" ]]; then
-      local key
       for key in "${!head[@]}"; do
         export "HOST_${head[key]^^}=${line[key]}"
       done

@@ -115,9 +115,9 @@ secret() {
   done
 
   shift $((OPTIND - 1))
+  local name="$1"
   if ((file + query > 1)); then error "Options '-f' and '-q' are mutually exclusive"; fi
 
-  local name="$1"
   if [[ -f $TMP/secrets/$name ]]; then
     if ((query)); then return 0; fi
     if ((file)); then use "$TMP/secrets/$name"; else cat "$TMP/secrets/$name"; fi
