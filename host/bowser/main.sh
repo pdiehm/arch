@@ -1,4 +1,4 @@
 import ./network
+import ./zfs
 
-package zfs-linux-lts
 persist -u shared
