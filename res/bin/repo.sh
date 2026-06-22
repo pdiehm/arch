@@ -176,8 +176,8 @@ remove() {
     printf "  - %s\n" "${changes[@]}"
     echo
 
-    read -rp "Are you sure you want to remove this repository? [y/N] " read
-    if [[ $read != y ]]; then exit 1; fi
+    read -rp "Are you sure you want to remove this repository? [y/N] "
+    if [[ $REPLY != y ]]; then exit 1; fi
   fi
 
   cd ..

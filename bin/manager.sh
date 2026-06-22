@@ -126,17 +126,17 @@ secrets() {
   fi
 
   if [[ ! -f $TMP/store/ACL ]]; then
-    read -rsp "Enter master password: " read
+    read -rsp "Enter master password: "
     echo
 
     if [[ -f secrets/master ]]; then
-      if ! load_secrets secrets/master "$TMP/store" "$(sha "$read")"; then
+      if ! load_secrets secrets/master "$TMP/store" "$(sha "$REPLY")"; then
         fatal "Incorrect master password"
       fi
     else
       touch "$TMP/store/ACL"
       mkdir "$TMP/store/keys"
-      sha "$read" > "$TMP/store/keys/master"
+      sha "$REPLY" > "$TMP/store/keys/master"
     fi
   fi
 
@@ -148,10 +148,10 @@ secrets() {
   mv "$TMP/store/keys/master" "$TMP/keys"
 
   if ((rotate)); then
-    read -rsp "Enter new master password: " read
+    read -rsp "Enter new master password: "
     echo
 
-    sha "$read" > "$TMP/keys/master"
+    sha "$REPLY" > "$TMP/keys/master"
     rm -rf "$TMP/store/keys"
   fi
 
@@ -189,8 +189,8 @@ sync() {
   ahead="$(git rev-list --count "@{upstream}..")"
   if ((ahead == 0)); then return; fi
 
-  read -rp "Push local commits? [y/N] " read
-  if [[ $read == y ]]; then git push; fi
+  read -rp "Push local commits? [y/N] "
+  if [[ $REPLY == y ]]; then git push; fi
 }
 
 upgrade() {

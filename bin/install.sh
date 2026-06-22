@@ -43,9 +43,9 @@ while true; do
   echo
   if [[ -z $CRYPT ]]; then break; fi
 
-  read -rsp "Confirm password: " read
+  read -rsp "Confirm password: "
   echo
-  if [[ $CRYPT == "$read" ]]; then break; fi
+  if [[ $REPLY == "$CRYPT" ]]; then break; fi
 done
 
 if [[ $HOST_BOOT == EFI ]]; then

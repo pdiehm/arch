@@ -146,10 +146,10 @@ if [[ ! -f $TMP/secrets/keys/$HOST_NAME ]]; then
   fi
 
   if [[ ! -f $TMP/master/ACL ]]; then
-    read -rsp "Enter master password: " read
+    read -rsp "Enter master password: "
     echo
 
-    if ! load_secrets secrets/master "$TMP/master" "$(sha "$read")"; then
+    if ! load_secrets secrets/master "$TMP/master" "$(sha "$REPLY")"; then
       fatal "Incorrect master password"
     fi
   fi
