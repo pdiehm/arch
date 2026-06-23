@@ -1,4 +1,5 @@
 vim.diagnostic.config({
+  float = { focus = false },
   jump = { on_jump = vim.diagnostic.open_float },
   severity_sort = true,
   virtual_text = true,
