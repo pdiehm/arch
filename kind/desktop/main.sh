@@ -13,7 +13,6 @@ systemd -e NetworkManager.service
 copy res/systemd/logind.conf /etc/systemd/logind.conf
 write /etc/sysctl.d/sysrq.conf "kernel.sysrq = 1"
 
-script -u <<< "mkdir Downloads"
 write -a /etc/fstab "tmpfs /home/pascal/Temp tmpfs defaults 0 0"
 
 package reflector dmidecode hexedit nmap perl-image-exiftool yt-dlp vhs \

@@ -17,10 +17,6 @@
     <title>Home</title>
     <info><metadata owner="http://freedesktop.org"><bookmark:icon name="user-home" /></metadata></info>
   </bookmark>
-  <bookmark href="file:///home/pascal/Downloads">
-    <title>Downloads</title>
-    <info><metadata owner="http://freedesktop.org"><bookmark:icon name="folder-downloads" /></metadata></info>
-  </bookmark>
   <bookmark href="file:///home/pascal/Repos">
     <title>Repos</title>
     <info><metadata owner="http://freedesktop.org"><bookmark:icon name="folder-git" /></metadata></info>
