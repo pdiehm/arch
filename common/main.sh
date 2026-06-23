@@ -36,6 +36,8 @@ TCP+=(1970)
 copy -x res/bin/ntfy.sh /usr/local/bin/ntfy
 copy -sm 444 ntfy /usr/local/share/ntfy/token
 
+systemd -e fstrim.timer
+
 package man-db man-pages pkgstats wireguard-tools \
   bat eza fd ripgrep jq pv fzf rsync parallel \
   lsof usbutils pciutils fastfetch duf ncdu \
