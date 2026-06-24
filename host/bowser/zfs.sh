@@ -13,7 +13,7 @@ ZED_NTFY_TOPIC="bowser"
 ZED_NTFY_ACCESS_TOKEN="$(secret ntfy)"
 EOF
 
-write -x /usr/local/bin/hostname << EOF
+write -x /usr/bin/hostname << EOF
 #!/bin/sh
 echo "bowser"
 EOF
