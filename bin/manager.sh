@@ -64,31 +64,40 @@ fix() {
 
 rebuild() {
   local OPTIND opt
-  local help=0 break=0 clean=0
+  local help=0 break=0 clean=0 dry=0
 
-  while getopts "hbc" opt; do
+  while getopts "hbcn" opt; do
     case "$opt" in
       h) help=1 ;;
       b) break=1 ;;
       c) clean=1 ;;
+      n) dry=1 ;;
       *) fatal "Illegal option" ;;
     esac
   done
 
   if ((help)); then
-    echo "Usage: manager.sh rebuild [-hbc]"
+    echo "Usage: manager.sh rebuild [-hbcn] [host]"
     echo
     echo "Options:"
     echo "  -h   Print this help message"
     echo "  -b   Break after evaluation"
     echo "  -c   Clean rebuild"
+    echo "  -n   Skip activation"
     return
   fi
 
-  if ((UID)); then exec sudo "$0" rebuild "$@"; fi
+  if ((UID)); then
+    exec sudo "$0" rebuild "$@"
+  fi
+
+  shift $((OPTIND - 1))
+  local host="${1:-$HOSTNAME}"
+
   if ((break)); then export SM_BREAK=1; fi
   if ((clean)); then export SM_CLEAN=1; fi
-  exec bin/apply.sh "$HOSTNAME"
+  if ((dry)); then export SM_DRY=1; fi
+  exec bin/apply.sh "$host"
 }
 
 secrets() {

@@ -219,6 +219,12 @@ for ((stage = 0; stage < STAGE; stage++)); do
   touch "$TMP/root/images/$HASH"
 done
 
+if [[ -n ${SM_DRY:+x} ]]; then
+  mount --bind "$TMP/root/images/$HASH" "$TMP/root/images/$HASH"
+  arch-chroot "$TMP/root/images/$HASH" bash
+  exit
+fi
+
 rm -f "$TMP/root/latest"
 ln -s "images/$HASH" "$TMP/root/latest"
 
