@@ -20,8 +20,8 @@ if [[ $HOST_BOOT == EFI ]]; then
   script <<< "mkdir -p /boot/EFI/BOOT && cp /usr/share/limine/BOOTX64.EFI /boot/EFI/BOOT"
   upgrade <<< "mkdir -p /boot/EFI/BOOT && cp /usr/share/limine/BOOTX64.EFI /boot/EFI/BOOT"
 elif [[ $HOST_BOOT == BIOS ]]; then
-  script <<< "cp /usr/share/limine/limine-bios.sys /boot && limine bios-install \"\$(lsblk --noheadings --paths --output PKNAME /dev/disk/by-label/BOOT)\""
-  upgrade <<< "cp /usr/share/limine/limine-bios.sys /boot && limine bios-install \"\$(lsblk --noheadings --paths --output PKNAME /dev/disk/by-label/BOOT)\""
+  script <<< 'cp /usr/share/limine/limine-bios.sys /boot && limine bios-install "$(lsblk --noheadings --paths --output PKNAME /dev/disk/by-label/BOOT)"'
+  upgrade <<< 'cp /usr/share/limine/limine-bios.sys /boot && limine bios-install "$(lsblk --noheadings --paths --output PKNAME /dev/disk/by-label/BOOT)"'
 else
   error "Illegal boot method: $HOST_BOOT"
 fi
