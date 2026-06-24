@@ -60,9 +60,9 @@ write() {
   if ((executable)); then cmd+=" && chmod +x ${path@Q}"; fi
 
   if ((user)); then
-    run sudo -u pascal env -C /home/pascal bash -c "$cmd"
+    run sudo -u pascal env -C /home/pascal sh -c "$cmd"
   else
-    run bash -c "$cmd"
+    run sh -c "$cmd"
   fi
 }
 
@@ -104,9 +104,9 @@ copy() {
   if ((executable)); then cmd+=" && chmod +x ${dst@Q}"; fi
 
   if ((user)); then
-    run sudo -u pascal env -C /home/pascal bash -c "$cmd"
+    run sudo -u pascal env -C /home/pascal sh -c "$cmd"
   else
-    run bash -c "$cmd"
+    run sh -c "$cmd"
   fi
 }
 
@@ -136,9 +136,9 @@ symlink() {
   cmd+="mkdir -p ${dir@Q} && ln -s ${target@Q} ${link@Q}"
 
   if ((user)); then
-    run sudo -u pascal env -C /home/pascal bash -c "$cmd"
+    run sudo -u pascal env -C /home/pascal sh -c "$cmd"
   else
-    run bash -c "$cmd"
+    run sh -c "$cmd"
   fi
 }
 
@@ -176,9 +176,9 @@ persist() {
   cmd+="fi"
 
   if ((user)); then
-    run sudo -u pascal env -C /home/pascal bash -c "$cmd"
+    run sudo -u pascal env -C /home/pascal sh -c "$cmd"
   else
-    run bash -c "$cmd"
+    run sh -c "$cmd"
   fi
 }
 

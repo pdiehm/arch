@@ -189,7 +189,7 @@ if [[ -n ${CLEAN:+x} || ! -d $TMP/root/images/$HASH ]]; then
   mount --mkdir --bind "$TMP/root/pkgs" "$TMP/root/build/var/cache/pacman/pkg"
 
   pacstrap -G "$TMP/root/build"
-  arch-chroot "$TMP/root/build" bash -c "pacman-key --init && pacman-key --populate"
+  arch-chroot "$TMP/root/build" sh -c "pacman-key --init && pacman-key --populate"
   arch-chroot "$TMP/root/build" mkdir -m 1777 /perm
   unmount "$TMP/root/build"
 
