@@ -168,7 +168,7 @@ mkdir -p "$TMP/stages/$STAGE/res"
 PHASE="declare" import main
 PHASE="build" import main
 
-if [[ -n ${BREAK:+x} ]]; then
+if [[ -n ${SM_BREAK:+x} ]]; then
   if ! (cd "$TMP" && bash); then
     fatal "Shell exited with non-zero status, aborting..."
   fi
@@ -183,7 +183,7 @@ if [[ ! -d $TMP/root/perm ]]; then btrfs subvolume create "$TMP/root/perm"; fi
 if [[ ! -d $TMP/root/pkgs ]]; then btrfs subvolume create "$TMP/root/pkgs"; fi
 if [[ -d $TMP/root/build ]]; then btrfs subvolume delete --recursive "$TMP/root/build"; fi
 
-if [[ -n ${CLEAN:+x} || ! -d $TMP/root/images/$HASH ]]; then
+if [[ -n ${SM_CLEAN:+x} || ! -d $TMP/root/images/$HASH ]]; then
   btrfs subvolume create "$TMP/root/build"
   mount --bind "$TMP/root/build" "$TMP/root/build"
   mount --mkdir --bind "$TMP/root/pkgs" "$TMP/root/build/var/cache/pacman/pkg"
@@ -201,7 +201,7 @@ for ((stage = 0; stage < STAGE; stage++)); do
   hash="$(sha "$HASH+$(sha < "$TMP/stages/$stage/hash")")"
   touch "$TMP/root/images/$HASH"
 
-  if [[ -n ${CLEAN:+x} || ! -d $TMP/root/images/$hash ]]; then
+  if [[ -n ${SM_CLEAN:+x} || ! -d $TMP/root/images/$hash ]]; then
     btrfs subvolume snapshot "$TMP/root/images/$HASH" "$TMP/root/build"
     mount --bind "$TMP/root/build" "$TMP/root/build"
     mount --bind "$TMP/root/pkgs" "$TMP/root/build/var/cache/pacman/pkg"

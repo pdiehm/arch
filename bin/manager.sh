@@ -86,8 +86,8 @@ rebuild() {
   fi
 
   if ((UID)); then exec sudo "$0" rebuild "$@"; fi
-  if ((break)); then export BREAK=1; fi
-  if ((clean)); then export CLEAN=1; fi
+  if ((break)); then export SM_BREAK=1; fi
+  if ((clean)); then export SM_CLEAN=1; fi
   exec bin/apply.sh "$HOSTNAME"
 }
 
