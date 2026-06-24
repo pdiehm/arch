@@ -8,36 +8,36 @@ source bin/lib.sh
 
 overlay() {
   trap 'unmount "$MNT/root"; unmount "$MNT/boot"; rm -rf --one-file-system "$MNT"' EXIT
-  MNT="$(mktemp -d)"
-  chmod 700 "$MNT"
+  TMP="$(mktemp -d)"
+  chmod 700 "$TMP"
 
-  mount --mkdir --label root "$MNT/root"
-  if [[ -d $MNT/root/build ]]; then btrfs subvolume delete --recursive "$MNT/root/build"; fi
+  mount --mkdir --label root "$TMP/root"
+  if [[ -d $TMP/root/build ]]; then btrfs subvolume delete --recursive "$TMP/root/build"; fi
 
-  btrfs subvolume snapshot "$MNT/root/latest" "$MNT/root/build"
-  mount --bind "$MNT/root/build" "$MNT/root/build"
-  mount --bind "$MNT/root/pkgs" "$MNT/root/build/var/cache/pacman/pkg"
-  mount --bind -o ro "$MNT/root/perm" "$MNT/root/build/perm"
+  btrfs subvolume snapshot "$TMP/root/latest" "$TMP/root/build"
+  mount --bind "$TMP/root/build" "$TMP/root/build"
+  mount --bind "$TMP/root/pkgs" "$TMP/root/build/var/cache/pacman/pkg"
+  mount --bind -o ro "$TMP/root/perm" "$TMP/root/build/perm"
 
-  if ! arch-chroot "$MNT/root/build" "$@"; then
+  if ! arch-chroot "$TMP/root/build" "$@"; then
     fatal "Process '$*' exited with non-zero status, aborting..."
   fi
 
-  touch "$MNT/root/build"
-  unmount "$MNT/root/build"
+  touch "$TMP/root/build"
+  unmount "$TMP/root/build"
 
   local hash
-  hash="$(readlink "$MNT/root/latest")"
+  hash="$(readlink "$TMP/root/latest")"
   hash="$(sha "${hash##*/}++")"
-  if [[ -d $MNT/root/images/$hash ]]; then btrfs subvolume delete --recursive "$MNT/root/images/$hash"; fi
+  if [[ -d $TMP/root/images/$hash ]]; then btrfs subvolume delete --recursive "$TMP/root/images/$hash"; fi
 
-  mv "$MNT/root/build" "$MNT/root/images/$hash"
-  rm -f "$MNT/root/latest"
-  ln -s "images/$hash" "$MNT/root/latest"
+  mv "$TMP/root/build" "$TMP/root/images/$hash"
+  rm -f "$TMP/root/latest"
+  ln -s "images/$hash" "$TMP/root/latest"
 
-  mount --mkdir --label BOOT "$MNT/boot"
-  rm -rf "${MNT:?}/boot"/*
-  cp -r "$MNT/root/latest/boot/." "$MNT/boot"
+  mount --mkdir --label BOOT "$TMP/boot"
+  rm -rf "${TMP:?}/boot"/*
+  cp -r "$TMP/root/latest/boot/." "$TMP/boot"
 }
 
 help() {
