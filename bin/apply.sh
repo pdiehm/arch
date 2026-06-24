@@ -10,18 +10,12 @@ if (($# != 1)); then fatal "Usage: apply.sh <host>"; fi
 if ! resolve_host "$1"; then fatal "Illegal host: $1"; fi
 if ((UID)); then fatal "This script must be run as root"; fi
 
-trap cleanup EXIT
+trap 'unmount "$TMP/root"; unmount "$TMP/boot"; rm -rf --one-file-system "$TMP"' EXIT
 TMP="$(mktemp -d)"
 chmod 700 "$TMP"
 
 PHASE=""
 STAGE=0
-
-cleanup() {
-  if mountpoint --quiet "$TMP/root"; then unmount "$TMP/root"; fi
-  if mountpoint --quiet "$TMP/boot"; then unmount "$TMP/boot"; fi
-  rm -rf --one-file-system "$TMP"
-}
 
 # error <message>
 error() {
