@@ -17,7 +17,7 @@ elif [[ $DEV == android ]]; then
   aft-mtp-mount "$TMP"
   exec 3> >(sh -c "$UNMOUNT")
 elif [[ $DEV =~ ssh://([^:]+)(:(.*))? ]]; then
-  sshfs -o idmap=user -o transform_symlinks -o follow_symlinks "${BASH_REMATCH[1]}:${BASH_REMATCH[3]}" "$TMP"
+  sshfs -o idmap=user -o transform_symlinks -o follow_symlinks -o no_contain_symlinks "${BASH_REMATCH[1]}:${BASH_REMATCH[3]}" "$TMP"
   exec 3> >(sh -c "$UNMOUNT")
 else
   for dev in "$DEV" "/dev/$DEV" "/dev/disk/by-label/$DEV" "/dev/disk/by-partlabel/$DEV" ""; do
