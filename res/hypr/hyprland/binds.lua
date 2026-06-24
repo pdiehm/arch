@@ -51,4 +51,4 @@ hl.bind("SUPER + mouse:272", hl.dsp.window.drag(), { mouse = true })
 hl.bind("SUPER + mouse:273", hl.dsp.window.resize(), { mouse = true })
 
 hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
-hl.gesture({ fingers = 3, direction = "swipe", action = "resize", mods = "SUPER" })
+hl.gesture({ fingers = 3, direction = "swipe", mods = "SUPER", action = "resize" })
