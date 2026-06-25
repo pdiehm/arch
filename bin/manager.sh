@@ -7,7 +7,7 @@ cd "$(dirname "$(realpath "$0")")/.."
 source bin/lib.sh
 
 overlay() {
-  trap 'unmount "$MNT/root"; unmount "$MNT/boot"; rm -rf --one-file-system "$MNT"' EXIT
+  trap 'unmount "$TMP/root"; unmount "$TMP/boot"; rm -rf --one-file-system "$TMP"' EXIT
   TMP="$(mktemp -d)"
   chmod 700 "$TMP"
 
