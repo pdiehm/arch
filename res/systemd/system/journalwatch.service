@@ -1,7 +1,7 @@
 [Unit]
 Description=Watch journalctl and report relevant events to ntfy
-After=network-online.target
 Requires=network-online.target
+After=network-online.target
 
 [Service]
 TimeoutStartSec=infinity
