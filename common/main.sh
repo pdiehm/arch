@@ -33,6 +33,9 @@ systemd -m sshdgenkeys.service
 systemd -e sshd.service
 TCP+=(1970)
 
+package tmux
+symlink -u res/tmux.conf .config/tmux/tmux.conf
+
 copy -x res/bin/ntfy.sh /usr/local/bin/ntfy
 copy -sm 444 ntfy /usr/local/share/ntfy/token
 
