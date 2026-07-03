@@ -16,7 +16,7 @@ for path in ".ssh" ".local" ".cache" ".config/mozilla/firefox"; do
 done
 
 for path in "$(realpath /etc/resolv.conf)" "$XDG_RUNTIME_DIR/wayland-1" "/tmp/.X11-unix"; do
-  FLAGS+=("--ro-bind" "$path" "$path")
+  FLAGS+=("--ro-bind-try" "$path" "$path")
 done
 
 exec bwrap "${FLAGS[@]}" "$@"
