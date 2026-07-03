@@ -193,6 +193,7 @@ bindkey "^Z" undo                                # Ctrl+Z
 bindkey "^Y" redo                                # Ctrl+Y
 
 setopt PUSHD_SILENT
+setopt SHARE_HISTORY
 
 mkdir -p ~/.local/state/zsh
 HISTFILE="$HOME/.local/state/zsh/history"
