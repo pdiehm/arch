@@ -161,14 +161,23 @@ persist() {
 
   shift $((OPTIND - 1))
   local path="$1" dir target
-  dir="$(dirname "$path")"
 
+  if [[ $path != /* ]]; then
+    if ((user)); then
+      path="/home/pascal/$path"
+    else
+      path="/$path"
+    fi
+  fi
+
+  dir="$(dirname "$path")"
   target="${path//[^a-zA-Z0-9.\/]/_}"
   target="${target//\//-}"
-  if [[ $target == -* ]]; then target="/perm/${target:1}"; else target="/perm/home-pascal-$target"; fi
+  target="/perm/${target:1}"
 
   local cmd="if [[ -e ${target@Q} ]]; then echo 'Cannot persist' ${path@Q} '- Already persisted' >&2; exit 1; fi && "
-  cmd+="mkdir -p ${dir@Q} && if [[ -e ${path@Q} ]]; then mv ${path@Q} ${target@Q}; fi && ln -s ${target@Q} ${path@Q}"
+  cmd+="if [[ -e ${path@Q} ]]; then mv ${path@Q} ${target@Q}; else mkdir -p ${dir@Q}; fi && "
+  if ((file)); then cmd+="touch ${path@Q}"; else cmd+="mkdir ${path@Q}"; fi
 
   cmd+=" && if [[ ! -e ${target@Q} ]]; then "
   if ((file)); then cmd+="touch ${target@Q}; "; else cmd+="mkdir ${target@Q}; "; fi
@@ -176,9 +185,11 @@ persist() {
   cmd+="fi"
 
   if ((user)); then
-    run sudo -u pascal env -C /home/pascal sh -c "$cmd"
+    run sudo -u pascal sh -c "$cmd"
+    write -a /var/local/syscfg/persist.sh "mount --bind ${target@Q} ${path@Q}"
   else
     run sh -c "$cmd"
+    write -a /var/local/syscfg/persist.sh "mount --bind ${target@Q} ${path@Q}"
   fi
 }
 
@@ -352,7 +363,6 @@ timer() {
   fi
 }
 
-persist /var/lib/systemd
 copy -s "keys/$HOST_NAME" /var/local/syscfg/key
 if secret -q keys/master; then copy -s keys/master /var/local/syscfg/master; fi
 
@@ -360,6 +370,10 @@ script << EOF
 sha256sum /var/local/syscfg/key | head -c 32 > /etc/machine-id
 echo >> /etc/machine-id
 EOF
+
+persist /var/lib/systemd
+systemd -i persist.service
+systemd -e persist.service
 
 run pacman-key --add "$(use res/aur.pub)"
 run pacman-key --lsign-key "FE3A61A8A1C70F006D5718250AAB0BC4ED614894"

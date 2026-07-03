@@ -11,8 +11,7 @@ package paru base-devel devtools nvchecker
 conf -e /etc/paru.conf BottomUp CleanAfter RemoveMake SudoLoop
 
 package nix
-run mv /nix /perm/nix
-write -a /etc/fstab "/perm/nix /nix none bind 0 0"
+persist /nix
 copy res/nix.conf /etc/nix/nix.conf
 dropin env.sh "NIX_PATH=nixpkgs=flake:nixpkgs"
 systemd -e nix-daemon.service

@@ -1,0 +1,13 @@
+[Unit]
+Description=Bind mount persisted files and directories
+DefaultDependencies=no
+Requires=local-fs.target
+After=local-fs.target
+Before=sysinit.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/bash /var/local/syscfg/persist.sh
+
+[Install]
+WantedBy=sysinit.target
