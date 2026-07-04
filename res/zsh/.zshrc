@@ -86,7 +86,7 @@ alias lsblk="lsblk --output NAME,TYPE,SIZE,VENDOR,MODEL,PTTYPE,PARTLABEL,PARTTYP
 alias ntfy="ntfy -c main"
 alias parallel="parallel --group --keep-order"
 alias rg="rg --follow --hidden --smart-case"
-alias tx="tmux attach"
+alias tx="tmux new -As main"
 alias type="type -as"
 
 if [[ $HOSTKIND == desktop ]]; then
