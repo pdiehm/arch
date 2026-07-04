@@ -28,7 +28,13 @@ require("blink.cmp").setup({
   },
 
   sources = {
+    default = { "omni", "lsp", "path", "snippets", "buffer" },
+
     providers = {
+      omni = {
+        fallbacks = { "lsp", "path", "snippets", "buffer" },
+      },
+
       path = {
         opts = {
           show_hidden_files_by_default = true,
