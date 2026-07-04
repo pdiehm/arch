@@ -21,9 +21,6 @@ write -a /etc/environment "EDITOR=vim"
 package git git-delta
 symlink -u res/git.conf .config/git/config
 
-package htop
-copy -um 444 res/htop.conf .config/htop/htoprc
-
 package openssh
 copy res/ssh/sshd_config /etc/ssh/sshd_config
 copy res/ssh/known_hosts /etc/ssh/ssh_known_hosts
@@ -32,6 +29,9 @@ copy -sm 444 "ssh/$HOST_NAME/auth" /etc/ssh/authorized_keys
 systemd -m sshdgenkeys.service
 systemd -e sshd.service
 TCP+=(1970)
+
+package htop
+copy -um 444 res/htop.conf .config/htop/htoprc
 
 package tmux
 symlink -u res/tmux.conf .config/tmux/tmux.conf
