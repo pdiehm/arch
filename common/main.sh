@@ -27,6 +27,9 @@ systemd -m sshdgenkeys.service
 systemd -e sshd.service
 TCP+=(1970)
 
+package man-db man-pages
+persist /var/cache/man
+
 package htop
 copy -um 444 res/htop.conf .config/htop/htoprc
 
@@ -40,7 +43,7 @@ systemd -e fstrim.timer
 persist /var/lib/systemd
 persist -u .local/share/systemd
 
-package man-db man-pages pkgstats wireguard-tools \
+package pkgstats wireguard-tools \
   bat eza fd ripgrep jq pv fzf rsync parallel lsof \
   fastfetch usbutils pciutils dmidecode duf ncdu \
   curl xh openbsd-netcat doggo mtr tcpdump \
