@@ -56,6 +56,7 @@ if [[ $HOSTKIND == desktop ]]; then
   compdef _mk mk
   compdef _mnt mnt
   compdef _repo repo
+  compdef _tldr tl
 elif [[ $HOSTKIND == server ]]; then
   compdef _service service
 fi
@@ -136,6 +137,14 @@ watch() (
 if [[ $HOSTKIND == desktop ]]; then
   mktex() {
     latexmk -cd -pdf -outdir="$PWD/build" "$1"
+  }
+
+  tl() {
+    if (($#)); then
+      tldr "$@"
+    else
+      tldr --list | fzf --preview "tldr --color always {}" --preview-window 80% | xargs --no-run-if-empty tldr
+    fi
   }
 elif [[ $HOSTKIND == server ]]; then
   service() {
