@@ -1,82 +1,64 @@
 # shellcheck disable=SC1094,SC2016,SC2034,SC2140,SC2154,SC2155,SC2164
 
-setopt PROMPT_SUBST
 PROMPT='%F{4}%~%f$(_prompt_git) %F{%(?.5.1)}$(_prompt_char)%f '
 RPROMPT='$(_prompt_host)'
 
-_prompt_git() {
-  if ! git rev-parse HEAD &> /dev/null; then
-    return
-  fi
+setopt PROMPT_SUBST
+setopt PUSHD_SILENT
+setopt SHARE_HISTORY
 
-  local branch="$(git rev-parse --abbrev-ref HEAD)"
-  if [[ $branch == HEAD ]]; then
-    echo -n " %F{3}$(git rev-parse --short HEAD)%f"
-  else
-    echo -n " %F{8}$branch%f"
-  fi
+bindkey -rp ""
+bindkey -R " "-"~" self-insert
+bindkey -R "\M-^@"-"\M-^?" self-insert
 
-  local staged="$(git diff --staged --name-only)"
-  local changed="$(git ls-files --modified --others --exclude-standard)"
+bindkey "^M" accept-line                         # Enter
+bindkey "^I" expand-or-complete                  # Tab
+bindkey "^[[Z" reverse-menu-complete             # Shift+Tab
+bindkey "^[[C" forward-char                      # Right
+bindkey "^[[1;5C" forward-word                   # Ctrl+Right
+bindkey "^[[D" backward-char                     # Left
+bindkey "^[[1;5D" backward-word                  # Ctrl+Left
+bindkey "^[[H" beginning-of-line                 # Home
+bindkey "^[[F" end-of-line                       # End
+bindkey "^[[A" up-line-or-history                # Up
+bindkey "^[[B" down-line-or-history              # Down
+bindkey "^?" backward-delete-char                # Backspace
+bindkey "^H" backward-delete-word                # Ctrl+Backspace
+bindkey "^[[3~" delete-char                      # Delete
+bindkey "^[[3;5~" delete-word                    # Ctrl+Delete
+bindkey "^V" quoted-insert                       # Ctrl+V
+bindkey "^[[200~" bracketed-paste                # Ctrl+Shift+V
+bindkey "^R" history-incremental-search-backward # Ctrl+R
+bindkey "^L" clear-screen                        # Ctrl+L
+bindkey "^Z" undo                                # Ctrl+Z
+bindkey "^Y" redo                                # Ctrl+Y
 
-  if [[ -n $staged && -n $changed ]]; then
-    echo -en "%F{6}\u203d%f"
-  elif [[ -n $staged ]]; then
-    echo -n "%F{6}!%f"
-  elif [[ -n $changed ]]; then
-    echo -n "%F{6}?%f"
-  fi
+mkdir -p ~/.local/state/zsh
+HISTFILE="$HOME/.local/state/zsh/history"
+HISTSIZE=9999
+SAVEHIST=9999
 
-  if [[ -n "$(git stash list)" ]]; then
-    echo -en " %F{6}\u2026%f"
-  fi
+autoload -Uz compinit
+compinit -d ~/.local/state/zsh/compdump
 
-  if [[ -n "$(git remote show)" && $branch != HEAD ]]; then
-    if git rev-parse "@{upstream}" &> /dev/null; then
-      local ahead="$(git rev-list --count "@{upstream}..")"
-      local behind="$(git rev-list --count "..@{upstream}")"
+compdef _nothing ntfy
+compdef _files ed
+compdef _files mkcd
+compdef _sm sm
+compdef _xh xhs
+compdef '_arguments ":cmd:_command_names" "*::args:_normal"' await
+compdef '_arguments ":cmd:_command_names" "*::args:_normal"' bw
+compdef '_arguments ":cmd:_command_names" "*::args:_normal"' watch
 
-      if ((ahead && behind)); then
-        echo -en " %F{6}\u296f%f"
-      elif ((ahead)); then
-        echo -en " %F{6}\u2191%f"
-      elif ((behind)); then
-        echo -en " %F{6}\u2193%f"
-      fi
-    else
-      echo -en " %F{6}\u21a5%f"
-    fi
-  fi
-
-  local git="$(git rev-parse --git-dir)"
-  if [[ -f $git/BISECT_LOG ]]; then
-    echo -n " %F{1}(bisect)%f"
-  elif [[ -f $git/CHERRY_PICK_HEAD ]]; then
-    echo -n " %F{1}(cherry-pick)%f"
-  elif [[ -f $git/MERGE_HEAD ]]; then
-    echo -n " %F{1}(merge)%f"
-  elif [[ -f $git/REVERT_HEAD ]]; then
-    echo -n " %F{1}(revert)%f"
-  elif [[ -f $git/REBASE_HEAD ]]; then
-    local step="$(< "$git/rebase-merge/msgnum")"
-    local total="$(< "$git/rebase-merge/end")"
-    echo -n " %F{1}(rebase)%f %F{6}$step%F{8}/%F{6}$total%f"
-  fi
-}
-
-_prompt_char() {
-  if [[ $TTY == /dev/tty* ]]; then
-    echo -n ">"
-  else
-    echo -en "\u276f"
-  fi
-}
-
-_prompt_host() {
-  if [[ -n ${SSH_TTY:+x} ]]; then
-    echo -n "%F{14}%n@%M%f"
-  fi
-}
+if [[ $HOSTKIND == desktop ]]; then
+  compdef _nothing wp-toggle
+  compdef _files mktex
+  compdef _mk mk
+  compdef _mnt mnt
+  compdef _repo repo
+elif [[ $HOSTKIND == server ]]; then
+  compdef _service service
+fi
 
 alias dog="doggo"
 alias fd="fd --follow --hidden"
@@ -167,61 +149,79 @@ elif [[ $HOSTKIND == server ]]; then
   }
 fi
 
-bindkey -rp ""
-bindkey -R " "-"~" self-insert
-bindkey -R "\M-^@"-"\M-^?" self-insert
+_prompt_git() {
+  if ! git rev-parse HEAD &> /dev/null; then
+    return
+  fi
 
-bindkey "^M" accept-line                         # Enter
-bindkey "^I" expand-or-complete                  # Tab
-bindkey "^[[Z" reverse-menu-complete             # Shift+Tab
-bindkey "^[[C" forward-char                      # Right
-bindkey "^[[1;5C" forward-word                   # Ctrl+Right
-bindkey "^[[D" backward-char                     # Left
-bindkey "^[[1;5D" backward-word                  # Ctrl+Left
-bindkey "^[[H" beginning-of-line                 # Home
-bindkey "^[[F" end-of-line                       # End
-bindkey "^[[A" up-line-or-history                # Up
-bindkey "^[[B" down-line-or-history              # Down
-bindkey "^?" backward-delete-char                # Backspace
-bindkey "^H" backward-delete-word                # Ctrl+Backspace
-bindkey "^[[3~" delete-char                      # Delete
-bindkey "^[[3;5~" delete-word                    # Ctrl+Delete
-bindkey "^V" quoted-insert                       # Ctrl+V
-bindkey "^[[200~" bracketed-paste                # Ctrl+Shift+V
-bindkey "^R" history-incremental-search-backward # Ctrl+R
-bindkey "^L" clear-screen                        # Ctrl+L
-bindkey "^Z" undo                                # Ctrl+Z
-bindkey "^Y" redo                                # Ctrl+Y
+  local branch="$(git rev-parse --abbrev-ref HEAD)"
+  if [[ $branch == HEAD ]]; then
+    echo -n " %F{3}$(git rev-parse --short HEAD)%f"
+  else
+    echo -n " %F{8}$branch%f"
+  fi
 
-setopt PUSHD_SILENT
-setopt SHARE_HISTORY
+  local staged="$(git diff --staged --name-only)"
+  local changed="$(git ls-files --modified --others --exclude-standard)"
 
-mkdir -p ~/.local/state/zsh
-HISTFILE="$HOME/.local/state/zsh/history"
-HISTSIZE=9999
-SAVEHIST=9999
+  if [[ -n $staged && -n $changed ]]; then
+    echo -en "%F{6}\u203d%f"
+  elif [[ -n $staged ]]; then
+    echo -n "%F{6}!%f"
+  elif [[ -n $changed ]]; then
+    echo -n "%F{6}?%f"
+  fi
 
-autoload -Uz compinit
-compinit -d ~/.local/state/zsh/compdump
+  if [[ -n "$(git stash list)" ]]; then
+    echo -en " %F{6}\u2026%f"
+  fi
 
-compdef _nothing ntfy
-compdef _files ed
-compdef _files mkcd
-compdef _sm sm
-compdef _xh xhs
-compdef '_arguments ":cmd:_command_names" "*::args:_normal"' await
-compdef '_arguments ":cmd:_command_names" "*::args:_normal"' bw
-compdef '_arguments ":cmd:_command_names" "*::args:_normal"' watch
+  if [[ -n "$(git remote show)" && $branch != HEAD ]]; then
+    if git rev-parse "@{upstream}" &> /dev/null; then
+      local ahead="$(git rev-list --count "@{upstream}..")"
+      local behind="$(git rev-list --count "..@{upstream}")"
 
-if [[ $HOSTKIND == desktop ]]; then
-  compdef _nothing wp-toggle
-  compdef _files mktex
-  compdef _mk mk
-  compdef _mnt mnt
-  compdef _repo repo
-elif [[ $HOSTKIND == server ]]; then
-  compdef _service service
-fi
+      if ((ahead && behind)); then
+        echo -en " %F{6}\u296f%f"
+      elif ((ahead)); then
+        echo -en " %F{6}\u2191%f"
+      elif ((behind)); then
+        echo -en " %F{6}\u2193%f"
+      fi
+    else
+      echo -en " %F{6}\u21a5%f"
+    fi
+  fi
+
+  local git="$(git rev-parse --git-dir)"
+  if [[ -f $git/BISECT_LOG ]]; then
+    echo -n " %F{1}(bisect)%f"
+  elif [[ -f $git/CHERRY_PICK_HEAD ]]; then
+    echo -n " %F{1}(cherry-pick)%f"
+  elif [[ -f $git/MERGE_HEAD ]]; then
+    echo -n " %F{1}(merge)%f"
+  elif [[ -f $git/REVERT_HEAD ]]; then
+    echo -n " %F{1}(revert)%f"
+  elif [[ -f $git/REBASE_HEAD ]]; then
+    local step="$(< "$git/rebase-merge/msgnum")"
+    local total="$(< "$git/rebase-merge/end")"
+    echo -n " %F{1}(rebase)%f %F{6}$step%F{8}/%F{6}$total%f"
+  fi
+}
+
+_prompt_char() {
+  if [[ $TTY == /dev/tty* ]]; then
+    echo -n ">"
+  else
+    echo -en "\u276f"
+  fi
+}
+
+_prompt_host() {
+  if [[ -n ${SSH_TTY:+x} ]]; then
+    echo -n "%F{14}%n@%M%f"
+  fi
+}
 
 _mk() {
   if ((CURRENT == 2)); then
@@ -283,7 +283,7 @@ _service() {
     compadd "${cmp[@]##*/}"
   elif [[ -f "$HOME/docker/$HOSTNAME/${words[2]}/compose.yaml" ]]; then
     words=("docker" "compose" "--file" "$HOME/docker/$HOSTNAME/${words[2]}/compose.yaml" "${words[3,-1]}")
-    CURRENT=$((CURRENT + 2))
+    CURRENT="$((CURRENT + 2))"
     _docker
   fi
 }
