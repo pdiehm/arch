@@ -437,7 +437,7 @@ timer() {
   local timer=("[Timer]" "Persistent=true" "OnCalendar=$time" "[Install]" "WantedBy=timers.target")
 
   local service=("[Service]" "Type=oneshot")
-  if ((network)); then service+=("ExecStartPre=/bin/sh -c 'until ping -c 1.1.1.1; do sleep 1; done'"); fi
+  if ((network)); then service+=("ExecStartPre=/bin/sh -c 'until ping -c 1 1.1.1.1; do sleep 1; done'"); fi
   service+=("ExecStart=$command ${args[*]@Q}")
 
   if ((user)); then
