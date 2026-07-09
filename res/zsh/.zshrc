@@ -293,7 +293,7 @@ _sm() {
     compadd help edit fix rebuild secrets sync upgrade
   elif [[ ${words[2]} == rebuild ]]; then
     compset -n 2
-    _arguments "-h[help]" "-c[clean]" "-d[dry]"
+    _arguments "-h[help]" "-b[break]" "-c[clean]" "-n[dry]"
   elif [[ ${words[2]} == secrets ]]; then
     compset -n 2
     _arguments "-h[help]" "-r[rotate]"
