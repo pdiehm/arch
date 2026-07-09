@@ -13,8 +13,8 @@ conf /etc/mkinitcpio.conf "HOOKS=(base udev autodetect microcode modconf keyboar
 run mkinitcpio --allpresets
 
 package limine "$HOST_CPU-ucode"
-env CPU "$HOST_CPU"
-env KERNEL "$HOST_KERNEL"
+var CPU "$HOST_CPU"
+var KERNEL "$HOST_KERNEL"
 copy -e res/limine.conf /boot/limine.conf
 
 if [[ $HOST_BOOT == EFI ]]; then

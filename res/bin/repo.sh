@@ -44,8 +44,8 @@ git-is-local() {
 }
 
 git-is-dirty() {
-  if [[ -n "$(git diff --staged --name-only)" ]]; then return 0; fi
-  if [[ -n "$(git ls-files --modified --others --exclude-standard)" ]]; then return 0; fi
+  if [[ $(git diff --staged --name-only) ]]; then return 0; fi
+  if [[ $(git ls-files --modified --others --exclude-standard) ]]; then return 0; fi
   return 1
 }
 
@@ -55,7 +55,7 @@ git-branches() {
 
 git-status() {
   if git-is-dirty; then echo "change"; fi
-  if [[ -n "$(git stash list)" ]]; then echo "stash"; fi
+  if [[ $(git stash list) ]]; then echo "stash"; fi
 
   local branch
   git-branches | while read -r branch; do
@@ -92,9 +92,9 @@ clone() {
     if git ls-remote "$url" &> /dev/null; then break; fi
   done
 
-  if [[ -z $url ]]; then
+  if [[ ! $url ]]; then
     fatal "Not found: $src"
-  elif [[ -z $name ]]; then
+  elif [[ ! $name ]]; then
     git clone "$url"
   else
     git clone "$url" "$name"
@@ -119,7 +119,7 @@ edit() {
 fetch() {
   local name="${1:-}"
 
-  if [[ -z $name ]]; then
+  if [[ ! $name ]]; then
     for name in *; do fetch "$name"; done
   elif [[ ! -d $name ]]; then
     fatal "No such repo: $name"
@@ -144,7 +144,7 @@ list() {
       while read -r type ahead behind _; do
         case "$type" in
           change) icon="*" ;;
-          stash) if [[ -z $icon ]]; then icon="~"; fi ;;
+          stash) if [[ ! $icon ]]; then icon="~"; fi ;;
           local) if [[ $icon != "*" ]]; then icon="+"; fi ;;
           branch) if [[ $icon != "*" ]] && ((ahead || behind)); then icon="+"; fi ;;
         esac
@@ -205,7 +205,7 @@ shell() {
 status() {
   local name="${1:-}"
 
-  if [[ -z $name ]]; then
+  if [[ ! $name ]]; then
     local div=0
 
     for name in *; do
@@ -230,7 +230,7 @@ status() {
   fi
 
   git-status | while read -r type ahead behind branch; do
-    if [[ -n $branch ]]; then
+    if [[ $branch ]]; then
       read -r hash message < <(git show --oneline --no-patch "$branch")
     fi
 
@@ -240,7 +240,7 @@ status() {
     esac
   done | column --table --separator $'\x09'
 
-  if [[ -n "$(git stash list)" ]]; then echo && git stash list --oneline; fi
+  if [[ $(git stash list) ]]; then echo && git stash list --oneline; fi
   if git-is-dirty; then echo && git status --short; fi
   cd ..
 }
@@ -248,7 +248,7 @@ status() {
 update() {
   local name="${1:-}"
 
-  if [[ -z $name ]]; then
+  if [[ ! $name ]]; then
     for name in *; do update "$name"; done
     return
   fi

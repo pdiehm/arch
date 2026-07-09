@@ -10,8 +10,8 @@ vim.keymap.set("n", "gS", "[s")
 
 vim.keymap.set("x", "H", "<gv")
 vim.keymap.set("x", "L", ">gv")
-vim.keymap.set("x", "J", ":m '>+1<CR>gv=gv")
-vim.keymap.set("x", "K", ":m '<-2<CR>gv=gv")
+vim.keymap.set("x", "J", ":move '>+1<CR>gv=gv")
+vim.keymap.set("x", "K", ":move '<-2<CR>gv=gv")
 vim.keymap.set("x", "O", ":sort<CR>")
 
 vim.keymap.set("n", "<Space><Return>", "<Cmd>terminal<CR>i")

@@ -26,8 +26,8 @@ if ((DRY)); then
   UDP=(1234)
 fi
 
-env TCP "$(IFS=, && echo "${TCP[*]}")"
-env UDP "$(IFS=, && echo "${UDP[*]}")"
+var TCP "$(IFS=, && echo "${TCP[*]}")"
+var UDP "$(IFS=, && echo "${UDP[*]}")"
 copy -e res/nftables.conf /etc/nftables.conf
 systemd -e nftables.service
 

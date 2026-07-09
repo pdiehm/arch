@@ -3,13 +3,13 @@
 SOURCE="${1:-}"
 TARGET="${2:-$SOURCE}"
 
-if [[ -z "$SOURCE" ]]; then
+if [[ ! $SOURCE ]]; then
   echo "Usage: mk <source> [target]"
   exit 1
-elif [[ ! -f "/home/pascal/.local/share/mk/$SOURCE" ]]; then
+elif [[ ! -f /home/pascal/.local/share/mk/$SOURCE ]]; then
   echo "Cannot make '$SOURCE'"
   exit 1
-elif [[ -f "$TARGET" ]]; then
+elif [[ -f $TARGET ]]; then
   echo "$TARGET already exists"
   exit 1
 else

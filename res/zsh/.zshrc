@@ -7,6 +7,11 @@ setopt PROMPT_SUBST
 setopt PUSHD_SILENT
 setopt SHARE_HISTORY
 
+mkdir -p ~/.local/state/zsh
+HISTFILE="$HOME/.local/state/zsh/history"
+HISTSIZE=9999
+SAVEHIST=9999
+
 bindkey -rp ""
 bindkey -R " "-"~" self-insert
 bindkey -R "\M-^@"-"\M-^?" self-insert
@@ -33,11 +38,6 @@ bindkey "^L" clear-screen                        # Ctrl+L
 bindkey "^Z" undo                                # Ctrl+Z
 bindkey "^Y" redo                                # Ctrl+Y
 
-mkdir -p ~/.local/state/zsh
-HISTFILE="$HOME/.local/state/zsh/history"
-HISTSIZE=9999
-SAVEHIST=9999
-
 autoload -Uz compinit
 compinit -d ~/.local/state/zsh/compdump
 
@@ -52,7 +52,6 @@ compdef '_arguments ":cmd:_command_names" "*::args:_normal"' watch
 
 if [[ $HOSTKIND == desktop ]]; then
   compdef _nothing wp-toggle
-  compdef _files mktex
   compdef _mk mk
   compdef _mnt mnt
   compdef _repo repo
@@ -73,6 +72,7 @@ alias tx="tmux new -As main"
 alias type="type -as"
 
 if [[ $HOSTKIND == desktop ]]; then
+  alias mktex='latexmk -cd -pdf -outdir="$PWD/build"'
   alias open="xdg-open"
   alias play="mpv --no-audio-display"
   alias py="python3"
@@ -135,10 +135,6 @@ watch() (
 )
 
 if [[ $HOSTKIND == desktop ]]; then
-  mktex() {
-    latexmk -cd -pdf -outdir="$PWD/build" "$1"
-  }
-
   tl() {
     if (($#)); then
       tldr "$@"
@@ -173,19 +169,19 @@ _prompt_git() {
   local staged="$(git diff --staged --name-only)"
   local changed="$(git ls-files --modified --others --exclude-standard)"
 
-  if [[ -n $staged && -n $changed ]]; then
+  if [[ $staged && $changed ]]; then
     echo -en "%F{6}\u203d%f"
-  elif [[ -n $staged ]]; then
+  elif [[ $staged ]]; then
     echo -n "%F{6}!%f"
-  elif [[ -n $changed ]]; then
+  elif [[ $changed ]]; then
     echo -n "%F{6}?%f"
   fi
 
-  if [[ -n "$(git stash list)" ]]; then
+  if [[ $(git stash list) ]]; then
     echo -en " %F{6}\u2026%f"
   fi
 
-  if [[ -n "$(git remote show)" && $branch != HEAD ]]; then
+  if [[ $(git remote show) && $branch != HEAD ]]; then
     if git rev-parse "@{upstream}" &> /dev/null; then
       local ahead="$(git rev-list --count "@{upstream}..")"
       local behind="$(git rev-list --count "..@{upstream}")"
@@ -227,7 +223,7 @@ _prompt_char() {
 }
 
 _prompt_host() {
-  if [[ -n ${SSH_TTY:+x} ]]; then
+  if [[ ${SSH_TTY:+x} ]]; then
     echo -n "%F{14}%n@%M%f"
   fi
 }
@@ -290,7 +286,7 @@ _service() {
   if ((CURRENT == 2)); then
     local cmp=("$HOME/docker/$HOSTNAME"/*)
     compadd "${cmp[@]##*/}"
-  elif [[ -f "$HOME/docker/$HOSTNAME/${words[2]}/compose.yaml" ]]; then
+  elif [[ -f $HOME/docker/$HOSTNAME/${words[2]}/compose.yaml ]]; then
     words=("docker" "compose" "--file" "$HOME/docker/$HOSTNAME/${words[2]}/compose.yaml" "${words[3,-1]}")
     CURRENT="$((CURRENT + 2))"
     _docker
@@ -309,7 +305,7 @@ _sm() {
   fi
 }
 
-if [[ -n ${KITTY_INSTALLATION_DIR:+x} ]]; then
+if [[ ${KITTY_INSTALLATION_DIR:+x} ]]; then
   export KITTY_SHELL_INTEGRATION="enabled"
   autoload -Uz "$KITTY_INSTALLATION_DIR/shell-integration/zsh/kitty-integration"
   kitty-integration

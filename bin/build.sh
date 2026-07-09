@@ -8,6 +8,14 @@ source bin/lib.sh
 
 STAGE=0
 
+if ((UID)); then fatal "Not root"; fi
+if (($# != 1)); then fatal "Usage: build.sh <host>"; fi
+if ! load_host "$1"; then fatal "Unknown host: $1"; fi
+
+trap 'unmount "$TMP/root"; unmount "$TMP/boot"; rm -rf --one-file-system "$TMP"' EXIT
+TMP="$(mktemp -d)"
+chmod 700 "$TMP"
+
 # error <message> ...
 error() {
   echo -e "[\e[31mERROR\e[m] $*" >&2
@@ -59,7 +67,7 @@ use() {
   path="$(resolve "$path")"
   if ((DRY)); then return; fi
 
-  if [[ $path == /* && $path != /dev/stdin && $path != $TMP/secrets/* ]]; then
+  if [[ $path == /* && $path != /dev/stdin && $path != $TMP/* ]]; then
     error "Absolute path: $path"
   elif [[ ! -e $path ]]; then
     error "No such file or directory: $path"
@@ -177,8 +185,8 @@ write() {
   if ((env)); then cmd+="envsubst < ${file@Q} "; else cmd+="cat ${file@Q} "; fi
   if ((append)); then cmd+=">> ${path@Q}"; else cmd+="> ${path@Q}"; fi
 
-  if [[ -n $owner ]]; then cmd+=" && chown ${owner@Q} ${path@Q}"; fi
-  if [[ -n $mode ]]; then cmd+=" && chmod ${mode@Q} ${path@Q}"; fi
+  if [[ $owner ]]; then cmd+=" && chown ${owner@Q} ${path@Q}"; fi
+  if [[ $mode ]]; then cmd+=" && chmod ${mode@Q} ${path@Q}"; fi
   if ((exec)); then cmd+=" && chmod +x ${path@Q}"; fi
   run $user sh -c "$cmd"
 }
@@ -216,8 +224,8 @@ copy() {
   local cmd="mkdir -p ${dir@Q} && "
   if ((env)); then cmd+="envsubst < ${src@Q} > ${dst@Q}"; else cmd+="cp ${src@Q} ${dst@Q}"; fi
 
-  if [[ -n $owner ]]; then cmd+=" && chown ${owner@Q} ${dst@Q}"; fi
-  if [[ -n $mode ]]; then cmd+=" && chmod ${mode@Q} ${dst@Q}"; fi
+  if [[ $owner ]]; then cmd+=" && chown ${owner@Q} ${dst@Q}"; fi
+  if [[ $mode ]]; then cmd+=" && chmod ${mode@Q} ${dst@Q}"; fi
   if ((exec)); then cmd+=" && chmod +x ${dst@Q}"; fi
   run $user sh -c "$cmd"
 }
@@ -271,7 +279,7 @@ persist() {
   if [[ $path =~ ([[:space:]]|\\) ]]; then error "Invalid path: $path"; fi
 
   if [[ $path != /* ]]; then
-    if [[ -n $user ]]; then
+    if [[ $user ]]; then
       path="/home/pascal/$path"
     else
       path="/$path"
@@ -288,15 +296,15 @@ persist() {
 
   cmd+=" && if [[ ! -e ${target@Q} ]]; then "
   if ((file)); then cmd+="touch ${target@Q}; "; else cmd+="mkdir ${target@Q}; "; fi
-  if [[ -n $mode ]]; then cmd+="chmod ${mode@Q} ${target@Q}; "; fi
+  if [[ $mode ]]; then cmd+="chmod ${mode@Q} ${target@Q}; "; fi
   cmd+="fi"
 
   run $user sh -c "$cmd"
   write -a /etc/fstab "$target $path none bind 0 0"
 }
 
-# env <name> <value>
-env() {
+# var <name> <value>
+var() {
   local name="$1" value="$2"
   run export "$name=$value"
 }
@@ -451,14 +459,6 @@ timer() {
   fi
 }
 
-if ((UID)); then fatal "Not root"; fi
-if (($# != 1)); then fatal "Usage: build.sh <host>"; fi
-if ! load_host "$1"; then fatal "Unknown host: $1"; fi
-
-trap 'unmount "$TMP/root"; unmount "$TMP/boot"; rm -rf --one-file-system "$TMP"' EXIT
-TMP="$(mktemp -d)"
-chmod 700 "$TMP"
-
 mkdir "$TMP/secrets"
 if [[ ! -f secrets/$HOST_NAME ]]; then fatal "No secrets for host"; fi
 
@@ -500,8 +500,8 @@ mkdir -p "$TMP/stages/$STAGE"
 DRY=1 import main
 DRY=0 import main
 
-if [[ -n ${SM_BREAK:+x} ]]; then
-  if ! (cd "$TMP" && bash); then
+if [[ ${SM_BREAK:+x} ]]; then
+  if ! env -C "$TMP" bash; then
     fatal "Shell exited with non-zero status, aborting..."
   fi
 fi
@@ -516,7 +516,7 @@ if [[ ! -d $TMP/root/keep ]]; then btrfs subvolume create "$TMP/root/keep"; fi
 if [[ ! -d $TMP/root/pkgs ]]; then btrfs subvolume create "$TMP/root/pkgs"; fi
 if [[ -d $TMP/root/build ]]; then btrfs subvolume delete --recursive "$TMP/root/build"; fi
 
-if [[ -n ${SM_CLEAN:+x} || ! -d $TMP/root/imgs/$HASH ]]; then
+if [[ ${SM_CLEAN:+x} || ! -d $TMP/root/imgs/$HASH ]]; then
   btrfs subvolume create "$TMP/root/build"
   mount --bind "$TMP/root/build" "$TMP/root/build"
   mount --mkdir --bind "$TMP/root/pkgs" "$TMP/root/build/var/cache/pacman/pkg"
@@ -535,7 +535,7 @@ for ((stage = 0; stage < STAGE; stage++)); do
   hash="$(sha < "$TMP/stages/$stage/hash")"
   hash="$(sha "$HASH+$hash")"
 
-  if [[ -n ${SM_CLEAN:+x} || ! -d $TMP/root/imgs/$hash ]]; then
+  if [[ ${SM_CLEAN:+x} || ! -d $TMP/root/imgs/$hash ]]; then
     btrfs subvolume snapshot "$TMP/root/imgs/$HASH" "$TMP/root/build"
     mount --bind "$TMP/root/build" "$TMP/root/build"
     mount --bind "$TMP/root/pkgs" "$TMP/root/build/var/cache/pacman/pkg"
@@ -553,7 +553,7 @@ for ((stage = 0; stage < STAGE; stage++)); do
   touch "$TMP/root/imgs/$HASH"
 done
 
-if [[ -n ${SM_DRY:+x} ]]; then
+if [[ ${SM_DRY:+x} ]]; then
   btrfs subvolume snapshot "$TMP/root/imgs/$HASH" "$TMP/root/build"
   mount --bind "$TMP/root/build" "$TMP/root/build"
   arch-chroot "$TMP/root/build" || true

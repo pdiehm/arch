@@ -7,7 +7,7 @@ TMP="$(mktemp -d)"
 DEV="${1:-}"
 UNMOUNT="read && echo 'Unmounting...' && umount ${TMP@Q}"
 
-if [[ -z $DEV ]]; then
+if [[ ! $DEV ]]; then
   echo "Usage: mnt <dev>"
   exit 1
 elif [[ $DEV == tmpfs ]]; then
@@ -21,15 +21,14 @@ elif [[ $DEV =~ ssh://([^:]+)(:(.*))? ]]; then
   exec 3> >(sh -c "$UNMOUNT")
 else
   for dev in "$DEV" "/dev/$DEV" "/dev/disk/by-label/$DEV" "/dev/disk/by-partlabel/$DEV" ""; do
-    if [[ -b $dev || -f $dev ]]; then
-      sudo mount "$dev" "$TMP"
-      exec 3> >(sudo sh -c "$UNMOUNT")
-      break
-    fi
+    if [[ -b $dev || -f $dev ]]; then break; fi
   done
 
-  if [[ -z $dev ]]; then
-    echo "Cannot mount '$1'"
+  if [[ $dev ]]; then
+    sudo mount "$dev" "$TMP"
+    exec 3> >(sudo sh -c "$UNMOUNT")
+  else
+    echo "Cannot mount '$DEV'"
     exit 1
   fi
 fi

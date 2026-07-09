@@ -188,7 +188,7 @@ secrets() {
 
   rm -rf secrets
   mv "$TMP/secrets" .
-  chown -R "$(stat -c "%u:%g" .)" secrets
+  chown -R --reference . secrets
 }
 
 sync() {

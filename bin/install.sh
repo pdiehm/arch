@@ -40,7 +40,7 @@ done
 while true; do
   read -rsp "Enter disk encryption password: " CRYPT
   echo
-  if [[ -z $CRYPT ]]; then break; fi
+  if [[ ! $CRYPT ]]; then break; fi
 
   read -rsp "Confirm password: "
   echo
@@ -57,7 +57,7 @@ fi
 
 wipefs --all "$DISK"
 printf "%s\n" "${CFG[@]}" | sfdisk "$DISK"
-while [[ -z ${PARTS[1]:+x} ]]; do mapfile -t PARTS < <(lsblk --noheadings --paths --output KNAME "$DISK"); done
+while [[ ! ${PARTS[1]:+x} ]]; do mapfile -t PARTS < <(lsblk --noheadings --paths --output KNAME "$DISK"); done
 
 PART_BOOT="${PARTS[1]}"
 PART_SWAP="${PARTS[2]}"
@@ -67,7 +67,7 @@ until [[ -b $PART_BOOT ]]; do sleep 1; done
 until [[ -b $PART_SWAP ]]; do sleep 1; done
 until [[ -b $PART_ROOT ]]; do sleep 1; done
 
-if [[ -n $CRYPT ]]; then
+if [[ $CRYPT ]]; then
   cryptsetup luksFormat "$PART_ROOT" <<< "$CRYPT"
   cryptsetup open "$PART_ROOT" root <<< "$CRYPT"
   PART_ROOT="/dev/mapper/root"

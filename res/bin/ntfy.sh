@@ -1,23 +1,23 @@
 #!/usr/bin/env bash
 
-help=0
-channel="$HOSTNAME"
-priority="default"
-title=""
+HELP=0
+CHANNEL="$HOSTNAME"
+PRIORITY=""
+TITLE=""
 
 while getopts "hc:p:t:" opt; do
   case "$opt" in
-    h) help=1 ;;
-    c) channel="$OPTARG" ;;
-    p) priority="$OPTARG" ;;
-    t) title="$OPTARG" ;;
+    h) HELP=1 ;;
+    c) CHANNEL="$OPTARG" ;;
+    p) PRIORITY="$OPTARG" ;;
+    t) TITLE="$OPTARG" ;;
     *) exit 1 ;;
   esac
 done
 
 shift "$((OPTIND - 1))"
 
-if ((help)); then
+if ((HELP)); then
   echo "Usage: ntfy [-c channel] [-p priority] [-t title] <message> ..."
   echo
   echo "Options:"
@@ -33,4 +33,8 @@ if (($# == 0)); then
   exit 1
 fi
 
-curl -fsSL -H "Authorization: Bearer $(< /usr/local/share/ntfy/token)" -H "Priority: $priority" ${title:+-H "Title: $title"} -d "$*" "https://ntfy.pdiehm.dev/$channel"
+curl -fsSL -d "$*" \
+  -H "Authorization: Bearer $(< /usr/local/share/ntfy/token)" \
+  ${PRIORITY:+-H "Priority: $PRIORITY"} \
+  ${TITLE:+-H "Title: $TITLE"} \
+  "https://ntfy.pdiehm.dev/$CHANNEL"
