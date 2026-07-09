@@ -7,3 +7,6 @@ symlink -u res/bin/mnt.sh .local/bin/mnt
 
 symlink -u res/mk .local/share/mk
 symlink -u res/bin/mk.sh .local/bin/mk
+
+package bubblewrap
+symlink -u res/bin/bwrap.sh .local/bin/bw

@@ -1,10 +1,10 @@
-# fatal <message>
+# fatal <message> ...
 fatal() {
   echo -e "[\e[31mERROR\e[m] $*" >&2
   exit 1
 }
 
-# warn <message>
+# warn <message> ...
 warn() {
   echo -e "[\e[33mWARNING\e[m] $*" >&2
 }
@@ -30,8 +30,8 @@ store_secrets() {
   tar c -C "$directory" "${spec[@]}" | gpg --symmetric --quiet --batch --pinentry-mode loopback --passphrase-fd 3 3<<< "$key" > "$store"
 }
 
-# resolve_host <name>
-resolve_host() {
+# load_host <name>
+load_host() {
   local name="$1" line head key
 
   while IFS=, read -ra line; do
@@ -52,7 +52,7 @@ resolve_host() {
 # unmount <path>
 unmount() {
   local path="$1"
-  if ! mountpoint -q "$path"; then return; fi
+  if ! mountpoint --quiet "$path"; then return; fi
 
   for _ in {0..9}; do
     if umount --recursive "$path"; then return; fi

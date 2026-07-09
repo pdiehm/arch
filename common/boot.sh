@@ -2,13 +2,14 @@ write -a /etc/fstab << EOF
 LABEL=root /                     btrfs subvol=root 0 1
 LABEL=swap none                  swap  defaults    0 0
 LABEL=BOOT /boot                 vfat  defaults    0 2
-LABEL=root /perm                 btrfs subvol=perm 0 2
+LABEL=root /keep                 btrfs subvol=keep 0 2
 LABEL=root /var/cache/pacman/pkg btrfs subvol=pkgs 0 2
 EOF
 
+package "$HOST_KERNEL" linux-firmware
 copy res/initcpio/root/hook.sh /etc/initcpio/hooks/root
 copy res/initcpio/root/install.sh /etc/initcpio/install/root
-conf /etc/mkinitcpio.conf "HOOKS=(base udev autodetect microcode keyboard block encrypt filesystems root fsck)"
+conf /etc/mkinitcpio.conf "HOOKS=(base udev autodetect microcode modconf keyboard block encrypt filesystems root fsck)"
 run mkinitcpio --allpresets
 
 package limine "$HOST_CPU-ucode"

@@ -231,7 +231,7 @@ status() {
 
   git-status | while read -r type ahead behind branch; do
     if [[ -n $branch ]]; then
-      read -r hash message <<< "$(git show --oneline --no-patch "$branch")"
+      read -r hash message < <(git show --oneline --no-patch "$branch")
     fi
 
     case "$type" in

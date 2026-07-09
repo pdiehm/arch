@@ -17,16 +17,11 @@ pascal-pc     192.168.1.90 fd42:6c77:9a2f::1001
 pascal-laptop 192.168.1.91 fd42:6c77:9a2f::1002
 EOF
 
-write /etc/sysctl.d/forwarding.conf << EOF
-net.ipv4.ip_forward = 1
-net.ipv6.conf.all.forwarding = 1
-EOF
-
 copy res/systemd/resolved.conf /etc/systemd/resolved.conf
 systemd -i resolvconf.service
 systemd -e systemd-resolved.service resolvconf.service
 
-if [[ $PHASE == declare ]]; then
+if ((DRY)); then
   TCP=(1234)
   UDP=(1234)
 fi
@@ -35,3 +30,8 @@ env TCP "$(IFS=, && echo "${TCP[*]}")"
 env UDP "$(IFS=, && echo "${UDP[*]}")"
 copy -e res/nftables.conf /etc/nftables.conf
 systemd -e nftables.service
+
+write /etc/sysctl.d/forwarding.conf << EOF
+net.ipv4.ip_forward = 1
+net.ipv6.conf.all.forwarding = 1
+EOF

@@ -13,7 +13,7 @@ package neovim vim-spell-de nvim-plugins-pd \
   texlab bibtex-tidy
 
 symlink -u res/nvim .config/nvim
-dropin env.sh "EDITOR=nvim"
+write -au .config/dropin/env.sh "EDITOR=nvim"
 
 symlink -u res/clangd .config/clangd
 symlink -u res/latexindent.yaml .config/latexindent.yaml

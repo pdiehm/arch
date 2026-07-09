@@ -14,10 +14,9 @@ overlay() {
   mount --mkdir --label root "$TMP/root"
   if [[ -d $TMP/root/build ]]; then btrfs subvolume delete --recursive "$TMP/root/build"; fi
 
-  btrfs subvolume snapshot "$TMP/root/latest" "$TMP/root/build"
+  btrfs subvolume snapshot "$TMP/root/base" "$TMP/root/build"
   mount --bind "$TMP/root/build" "$TMP/root/build"
   mount --bind "$TMP/root/pkgs" "$TMP/root/build/var/cache/pacman/pkg"
-  mount --bind -o ro "$TMP/root/perm" "$TMP/root/build/perm"
 
   if ! arch-chroot "$TMP/root/build" "$@"; then
     fatal "Process '$*' exited with non-zero status, aborting..."
@@ -26,18 +25,17 @@ overlay() {
   touch "$TMP/root/build"
   unmount "$TMP/root/build"
 
-  local hash
-  hash="$(readlink "$TMP/root/latest")"
+  hash="$(readlink "$TMP/root/base")"
   hash="$(sha "${hash##*/}++")"
-  if [[ -d $TMP/root/images/$hash ]]; then btrfs subvolume delete --recursive "$TMP/root/images/$hash"; fi
+  if [[ -d $TMP/root/imgs/$hash ]]; then btrfs subvolume delete --recursive "$TMP/root/imgs/$hash"; fi
 
-  mv "$TMP/root/build" "$TMP/root/images/$hash"
-  rm -f "$TMP/root/latest"
-  ln -s "images/$hash" "$TMP/root/latest"
+  mv "$TMP/root/build" "$TMP/root/imgs/$hash"
+  rm -f "$TMP/root/base"
+  ln -s "imgs/$hash" "$TMP/root/base"
 
   mount --mkdir --label BOOT "$TMP/boot"
-  rm -rf "${TMP:?}/boot"/*
-  cp -r "$TMP/root/latest/boot/." "$TMP/boot"
+  find "$TMP/boot" -mindepth 1 -delete
+  cp -r "$TMP/root/base/boot/." "$TMP/boot"
 }
 
 help() {
@@ -91,13 +89,13 @@ rebuild() {
     exec sudo "$0" rebuild "$@"
   fi
 
-  shift $((OPTIND - 1))
+  shift "$((OPTIND - 1))"
   local host="${1:-$HOSTNAME}"
 
   if ((break)); then export SM_BREAK=1; fi
   if ((clean)); then export SM_CLEAN=1; fi
   if ((dry)); then export SM_DRY=1; fi
-  exec bin/apply.sh "$host"
+  exec bin/build.sh "$host"
 }
 
 secrets() {
@@ -130,7 +128,7 @@ secrets() {
 
   if [[ -f secrets/master && -f /var/local/syscfg/master ]]; then
     if ! load_secrets secrets/master "$TMP/store" "$(< /var/local/syscfg/master)"; then
-      warn "Stale master password"
+      warn "Stale master key"
     fi
   fi
 
@@ -166,7 +164,7 @@ secrets() {
 
   while read -r host _; do
     if [[ $host == master || $host =~ [^a-zA-Z0-9-] ]]; then
-      fatal "Illegal host name: $name"
+      fatal "Illegal host name: $host"
     elif [[ -f $TMP/store/keys/$host ]]; then
       mv "$TMP/store/keys/$host" "$TMP/keys"
     else
@@ -180,10 +178,10 @@ secrets() {
   mkdir "$TMP/secrets"
   store_secrets "$TMP/secrets/master" "$TMP/store" "$(< "$TMP/store/keys/master")" .
 
-  while read -r host args; do
-    read -ra spec <<< "$args"
+  while read -ra line; do
+    local host="${line[0]}"
 
-    if ! store_secrets "$TMP/secrets/$host" "$TMP/store" "$(< "$TMP/store/keys/$host")" "keys/$host" "${spec[@]}"; then
+    if ! store_secrets "$TMP/secrets/$host" "$TMP/store" "$(< "$TMP/store/keys/$host")" "keys/$host" "${line[@]:1}"; then
       warn "Illegal ACL for host '$host', store might be incomplete."
     fi
   done < "$TMP/store/ACL"

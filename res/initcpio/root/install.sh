@@ -7,5 +7,5 @@ build() {
 }
 
 help() {
-  echo "This hook initializes the root subvolume."
+  echo "This hook creates the root subvolume."
 }

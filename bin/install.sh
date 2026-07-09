@@ -24,7 +24,7 @@ fi
 source bin/lib.sh
 
 HOST_NAME=""
-until resolve_host "$HOST_NAME"; do
+until load_host "$HOST_NAME"; do
   read -rp "Enter host name: " HOST_NAME
 done
 
@@ -33,11 +33,10 @@ until [[ -b $DISK ]]; do
   lsblk --output NAME,VENDOR,MODEL,SIZE,PARTLABEL,LABEL
   echo
 
-  read -rp "Enter disk to install to: " DISK
+  read -rp "Enter disk: " DISK
   if [[ ! -b $DISK ]]; then DISK="/dev/$DISK"; fi
 done
 
-CRYPT=""
 while true; do
   read -rsp "Enter disk encryption password: " CRYPT
   echo
@@ -58,18 +57,14 @@ fi
 
 wipefs --all "$DISK"
 printf "%s\n" "${CFG[@]}" | sfdisk "$DISK"
-
-while [[ -z ${PARTS[1]:+x} ]]; do
-  mapfile -t PARTS < <(lsblk --noheadings --paths --output KNAME "$DISK")
-done
+while [[ -z ${PARTS[1]:+x} ]]; do mapfile -t PARTS < <(lsblk --noheadings --paths --output KNAME "$DISK"); done
 
 PART_BOOT="${PARTS[1]}"
-until [[ -b $PART_BOOT ]]; do sleep 1; done
-
 PART_SWAP="${PARTS[2]}"
-until [[ -b $PART_SWAP ]]; do sleep 1; done
-
 PART_ROOT="${PARTS[3]}"
+
+until [[ -b $PART_BOOT ]]; do sleep 1; done
+until [[ -b $PART_SWAP ]]; do sleep 1; done
 until [[ -b $PART_ROOT ]]; do sleep 1; done
 
 if [[ -n $CRYPT ]]; then
@@ -86,4 +81,4 @@ until [[ -b /dev/disk/by-label/BOOT ]]; do sleep 1; done
 until [[ -b /dev/disk/by-label/swap ]]; do sleep 1; done
 until [[ -b /dev/disk/by-label/root ]]; do sleep 1; done
 
-exec bin/apply.sh "$HOST_NAME"
+exec bin/build.sh "$HOST_NAME"

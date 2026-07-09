@@ -6,10 +6,10 @@ copy -su ssh/keys/goomba .ssh/goomba
 copy -su ssh/keys/github .ssh/github
 copy -su ssh/keys/uni-gitlab .ssh/uni-gitlab
 
+write -au .config/dropin/env.sh 'SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"'
+systemd -ou ssh-agent.service
+systemd -eu /usr/lib/systemd/user/ssh-agent.service
+
 package sshfs
 systemd -iu home-pascal-Shared.mount
 systemd -eu home-pascal-Shared.mount
-
-dropin env.sh 'SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"'
-systemd -ou ssh-agent.service
-systemd -eu /usr/lib/systemd/user/ssh-agent.service

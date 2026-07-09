@@ -10,12 +10,12 @@ run_hook() {
   if [[ -d $tmp/root ]]; then
     local time="$(stat -c "%y" "$tmp/root")"
     local target="$tmp/boot/${time:0:10}_${time:11:8}"
-    while [[ -d $target ]]; do target="$target="; done
 
+    while [[ -d $target ]]; do target="${target}_"; done
     mv "$tmp/root" "$target"
   fi
 
-  btrfs subvolume snapshot "$tmp/latest" "$tmp/root"
+  btrfs subvolume snapshot "$tmp/base" "$tmp/root"
   touch "$tmp/root"
 
   umount "$tmp"

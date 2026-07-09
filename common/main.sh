@@ -1,13 +1,10 @@
+import ./base
+import ./pacman
 import ./boot
+import ./user
 import ./locale
 import ./network
 import ./docker
-import ./bwrap
-
-write -a /etc/environment << EOF
-HOSTNAME="$HOST_NAME"
-HOSTKIND="$HOST_KIND"
-EOF
 
 package zsh zsh-autosuggestions zsh-completions zsh-syntax-highlighting
 write -a /etc/zsh/zshenv 'ZDOTDIR="$HOME/.config/zsh"'
@@ -40,10 +37,12 @@ copy -x res/bin/ntfy.sh /usr/local/bin/ntfy
 copy -sm 444 ntfy /usr/local/share/ntfy/token
 
 systemd -e fstrim.timer
+persist /var/lib/systemd
+persist -u .local/share/systemd
 
 package man-db man-pages pkgstats wireguard-tools \
-  bat eza fd ripgrep jq pv fzf rsync parallel \
-  lsof usbutils pciutils fastfetch duf ncdu \
+  bat eza fd ripgrep jq pv fzf rsync parallel lsof \
+  fastfetch usbutils pciutils dmidecode duf ncdu \
   curl xh openbsd-netcat doggo mtr tcpdump \
   btrfs-progs e2fsprogs exfatprogs dosfstools \
   libarchive zip unzip
