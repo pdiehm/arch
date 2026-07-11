@@ -374,12 +374,16 @@ upgrade() {
 #   -u   in user manager
 #   -t   for target
 #
-# systemd [-iu] <unit> ...
-#   -i   install units
+# systemd [-du] <unit> ...
+#   -d   disable units
 #   -u   in user manager
 #
 # systemd [-mu] <unit> ...
 #   -m   mask units
+#   -u   in user manager
+#
+# systemd [-iu] <unit> ...
+#   -i   install units
 #   -u   in user manager
 #
 # systemd [-ou] <unit> ...
@@ -387,13 +391,14 @@ upgrade() {
 #   -u   in user manager
 systemd() {
   local OPTIND OPTARG opt
-  local enable=0 install=0 mask=0 override=0 user=0 target=""
+  local enable=0 disable=0 mask=0 install=0 override=0 user=0 target=""
 
-  while getopts "eimout:" opt; do
+  while getopts "edmiout:" opt; do
     case "$opt" in
       e) enable=1 ;;
-      i) install=1 ;;
+      d) disable=1 ;;
       m) mask=1 ;;
+      i) install=1 ;;
       o) override=1 ;;
       u) user=1 ;;
       t) target="$OPTARG" ;;
@@ -404,8 +409,8 @@ systemd() {
   shift "$((OPTIND - 1))"
   local unit
 
-  if ((enable + install + mask + override != 1)); then error "Exactly one of '-e', '-i', '-m' or '-o' is required"; fi
-  if [[ -n $target ]] && ((enable + user != 2)); then error "Option '-t' requires '-e' and '-u'"; fi
+  if ((enable + disable + mask + install + override != 1)); then error "Exactly one of '-e', '-d', '-m', '-i' or '-o' is required"; fi
+  if [[ $target ]] && ((enable + user != 2)); then error "Option '-t' requires '-e' and '-u'"; fi
   target="${target:-default.target}"
 
   if ((enable)); then
@@ -420,17 +425,23 @@ systemd() {
     else
       run systemctl enable "$@"
     fi
-  elif ((install)); then
+  elif ((disable)); then
     if ((user)); then
-      for unit; do copy -u "res/systemd/user/$unit" ".config/systemd/user/$unit"; done
+      run -u sh -c "rm -f .config/systemd/user/*.wants/${unit@Q}"
     else
-      for unit; do copy "res/systemd/system/$unit" "/etc/systemd/system/$unit"; done
+      run systemctl disable "$@"
     fi
   elif ((mask)); then
     if ((user)); then
       for unit; do symlink -u /dev/null ".config/systemd/user/$unit"; done
     else
       run systemctl mask "$@"
+    fi
+  elif ((install)); then
+    if ((user)); then
+      for unit; do copy -u "res/systemd/user/$unit" ".config/systemd/user/$unit"; done
+    else
+      for unit; do copy "res/systemd/system/$unit" "/etc/systemd/system/$unit"; done
     fi
   elif ((override)); then
     if ((user)); then

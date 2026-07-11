@@ -40,6 +40,7 @@ copy -x res/bin/ntfy.sh /usr/local/bin/ntfy
 copy -sm 444 ntfy /usr/local/share/ntfy/token
 
 systemd -e fstrim.timer
+systemd -d systemd-userdbd.socket
 persist /var/lib/systemd
 persist -u .local/share/systemd
 
