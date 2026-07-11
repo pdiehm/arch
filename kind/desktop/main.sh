@@ -11,8 +11,8 @@ package networkmanager nm-connection-editor
 systemd -e NetworkManager.service
 
 package tlrc
-persist -u .cache/tlrc
-timer -nu tldr-update daily /usr/bin/tldr --update
+run -u tldr --update
+upgrade -u tldr --update
 
 write /etc/sysctl.d/sysrq.conf "kernel.sysrq = 1"
 copy res/systemd/logind.conf /etc/systemd/logind.conf

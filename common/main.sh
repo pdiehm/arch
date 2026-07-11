@@ -28,7 +28,7 @@ systemd -e sshd.service
 TCP+=(1970)
 
 package man-db man-pages
-persist /var/cache/man
+systemd -m man-db.timer
 
 package htop
 copy -um 444 res/htop.conf .config/htop/htoprc

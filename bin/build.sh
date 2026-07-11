@@ -344,12 +344,28 @@ package() {
   run pacman --noconfirm --sync --refresh --sysupgrade "$@"
 }
 
-# upgrade [command ...]
+# upgrade [-u] [command ...]
+#   -u   as user in home directory
 upgrade() {
-  if (($#)); then
-    write -a /var/local/syscfg/upgrade.sh "${*@Q}"
-  else
+  local OPTIND opt
+  local user=0
+
+  while getopts "u" opt; do
+    case "$opt" in
+      u) user=1 ;;
+      *) error "Illegal option" ;;
+    esac
+  done
+
+  shift "$((OPTIND - 1))"
+  local command="${*@Q}"
+
+  if [[ ! $command ]]; then
     write -a /var/local/syscfg/upgrade.sh
+  elif ((user)); then
+    write -a /var/local/syscfg/upgrade.sh "sudo -u pascal env -C /home/pascal $command"
+  else
+    write -a /var/local/syscfg/upgrade.sh "$command"
   fi
 }
 
