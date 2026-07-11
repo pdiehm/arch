@@ -604,7 +604,7 @@ for path in "$TMP/root/base/keep"/*; do
   touch "$target"
 done
 
-while read -r path; do
+while read -ru 3 path; do
   read -rp "Remove '/keep/${path##*/}'? [y/N] "
   if [[ $REPLY == y ]]; then rm -rf "$path"; fi
-done < <(find "$TMP/root/keep" -mindepth 1 -maxdepth 1 -mtime +0)
+done 3< <(find "$TMP/root/keep" -mindepth 1 -maxdepth 1 -mtime +0)
