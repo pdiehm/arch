@@ -1,7 +1,7 @@
 write -a /etc/fstab << EOF
 LABEL=root /                     btrfs subvol=root 0 1
 LABEL=swap none                  swap  defaults    0 0
-LABEL=BOOT /boot                 vfat  defaults    0 2
+LABEL=BOOT /boot                 vfat  umask=077   0 2
 LABEL=root /keep                 btrfs subvol=keep 0 2
 LABEL=root /var/cache/pacman/pkg btrfs subvol=pkgs 0 2
 EOF
