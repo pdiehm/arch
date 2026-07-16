@@ -3,7 +3,6 @@
     "DisableAccounts": true,
     "DisableAppUpdate": true,
     "DisableProfileImport": true,
-    "DownloadDirectory": "${home}/Temp",
     "HttpAllowlist": ["http://homeassistant:8123"],
     "NoDefaultBookmarks": true,
     "OverrideFirstRunPage": "",
