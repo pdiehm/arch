@@ -1,5 +1,5 @@
-NAME,KIND,BOOT,CPU,KERNEL
-pascal-pc,desktop,EFI,amd,linux
-pascal-laptop,desktop,EFI,amd,linux
-bowser,server,EFI,amd,linux-lts
-goomba,server,BIOS,amd,linux-lts
+NAME,KIND,BOOT,CPU,GPU,KERNEL
+pascal-pc,desktop,EFI,amd,radeon,linux
+pascal-laptop,desktop,EFI,amd,radeon,linux
+bowser,server,EFI,amd,,linux-lts
+goomba,server,BIOS,amd,,linux-lts

@@ -14,8 +14,9 @@ package tlrc
 run -u tldr --update
 upgrade -u tldr --update
 
-write /etc/sysctl.d/sysrq.conf "kernel.sysrq = 1"
+package mesa mesa-utils "vulkan-$HOST_GPU" vulkan-icd-loader vulkan-tools
 copy res/systemd/logind.conf /etc/systemd/logind.conf
+write /etc/sysctl.d/sysrq.conf "kernel.sysrq = 1"
 
 write -a /etc/fstab "tmpfs /home/pascal/Temp tmpfs uid=1000,gid=1000 0 0"
 run -u mkdir Downloads
