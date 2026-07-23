@@ -1,4 +1,4 @@
-name,kind,boot,cpu,kernel
+NAME,KIND,BOOT,CPU,KERNEL
 pascal-pc,desktop,EFI,amd,linux
 pascal-laptop,desktop,EFI,amd,linux
 bowser,server,EFI,amd,linux-lts

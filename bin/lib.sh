@@ -39,7 +39,7 @@ load_host() {
       head=("${line[@]}")
     elif [[ ${line[0]} == "$name" ]]; then
       for key in "${!head[@]}"; do
-        export "HOST_${head[key]^^}=${line[key]}"
+        export "HOST_${head[key]}=${line[key]}"
       done
 
       return 0
