@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-SOURCE="${1:-}"
+SOURCE="$1"
 TARGET="${2:-$SOURCE}"
 
 if [[ ! $SOURCE ]]; then
