@@ -53,6 +53,7 @@ box#workspaces button.special.visible {
 }
 
 label#cpu.load,
+label#bluetooth.connected,
 label#battery.charging {
   color: #0074d9;
 }
@@ -61,6 +62,7 @@ label#memory.warn,
 label#disk.warn,
 label#temperature.warning,
 label#network:not(.disconnected):not(.wifi):not(.ethernet),
+label#bluetooth:not(.off):not(.on):not(.connected):not(.discoverable),
 label#battery.discharging.warn {
   color: #ffdc00;
 }
@@ -71,10 +73,12 @@ label#disk.crit,
 label#temperature.critical,
 label#systemd-failed-units.degraded,
 label#network.disconnected,
+label#bluetooth.off,
 label#battery.discharging.crit {
   color: #ff4136;
 }
 
+label#bluetooth.discoverable,
 label#battery.full {
   color: #2ecc40;
 }

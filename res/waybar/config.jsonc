@@ -40,7 +40,7 @@
 
   "group/right": {
     "orientation": "inherit",
-    "modules": ["network", "wireplumber", "backlight", "battery"]
+    "modules": ["network", "bluetooth", "wireplumber", "backlight", "battery"]
   },
 
   "clock": {
@@ -113,6 +113,19 @@
     "tooltip-format-disconnected": "{ifname}: Disconnected",
     "format-icons": ["󰤯", "󰤟", "󰤢", "󰤥", "󰤨"],
     "interval": 1
+  },
+
+  "bluetooth": {
+    "format": " 󰂲 ",
+    "format-on": " 󰂯 ",
+    "format-connected": "󰂱  {device_alias}",
+    "tooltip-format": "{controller_address}",
+    "tooltip-format-no-controller": "N/A",
+    "tooltip-format-connected": "{device_enumerate}",
+    "tooltip-format-enumerate-connected": "{device_alias} ({device_address})",
+    "on-click": "~/.local/bin/bt-toggle power",
+    "on-click-right": "bluetoothctl disconnect",
+    "on-click-middle": "~/.local/bin/bt-toggle discoverable"
   },
 
   "wireplumber": {

@@ -10,6 +10,11 @@ import ./scripts
 package networkmanager nm-connection-editor
 systemd -e NetworkManager.service
 
+package bluez bluez-utils
+persist /var/lib/bluetooth
+conf /etc/bluetooth/main.conf "AutoEnable=false"
+systemd -e bluetooth.service
+
 package tlrc
 run -u tldr --update
 upgrade -u tldr --update

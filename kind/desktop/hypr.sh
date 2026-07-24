@@ -6,7 +6,6 @@ package fontconfig noto-fonts noto-fonts-extra noto-fonts-cjk noto-fonts-emoji t
 symlink -u res/fontconfig.xml .config/fontconfig/fonts.conf
 
 package pipewire pipewire-alsa pipewire-pulse wireplumber wiremix alsa-utils
-symlink -u res/bin/wp-toggle.sh .local/bin/wp-toggle
 persist -u .local/state/wireplumber
 
 package hyprland hyprpaper hyprlock hypridle hyprshot hyprpicker xdg-desktop-portal-hyprland adwaita-icon-theme
