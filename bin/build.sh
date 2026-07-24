@@ -334,7 +334,7 @@ conf() {
     elif ((enable)); then
       run sed -Ei "s|^#?($name)\b|\1|" "$path"
     else
-      run sed -Ei "s|^#?${name%%=*}=.*$|$name|" "$path"
+      run sed -Ei "s|^#?${name%%=*}\s*=.*$|$name|" "$path"
     fi
   done
 }
