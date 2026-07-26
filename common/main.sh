@@ -30,6 +30,11 @@ TCP+=(1970)
 package man-db man-pages
 persist /var/cache/man
 
+package fwupd
+persist /var/lib/fwupd
+persist /var/cache/fwupd
+systemd -e fwupd-refresh.timer
+
 package htop
 copy -um 444 res/htop.conf .config/htop/htoprc
 
