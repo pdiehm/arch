@@ -14,7 +14,7 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/checkout@v7.0.0
+      - uses: actions/checkout@v7.0.1
 
       - name: Copy install script
         run: mkdir _site && cp bin/install.sh _site/index.html
