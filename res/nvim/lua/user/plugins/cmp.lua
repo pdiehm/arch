@@ -33,6 +33,10 @@ require("blink.cmp").setup({
     providers = {
       omni = {
         fallbacks = { "lsp", "path", "snippets", "buffer" },
+
+        enabled = function()
+          return not vim.list_contains({ "", "v:lua.vim.lsp.omnifunc" }, vim.bo.omnifunc)
+        end,
       },
 
       path = {
