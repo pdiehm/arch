@@ -1,4 +1,3 @@
-run usermod --password "$(secret password)" pascal
 run usermod --append --groups wheel pascal
 write -a /etc/sudoers "pascal ALL=(ALL:ALL) ALL"
 
