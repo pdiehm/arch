@@ -1,5 +1,5 @@
 import ./network
-package tenacity kdenlive qemu-full quickemu
+package tenacity kdenlive qemu-full quickemu via-bin
 
 package cups ipp-usb
 systemd -e cups.service ipp-usb.service
