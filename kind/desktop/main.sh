@@ -16,8 +16,8 @@ conf /etc/bluetooth/main.conf "AutoEnable=false"
 systemd -e bluetooth.service
 
 package tlrc
-run -u tldr --update
-upgrade -u tldr --update
+persist -u .cache/tlrc
+timer -nu tldr-update hourly /usr/bin/tldr --update
 
 package mesa mesa-utils "vulkan-$HOST_GPU" vulkan-icd-loader vulkan-tools
 copy res/systemd/logind.conf /etc/systemd/logind.conf
