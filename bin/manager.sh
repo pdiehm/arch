@@ -39,7 +39,7 @@ overlay() {
 }
 
 help() {
-  echo "Usage: manager.sh <command>"
+  echo "Usage: sm <command> [args...]"
   echo
   echo "Commands:"
   echo "  help             Print this help message"
