@@ -52,11 +52,11 @@ compdef '_arguments ":cmd:_command_names" "*::args:_normal"' watch
 
 if [[ $HOSTKIND == desktop ]]; then
   compdef _nothing wp-toggle
-  compdef _bt_toggle bt-toggle
   compdef _mk mk
   compdef _mnt mnt
   compdef _repo repo
   compdef _tldr tl
+  compdef '_arguments ":cmd:(power discoverable)"' bt-toggle
 elif [[ $HOSTKIND == server ]]; then
   compdef _service service
 fi
@@ -226,12 +226,6 @@ _prompt_char() {
 _prompt_host() {
   if [[ ${SSH_TTY:+x} ]]; then
     echo -n "%F{14}%n@%M%f"
-  fi
-}
-
-_bt_toggle() {
-  if ((CURRENT == 2)); then
-    compadd power discoverable
   fi
 }
 
