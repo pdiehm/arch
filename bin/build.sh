@@ -361,11 +361,11 @@ upgrade() {
   local command="${*@Q}"
 
   if [[ ! $command ]]; then
-    write -a /var/local/syscfg/upgrade.sh
+    write -ax /var/local/syscfg/upgrade.sh
   elif ((user)); then
-    write -a /var/local/syscfg/upgrade.sh "sudo -u pascal env -C /home/pascal $command"
+    write -ax /var/local/syscfg/upgrade.sh "sudo -u pascal env -C /home/pascal $command"
   else
-    write -a /var/local/syscfg/upgrade.sh "$command"
+    write -ax /var/local/syscfg/upgrade.sh "$command"
   fi
 }
 
