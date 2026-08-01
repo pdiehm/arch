@@ -28,8 +28,6 @@ for _, char in pairs({ '"', "'", "`" }) do
   map(char, function(pair, pre)
     if pair:sub(2, 2) == char then
       return "<Right>"
-    elseif char == "'" and pair:len() == 0 then
-      return "'"
     elseif char == "'" and pair:sub(1, 1):match("[%w&]") then
       return "'"
     elseif char == "'" and pre:sub(-2, -1) == "''" then
