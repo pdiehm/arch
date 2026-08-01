@@ -75,7 +75,7 @@ rebuild() {
   done
 
   if ((help)); then
-    echo "Usage: manager.sh rebuild [-hbcn] [host]"
+    echo "Usage: sm rebuild [-hbcn] [host]"
     echo
     echo "Options:"
     echo "  -h   Print this help message"
@@ -111,7 +111,7 @@ secrets() {
   done
 
   if ((help)); then
-    echo "Usage: manager.sh secrets [-hr]"
+    echo "Usage: sm secrets [-hr]"
     echo
     echo "Options:"
     echo "  -h   Print this help message"
