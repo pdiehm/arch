@@ -47,9 +47,9 @@ while true; do
   if [[ $REPLY == "$CRYPT" ]]; then break; fi
 done
 
-if [[ $HOST_BOOT == EFI ]]; then
+if [[ $HOST_BOOT == efi ]]; then
   CFG=("label: gpt" "size=1GiB, type=uefi, name=BOOT, bootable" "size=8GiB, type=swap, name=swap" "type=linux, name=root")
-elif [[ $HOST_BOOT == BIOS ]]; then
+elif [[ $HOST_BOOT == bios ]]; then
   CFG=("label: dos" "size=1GiB, type=0c, name=BOOT, bootable" "size=8GiB, type=swap, name=swap" "type=linux, name=root")
 else
   fatal "Illegal boot method: $HOST_BOOT"

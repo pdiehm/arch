@@ -17,10 +17,10 @@ var CPU "$HOST_CPU"
 var KERNEL "$HOST_KERNEL"
 copy -e res/limine.conf /boot/limine.conf
 
-if [[ $HOST_BOOT == EFI ]]; then
+if [[ $HOST_BOOT == efi ]]; then
   script <<< "mkdir -p /boot/EFI/BOOT && cp /usr/share/limine/BOOTX64.EFI /boot/EFI/BOOT"
   upgrade <<< "mkdir -p /boot/EFI/BOOT && cp /usr/share/limine/BOOTX64.EFI /boot/EFI/BOOT"
-elif [[ $HOST_BOOT == BIOS ]]; then
+elif [[ $HOST_BOOT == bios ]]; then
   script <<< 'cp /usr/share/limine/limine-bios.sys /boot && limine bios-install "$(lsblk --noheadings --paths --output PKNAME /dev/disk/by-label/BOOT)"'
   upgrade <<< 'cp /usr/share/limine/limine-bios.sys /boot && limine bios-install "$(lsblk --noheadings --paths --output PKNAME /dev/disk/by-label/BOOT)"'
 else
