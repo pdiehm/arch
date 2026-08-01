@@ -1,4 +1,4 @@
-copy -x res/bin/journalwatch.sh /usr/local/lib/journalwatch/journalwatch
+copy -x res/bin/journalwatch.sh /usr/local/lib/journalwatch/journalwatch.sh
 systemd -i journalwatch.service
 systemd -e journalwatch.service
 
