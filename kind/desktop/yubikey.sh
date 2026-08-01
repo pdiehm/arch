@@ -9,4 +9,4 @@ run sed -i "3a auth sufficient pam_u2f.so cue origin=pam://pascal" /etc/pam.d/sy
 package evtest
 copy -x res/bin/yubikey-lock.sh /usr/local/lib/yubikey/lock.sh
 copy -x res/bin/yubikey-unlock.sh /usr/local/lib/yubikey/unlock.sh
-copy res/udev/yubikey.rules /etc/udev/rules.d/yubikey.rules
+copy res/udev/yubikey.rules /etc/udev/rules.d/10-yubikey.rules
