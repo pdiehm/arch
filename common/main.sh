@@ -4,6 +4,7 @@ import ./boot
 import ./user
 import ./locale
 import ./network
+import ./backup
 import ./docker
 
 package zsh zsh-autosuggestions zsh-completions zsh-syntax-highlighting

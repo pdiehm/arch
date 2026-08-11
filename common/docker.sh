@@ -12,6 +12,7 @@ if [[ $HOST_KIND == desktop ]]; then
 elif [[ $HOST_KIND == server ]]; then
   persist -u docker
   systemd -e docker.service
+  BACKUP+=("/home/pascal/docker/**/.env" "/var/lib/docker/volumes/*/")
 else
   error "Illegal host kind: $HOST_KIND"
 fi
