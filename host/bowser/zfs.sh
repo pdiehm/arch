@@ -3,7 +3,7 @@ run sed -i 's/Priority: high/Priority: default/' /etc/zfs/zed.d/zed-functions.sh
 write -x /usr/bin/hostname "#!/bin/sh" "echo bowser"
 
 systemd -e zfs.target zfs-import.target zfs-import-scan.service zfs-mount.service zfs-zed.service
-timer zfs-scrub-all weekly /usr/bin/zpool scrub --all
+timer zfs-scrub-all weekly /usr/bin/zpool scrub -a
 
 conf /etc/mkinitcpio.conf "HOOKS=(base udev autodetect microcode modconf keyboard block encrypt zfs filesystems root fsck)"
 run mkinitcpio --allpresets
