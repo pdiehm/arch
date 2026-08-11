@@ -1,3 +1,5 @@
+UDP+=(51820)
+
 write /etc/systemd/network/main.network << EOF
 [Match]
 Kind=!*
@@ -42,5 +44,3 @@ Name=wg
 [Network]
 Address=fd42:6c77:9a2f::1/112
 EOF
-
-UDP+=(51820)
