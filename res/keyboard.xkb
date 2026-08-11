@@ -1,0 +1,287 @@
+xkb_keymap {
+  xkb_keycodes {
+    minimum = 8;
+    maximum = 255;
+
+    indicator 1 = "Caps Lock";
+    indicator 2 = "Num Lock";
+    indicator 3 = "Scroll Lock";
+
+    <A00> = 49;
+    <A01> = 10;
+    <A02> = 11;
+    <A03> = 12;
+    <A04> = 13;
+    <A05> = 14;
+    <A06> = 15;
+    <A07> = 16;
+    <A08> = 17;
+    <A09> = 18;
+    <A0A> = 19;
+    <A0B> = 20;
+    <A0C> = 21;
+
+    <A10> = 24;
+    <A11> = 25;
+    <A12> = 26;
+    <A13> = 27;
+    <A14> = 28;
+    <A15> = 29;
+    <A16> = 30;
+    <A17> = 31;
+    <A18> = 32;
+    <A19> = 33;
+    <A1A> = 34;
+    <A1B> = 35;
+    <A1C> = 51;
+
+    <A20> = 38;
+    <A21> = 39;
+    <A22> = 40;
+    <A23> = 41;
+    <A24> = 42;
+    <A25> = 43;
+    <A26> = 44;
+    <A27> = 45;
+    <A28> = 46;
+    <A29> = 47;
+    <A2A> = 48;
+
+    <A30> = 52;
+    <A31> = 53;
+    <A32> = 54;
+    <A33> = 55;
+    <A34> = 56;
+    <A35> = 57;
+    <A36> = 58;
+    <A37> = 59;
+    <A38> = 60;
+    <A39> = 61;
+
+    <CLC> = 37;  // Control Left Control
+    <CLM> = 133; // Control Left Mod
+    <CLA> = 64;  // Control Left Alt
+    <CLS> = 50;  // Control Left Shift
+    <CLL> = 66;  // Control Left Lock
+    <CLT> = 23;  // Control Left Tab
+    <CRC> = 105; // Control Right Control
+    <CRM> = 134; // Control Right Mod
+    <CRA> = 108; // Control Right Alt
+    <CRS> = 62;  // Control Right Shift
+    <CRR> = 36;  // Control Right Return
+    <CRB> = 22;  // Control Right Backspace
+    <CCS> = 65;  // Control Center Space
+    <CCM> = 135; // Control Center Menu
+
+    <CAU> = 111; // Control Arrow Up
+    <CAD> = 116; // Control Arrow Down
+    <CAL> = 113; // Control Arrow Left
+    <CAR> = 114; // Control Arrow Right
+    <CX1> = 119; // Control Extra Delete
+    <CX2> = 115; // Control Extra End
+    <CX3> = 117; // Control Extra Page Down
+    <CX4> = 118; // Control Extra Insert
+    <CX5> = 110; // Control Extra Home
+    <CX6> = 112; // Control Extra Page Up
+    <CX7> = 107; // Control Extra Print
+    <CX8> = 78;  // Control Extra Scroll
+    <CX9> = 127; // Control Extra Pause
+
+    <FN0> = 9;   // Function Escape
+    <FN1> = 67;  // Function 1
+    <FN2> = 68;  // Function 2
+    <FN3> = 69;  // Function 3
+    <FN4> = 70;  // Function 4
+    <FN5> = 71;  // Function 5
+    <FN6> = 72;  // Function 6
+    <FN7> = 73;  // Function 7
+    <FN8> = 74;  // Function 8
+    <FN9> = 75;  // Function 9
+    <FNA> = 76;  // Function 10
+    <FNB> = 95;  // Function 11
+    <FNC> = 96;  // Function 12
+
+    <KP0> = 90;  // Keypad 0
+    <KP1> = 87;  // Keypad 1
+    <KP2> = 88;  // Keypad 2
+    <KP3> = 89;  // Keypad 3
+    <KP4> = 83;  // Keypad 4
+    <KP5> = 84;  // Keypad 5
+    <KP6> = 85;  // Keypad 6
+    <KP7> = 79;  // Keypad 7
+    <KP8> = 80;  // Keypad 8
+    <KP9> = 81;  // Keypad 9
+    <KPA> = 86;  // Keypad Add
+    <KPB> = 82;  // Keypad Subtract
+    <KPC> = 63;  // Keypad Multiply
+    <KPD> = 106; // Keypad Divide
+    <KPP> = 91;  // Keypad Period
+    <KPR> = 104; // Keypad Return
+    <KPL> = 77;  // Keypad Lock
+
+    <XMP> = 172; // Extra Media Play
+    <XMB> = 173; // Extra Media Back
+    <XMF> = 171; // Extra Media Forward
+    <XMM> = 121; // Extra Media Mute
+    <XML> = 122; // Extra Media Lower Volume
+    <XMR> = 123; // Extra Media Raise Volume
+  };
+
+  xkb_types {
+    type "ONE_LEVEL" {
+      modifiers = None;
+      map[None] = Level1;
+    };
+
+    type "TWO_LEVEL" {
+      modifiers = Shift;
+      map[None] = Level1;
+      map[Shift] = Level2;
+    };
+
+    type "FOUR_LEVEL" {
+      modifiers = Shift + Mod5;
+      map[None] = Level1;
+      map[Shift] = Level2;
+      map[Mod5] = Level3;
+      map[Shift+Mod5] = Level4;
+    };
+  };
+
+  xkb_compatibility {
+    interpret Control_L { action = SetMods(modifiers = Control); };
+    interpret Control_R { action = SetMods(modifiers = Control); };
+    interpret Super_L { action = SetMods(modifiers = Mod4); };
+    interpret Super_R { action = SetMods(modifiers = Mod4); };
+    interpret Alt_L { action = SetMods(modifiers = Mod1); };
+    interpret Alt_R { action = SetMods(modifiers = Mod5); };
+    interpret Shift_L { action = SetMods(modifiers = Shift); };
+    interpret Shift_R { action = SetMods(modifiers = Shift); };
+  };
+
+  // TODO: degree
+  xkb_symbols {
+    key.type = "FOUR_LEVEL";
+    key <A00> {[ grave, asciitilde, dead_grave, dead_tilde ]};
+    key <A01> {[ 1, exclam ]};
+    key <A02> {[ 2, at ]};
+    key <A03> {[ 3, numbersign ]};
+    key <A04> {[ 4, dollar ]};
+    key <A05> {[ 5, percent ]};
+    key <A06> {[ 6, asciicircum, NoSymbol, dead_circumflex ]};
+    key <A07> {[ 7, ampersand ]};
+    key <A08> {[ 8, asterisk ]};
+    key <A09> {[ 9, parenleft ]};
+    key <A0A> {[ 0, parenright ]};
+    key <A0B> {[ minus, underscore ]};
+    key <A0C> {[ equal, plus ]};
+
+    key <A10> {[ q, Q ]};
+    key <A11> {[ w, W ]};
+    key <A12> {[ e, E, EuroSign ]};
+    key <A13> {[ r, R, registered ]};
+    key <A14> {[ t, T, trademark ]};
+    key <A15> {[ y, Y ]};
+    key <A16> {[ u, U, udiaeresis, Udiaeresis ]};
+    key <A17> {[ i, I ]};
+    key <A18> {[ o, O, odiaeresis, Odiaeresis ]};
+    key <A19> {[ p, P ]};
+    key <A1A> {[ bracketleft, braceleft ]};
+    key <A1B> {[ bracketright, braceright ]};
+    key <A1C> {[ backslash, bar ]};
+
+    key <A20> {[ a, A, adiaeresis, Adiaeresis ]};
+    key <A21> {[ s, S, ssharp, SSHARP ]};
+    key <A22> {[ d, D ]};
+    key <A23> {[ f, F ]};
+    key <A24> {[ g, G ]};
+    key <A25> {[ h, H ]};
+    key <A26> {[ j, J ]};
+    key <A27> {[ k, K ]};
+    key <A28> {[ l, L, sterling ]};
+    key <A29> {[ semicolon, colon ]};
+    key <A2A> {[ apostrophe, quotedbl, dead_acute, dead_diaeresis ]};
+
+    key <A30> {[ z, Z ]};
+    key <A31> {[ x, X ]};
+    key <A32> {[ c, C, copyright ]};
+    key <A33> {[ v, V ]};
+    key <A34> {[ b, B ]};
+    key <A35> {[ n, N ]};
+    key <A36> {[ m, M, mu ]};
+    key <A37> {[ comma, less, NoSymbol, guillemetleft ]};
+    key <A38> {[ period, greater, NoSymbol, guillemetright ]};
+    key <A39> {[ slash, question ]};
+
+    key.type = "ONE_LEVEL";
+    key <CLC> {[ Control_L ]};
+    key <CLM> {[ Super_L ]};
+    key <CLA> {[ Alt_L ]};
+    key <CLS> {[ Shift_L ]};
+    key <CLL> {[ Escape ]};
+    key <CLT> {[ Tab ]};
+    key <CRC> {[ Control_R ]};
+    key <CRM> {[ Super_R ]};
+    key <CRA> {[ Alt_R ]};
+    key <CRS> {[ Shift_R ]};
+    key <CRR> {[ Return ]};
+    key <CRB> {[ BackSpace ]};
+    key <CCS> {[ space ]};
+    key <CCM> {[ Menu ]};
+
+    key <CAU> {[ Up ]};
+    key <CAD> {[ Down ]};
+    key <CAL> {[ Left ]};
+    key <CAR> {[ Right ]};
+    key <CX1> {[ Delete ]};
+    key <CX2> {[ End ]};
+    key <CX3> {[ Next ]};
+    key <CX4> {[ Insert ]};
+    key <CX5> {[ Home ]};
+    key <CX6> {[ Prior ]};
+    key <CX7> {[ Print ]};
+    key <CX8> {[ Scroll_Lock ]};
+    key <CX9> {[ Pause ]};
+
+    key <FN0> {[ Escape ]};
+    key <FN1> {[ F1 ]};
+    key <FN2> {[ F2 ]};
+    key <FN3> {[ F3 ]};
+    key <FN4> {[ F4 ]};
+    key <FN5> {[ F5 ]};
+    key <FN6> {[ F6 ]};
+    key <FN7> {[ F7 ]};
+    key <FN8> {[ F8 ]};
+    key <FN9> {[ F9 ]};
+    key <FNA> {[ F10 ]};
+    key <FNB> {[ F11 ]};
+    key <FNC> {[ F12 ]};
+
+    key <KP0> {[ KP_0 ]};
+    key <KP1> {[ KP_1 ]};
+    key <KP2> {[ KP_2 ]};
+    key <KP3> {[ KP_3 ]};
+    key <KP4> {[ KP_4 ]};
+    key <KP5> {[ KP_5 ]};
+    key <KP6> {[ KP_6 ]};
+    key <KP7> {[ KP_7 ]};
+    key <KP8> {[ KP_8 ]};
+    key <KP9> {[ KP_9 ]};
+    key <KPA> {[ KP_Add ]};
+    key <KPB> {[ KP_Subtract ]};
+    key <KPC> {[ KP_Multiply ]};
+    key <KPD> {[ KP_Divide ]};
+    key <KPP> {[ KP_Decimal ]};
+    key <KPR> {[ KP_Enter ]};
+    key <KPL> {[ Num_Lock ]};
+
+    key <XMP> {[ XF86AudioPlay ]};
+    key <XMB> {[ XF86AudioPrev ]};
+    key <XMF> {[ XF86AudioNext ]};
+    key <XMM> {[ XF86AudioMute ]};
+    key <XML> {[ XF86AudioLowerVolume ]};
+    key <XMR> {[ XF86AudioRaiseVolume ]};
+  };
+};
+
+// vim: ft=xkb nospell

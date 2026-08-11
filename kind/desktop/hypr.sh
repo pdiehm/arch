@@ -10,6 +10,7 @@ persist -u .local/state/wireplumber
 
 package hyprland hyprpaper hyprlock hypridle hyprshot hyprpicker xdg-desktop-portal-hyprland adwaita-icon-theme
 symlink -u res/hypr .config/hypr
+symlink -u res/keyboard.xkb .local/share/keyboard.xkb
 symlink -u res/wallpaper.jpg .local/share/wallpaper.jpg
 
 package kitty rofi waybar mako brightnessctl playerctl libnotify
