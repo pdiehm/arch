@@ -341,7 +341,7 @@ conf() {
 
 # package <name> ...
 package() {
-  run pacman --noconfirm --sync --refresh --sysupgrade "$@"
+  run pacman --noconfirm --sync --refresh --sysupgrade --needed "$@"
 }
 
 # upgrade [-u] [command ...]
