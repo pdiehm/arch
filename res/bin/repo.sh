@@ -108,7 +108,7 @@ edit() {
   if [[ -d $path ]]; then
     cd "$path"
     exec "$EDITOR" .
-  elif [[ -e $path ]]; then
+  elif [[ -f $path ]]; then
     cd "$(dirname "$path")"
     exec "$EDITOR" "$(basename "$path")"
   else

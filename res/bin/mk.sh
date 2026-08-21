@@ -9,7 +9,7 @@ if [[ ! $SOURCE ]]; then
 elif [[ ! -f /home/pascal/.local/share/mk/$SOURCE ]]; then
   echo "Cannot make '$SOURCE'"
   exit 1
-elif [[ -f $TARGET ]]; then
+elif [[ -e $TARGET ]]; then
   echo "$TARGET already exists"
   exit 1
 else
