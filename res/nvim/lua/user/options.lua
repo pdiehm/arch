@@ -6,7 +6,7 @@ vim.o.tabstop = 2
 vim.o.shiftwidth = 2
 vim.o.softtabstop = 2
 vim.o.expandtab = true
-vim.o.smartindent = true
+vim.o.cindent = true
 
 vim.o.wrap = false
 vim.o.linebreak = true
@@ -22,6 +22,7 @@ vim.o.spell = true
 vim.opt.spelllang = { "en", "de" }
 
 vim.o.clipboard = "unnamedplus"
+vim.o.exrc = true
 vim.o.list = true
 vim.o.mouse = ""
 vim.o.pumheight = 8
