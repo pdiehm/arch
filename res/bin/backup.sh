@@ -2,7 +2,7 @@
 
 set -euo pipefail
 shopt -s nullglob dotglob globstar
-trap "rm -f /var/tmp/backup.sh" EXIT
+trap "rm -f /var/tmp/backup.tgz" EXIT
 
 if [[ -x /usr/local/lib/backup/pre.sh ]]; then
   bash -e /usr/local/lib/backup/pre.sh
