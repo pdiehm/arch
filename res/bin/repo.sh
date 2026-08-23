@@ -10,9 +10,8 @@ fatal() {
 }
 
 enter() {
-  local name="$1"
-  if [[ ! -d $name ]]; then fatal "No such repo: $name"; fi
-  cd "$name"
+  if [[ ! -d $1 ]]; then fatal "No such repo: $1"; fi
+  cd "$1"
 }
 
 conflict() {
@@ -39,8 +38,7 @@ git-head() {
 }
 
 git-is-local() {
-  local branch="$1"
-  if git rev-parse "$branch@{upstream}" &> /dev/null; then return 1; else return 0; fi
+  if git rev-parse "$1@{upstream}" &> /dev/null; then return 1; else return 0; fi
 }
 
 git-is-dirty() {
