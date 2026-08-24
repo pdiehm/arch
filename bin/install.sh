@@ -48,9 +48,9 @@ while true; do
 done
 
 if [[ $HOST_BOOT == efi ]]; then
-  CFG=("label: gpt" "size=1GiB, type=uefi, name=BOOT, bootable" "size=8GiB, type=swap, name=swap" "type=linux, name=root")
+  CFG=("label: gpt" "size=1GiB, type=uefi, name=BOOT, bootable" "type=linux, name=root")
 elif [[ $HOST_BOOT == bios ]]; then
-  CFG=("label: dos" "size=1GiB, type=0c, name=BOOT, bootable" "size=8GiB, type=swap, name=swap" "type=linux, name=root")
+  CFG=("label: dos" "size=1GiB, type=0c, name=BOOT, bootable" "type=linux, name=root")
 else
   fatal "Illegal boot method: $HOST_BOOT"
 fi
@@ -60,11 +60,9 @@ printf "%s\n" "${CFG[@]}" | sfdisk "$DISK"
 while [[ ! ${PARTS[1]:+x} ]]; do mapfile -t PARTS < <(lsblk --noheadings --paths --output KNAME "$DISK"); done
 
 PART_BOOT="${PARTS[1]}"
-PART_SWAP="${PARTS[2]}"
-PART_ROOT="${PARTS[3]}"
+PART_ROOT="${PARTS[2]}"
 
 until [[ -b $PART_BOOT ]]; do sleep 1; done
-until [[ -b $PART_SWAP ]]; do sleep 1; done
 until [[ -b $PART_ROOT ]]; do sleep 1; done
 
 if [[ $CRYPT ]]; then
@@ -74,11 +72,9 @@ if [[ $CRYPT ]]; then
 fi
 
 mkfs.fat -F 32 -n BOOT "$PART_BOOT"
-mkswap --label swap "$PART_SWAP"
 mkfs.btrfs --force --label root "$PART_ROOT"
 
 until [[ -b /dev/disk/by-label/BOOT ]]; do sleep 1; done
-until [[ -b /dev/disk/by-label/swap ]]; do sleep 1; done
 until [[ -b /dev/disk/by-label/root ]]; do sleep 1; done
 
 exec bin/build.sh "$HOST_NAME"

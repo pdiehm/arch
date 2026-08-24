@@ -1,10 +1,13 @@
 write -a /etc/fstab << EOF
-LABEL=root /                     btrfs subvol=root 0 1
-LABEL=swap none                  swap  defaults    0 0
-LABEL=BOOT /boot                 vfat  umask=077   0 2
-LABEL=root /keep                 btrfs subvol=keep 0 2
-LABEL=root /var/cache/pacman/pkg btrfs subvol=pkgs 0 2
+/dev/zram0 none                  swap  x-systemd.makefs 0 0
+LABEL=root /                     btrfs subvol=root      0 1
+LABEL=BOOT /boot                 vfat  umask=077        0 2
+LABEL=root /keep                 btrfs subvol=keep      0 2
+LABEL=root /var/cache/pacman/pkg btrfs subvol=pkgs      0 2
 EOF
+
+write /etc/modules-load.d/zram.conf "zram"
+copy res/udev/zram.rules /etc/udev/rules.d/99-zram.rules
 
 package "$HOST_KERNEL" linux-firmware
 copy res/initcpio/root/hook.sh /etc/initcpio/hooks/root
