@@ -126,8 +126,8 @@ secrets() {
   chmod 700 "$TMP"
   mkdir "$TMP/store"
 
-  if [[ -f secrets/master && -f /var/local/syscfg/master ]]; then
-    if ! load_secrets secrets/master "$TMP/store" "$(< /var/local/syscfg/master)"; then
+  if [[ -f secrets/master && -f /usr/local/lib/syscfg/master ]]; then
+    if ! load_secrets secrets/master "$TMP/store" "$(< /usr/local/lib/syscfg/master)"; then
       warn "Stale master key"
     fi
   fi
@@ -202,7 +202,7 @@ sync() {
 
 upgrade() {
   if ((UID)); then exec sudo "$0" upgrade; fi
-  overlay bash -eu /var/local/syscfg/upgrade.sh
+  overlay bash -eu /usr/local/lib/syscfg/upgrade.sh
 }
 
 if (($# == 0)); then

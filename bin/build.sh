@@ -361,11 +361,11 @@ upgrade() {
   local command="${*@Q}"
 
   if [[ ! $command ]]; then
-    write -ax /var/local/syscfg/upgrade.sh
+    write -ax /usr/local/lib/syscfg/upgrade.sh
   elif ((user)); then
-    write -ax /var/local/syscfg/upgrade.sh "sudo -u pascal env -C /home/pascal $command"
+    write -ax /usr/local/lib/syscfg/upgrade.sh "sudo -u pascal env -C /home/pascal $command"
   else
-    write -ax /var/local/syscfg/upgrade.sh "$command"
+    write -ax /usr/local/lib/syscfg/upgrade.sh "$command"
   fi
 }
 
@@ -489,8 +489,8 @@ timer() {
 mkdir "$TMP/secrets"
 if [[ ! -f secrets/$HOST_NAME ]]; then fatal "No secrets for host"; fi
 
-if [[ -f /var/local/syscfg/key ]]; then
-  if ! load_secrets "secrets/$HOST_NAME" "$TMP/secrets" "$(< /var/local/syscfg/key)"; then
+if [[ -f /usr/local/lib/syscfg/key ]]; then
+  if ! load_secrets "secrets/$HOST_NAME" "$TMP/secrets" "$(< /usr/local/lib/syscfg/key)"; then
     warn "Stale host key"
   fi
 fi
@@ -498,8 +498,8 @@ fi
 if [[ ! -f $TMP/secrets/keys/$HOST_NAME ]]; then
   mkdir "$TMP/master"
 
-  if [[ -f /var/local/syscfg/master ]]; then
-    if ! load_secrets secrets/master "$TMP/master" "$(< /var/local/syscfg/master)"; then
+  if [[ -f /usr/local/lib/syscfg/master ]]; then
+    if ! load_secrets secrets/master "$TMP/master" "$(< /usr/local/lib/syscfg/master)"; then
       warn "Stale master key"
     fi
   fi
