@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 FLAGS=("--new-session" "--die-with-parent" "--unshare-all" "--share-net")
-FLAGS+=("--dev" "/dev" "--proc" "/proc" "--tmpfs" "/tmp" "--bind" "$PWD" "$PWD")
+FLAGS+=("--dev" "/dev" "--proc" "/proc" "--tmpfs" "/tmp")
 
 for path in "/bin" "/etc" "/lib" "/lib64" "/sbin" "/usr" "/var"; do
   FLAGS+=("--ro-bind" "$path" "$path")
@@ -11,8 +11,5 @@ for path in "$(realpath /etc/resolv.conf)" "$XDG_RUNTIME_DIR/wayland-1" "/tmp/.X
   FLAGS+=("--ro-bind-try" "$path" "$path")
 done
 
-for path in ".ssh" ".local" ".cache" ".config/mozilla"; do
-  FLAGS+=("--tmpfs" "$HOME/$path")
-done
-
+if [[ $HOME != "$PWD"* ]]; then FLAGS+=("--bind" "$PWD" "$PWD"); fi
 exec bwrap "${FLAGS[@]}" "${@:-/usr/bin/bash}"
