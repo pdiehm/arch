@@ -159,7 +159,6 @@ xkb_keymap {
     interpret Shift_R { action = SetMods(modifiers = Shift); };
   };
 
-  // TODO: degree
   xkb_symbols {
     key.type = "FOUR_LEVEL";
     key <A00> {[ grave, asciitilde, dead_grave, dead_tilde ]};
@@ -219,7 +218,7 @@ xkb_keymap {
     key <CLA> {[ Alt_L ]};
     key <CLS> {[ Shift_L ]};
     key <CLL> {[ Escape ]};
-    key <CLT> {[ Tab ]};
+    key <CLT> {[ Tab, ISO_Left_Tab ], type = "TWO_LEVEL" };
     key <CRC> {[ Control_R ]};
     key <CRM> {[ Super_R ]};
     key <CRA> {[ Alt_R ]};
