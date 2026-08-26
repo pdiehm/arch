@@ -8,6 +8,7 @@ copy -um 444 res/gwenview.toml .config/gwenviewrc
 
 package firefox
 persist -u .config/mozilla/firefox
+symlink res/firefox.json /etc/firefox/policies/policies.json
 
 package aerc w3m
 symlink -u res/aerc .config/aerc
