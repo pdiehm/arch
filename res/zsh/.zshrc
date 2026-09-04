@@ -51,6 +51,7 @@ compdef '_arguments ":cmd:_command_names" "*::args:_normal"' bw
 compdef '_arguments ":cmd:_command_names" "*::args:_normal"' watch
 
 if [[ $HOSTKIND == desktop ]]; then
+  compdef _nothing genpw
   compdef _nothing wp-toggle
   compdef _mk mk
   compdef _mnt mnt

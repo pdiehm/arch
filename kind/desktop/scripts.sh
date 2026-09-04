@@ -12,4 +12,5 @@ package bubblewrap
 symlink -u res/bin/bwrap.sh .local/bin/bw
 
 symlink -u res/bin/bt-toggle.sh .local/bin/bt-toggle
+symlink -u res/bin/genpw.sh .local/bin/genpw
 symlink -u res/bin/wp-toggle.sh .local/bin/wp-toggle
