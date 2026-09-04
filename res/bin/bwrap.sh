@@ -11,5 +11,5 @@ for path in "$(realpath /etc/resolv.conf)" "$XDG_RUNTIME_DIR/wayland-1" "/tmp/.X
   FLAGS+=("--ro-bind-try" "$path" "$path")
 done
 
-if [[ $HOME != "$PWD"* ]]; then FLAGS+=("--bind" "$PWD" "$PWD"); fi
+if [[ $HOME != "$PWD"* ]]; then FLAGS+=("--bind" "$PWD" "$PWD" "--ro-bind-try" "$PWD/.git" "$PWD/.git"); fi
 exec bwrap "${FLAGS[@]}" "${@:-/usr/bin/bash}"
