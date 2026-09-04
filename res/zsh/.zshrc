@@ -118,6 +118,19 @@ ed() {
   fi
 }
 
+man() {
+  if (($#)); then
+    /usr/bin/man "$@"
+  else
+    local width="$((COLUMNS / 2))"
+
+    /usr/bin/man -k . |
+      sed -E "s/^(\S+) \((\S+)\).*/\1.\2/" |
+      fzf --preview "MANWIDTH='$width' man {} 2> /dev/null | bat --plain --language man --color always" --preview-window "$width" |
+      xargs -r /usr/bin/man
+  fi
+}
+
 mkcd() {
   mkdir -p "$1"
   cd "$1"
