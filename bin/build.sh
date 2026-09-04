@@ -385,21 +385,16 @@ upgrade() {
 # systemd [-iu] <unit> ...
 #   -i   install units
 #   -u   in user manager
-#
-# systemd [-ou] <unit> ...
-#   -o   override units
-#   -u   in user manager
 systemd() {
   local OPTIND OPTARG opt
-  local enable=0 disable=0 mask=0 install=0 override=0 user=0 target=""
+  local enable=0 disable=0 mask=0 install=0 user=0 target=""
 
-  while getopts "edmiout:" opt; do
+  while getopts "edmiut:" opt; do
     case "$opt" in
       e) enable=1 ;;
       d) disable=1 ;;
       m) mask=1 ;;
       i) install=1 ;;
-      o) override=1 ;;
       u) user=1 ;;
       t) target="$OPTARG" ;;
       *) error "Illegal option" ;;
@@ -409,7 +404,7 @@ systemd() {
   shift "$((OPTIND - 1))"
   local unit
 
-  if ((enable + disable + mask + install + override != 1)); then error "Exactly one of '-e', '-d', '-m', '-i' or '-o' is required"; fi
+  if ((enable + disable + mask + install != 1)); then error "Exactly one of '-e', '-d', '-m' or '-i' is required"; fi
   if [[ $target ]] && ((enable + user != 2)); then error "Option '-t' requires '-e' and '-u'"; fi
   target="${target:-default.target}"
 
@@ -442,12 +437,6 @@ systemd() {
       for unit; do copy -u "res/systemd/user/$unit" ".config/systemd/user/$unit"; done
     else
       for unit; do copy "res/systemd/system/$unit" "/etc/systemd/system/$unit"; done
-    fi
-  elif ((override)); then
-    if ((user)); then
-      for unit; do copy -u "res/systemd/override/$unit" ".config/systemd/user/$unit.d/override.conf"; done
-    else
-      for unit; do copy "res/systemd/override/$unit" "/etc/systemd/system/$unit.d/override.conf"; done
     fi
   fi
 }

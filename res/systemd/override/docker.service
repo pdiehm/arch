@@ -1,2 +1,0 @@
-[Service]
-ExecStop=/bin/sh -c "docker container ls --all --quiet | xargs --no-run-if-empty docker container rm --force"

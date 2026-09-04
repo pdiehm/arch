@@ -7,11 +7,11 @@ persist /var/lib/containerd
 timer docker-gc monthly /usr/bin/docker system prune --all --force --volumes
 
 if [[ $HOST_KIND == desktop ]]; then
-  systemd -o docker.service
   systemd -e docker.socket
+  write /etc/systemd/system/docker.service.d/prune.conf "[Service]" 'ExecStop=/bin/sh -c "docker container ls --all --quiet | xargs -r docker container rm --force"'
 elif [[ $HOST_KIND == server ]]; then
-  persist -u docker
   systemd -e docker.service
+  persist -u docker
 
   BACKUP+=("/home/pascal/docker/**/.env" "/var/lib/docker/volumes/*/")
   write -ax /usr/local/lib/backup/pre.sh "systemctl stop docker.service"
