@@ -1,6 +1,5 @@
 package pipewire pipewire-alsa pipewire-pulse wireplumber wiremix alsa-utils
 persist -u .local/state/wireplumber
-persist /var/lib/alsa
 
 package networkmanager nm-connection-editor
 systemd -e NetworkManager.service
