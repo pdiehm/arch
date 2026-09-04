@@ -9,4 +9,4 @@ SCRIPT+="s/^sshd-session:::(Accepted|Failed) publickey for (\S+) from (\S+) port
 SCRIPT+="s/^sshd-session:::Invalid user (\S+) from (\S+) port \w+$/[ssh] Invalid user \1 from \2/p;"
 SCRIPT+="s/^sshd-session:::User (\S+) from (\S+) not allowed because not listed in AllowUsers$/[ssh] Denied user \1 from \2/p;"
 
-journalctl --follow --no-tail | sed -Enu "$SCRIPT" | xargs -rn 1 ntfy
+journalctl --follow --no-tail | sed -Enu "$SCRIPT" | xargs -d "\n" -n 1 ntfy
