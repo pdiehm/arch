@@ -5,10 +5,7 @@ systemd -e greetd.service
 package fontconfig noto-fonts noto-fonts-extra noto-fonts-cjk noto-fonts-emoji ttf-cascadia-code-nerd
 symlink -u res/fontconfig.xml .config/fontconfig/fonts.conf
 
-package pipewire pipewire-alsa pipewire-pulse wireplumber wiremix alsa-utils
-persist -u .local/state/wireplumber
-
-package hyprland hyprpaper hyprlock hypridle hyprshot hyprpicker xdg-desktop-portal-hyprland adwaita-icon-theme
+package hyprland hyprpaper hyprlock hypridle hyprshot hyprpicker xdg-desktop-portal-hyprland
 symlink -u res/hypr .config/hypr
 symlink -u res/keyboard.xkb .local/share/keyboard.xkb
 symlink -u res/wallpaper.jpg .local/share/wallpaper.jpg

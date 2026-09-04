@@ -6,18 +6,11 @@ import ./locale
 import ./network
 import ./backup
 import ./docker
+import ./programs
 
-package zsh zsh-autosuggestions zsh-completions zsh-syntax-highlighting
-write -a /etc/zsh/zshenv 'ZDOTDIR="$HOME/.config/zsh"'
-run chsh --shell /usr/bin/zsh pascal
-symlink -u res/zsh .config/zsh
-
-package vim
-copy res/vimrc.vim /etc/vimrc
-write -a /etc/environment "EDITOR=vim"
-
-package git git-delta
-symlink -u res/git.conf .config/git/config
+write /etc/modules-load.d/zram.conf "zram"
+copy res/udev/zram.rules /etc/udev/rules.d/99-zram.rules
+write -a /etc/fstab "/dev/zram0 none swap x-systemd.makefs 0 0"
 
 package openssh
 copy res/ssh/sshd_config /etc/ssh/sshd_config
@@ -28,22 +21,10 @@ systemd -m sshdgenkeys.service
 systemd -e sshd.service
 TCP+=(1970)
 
-package man-db man-pages
-persist /var/cache/man
-
 package fwupd
 persist /var/lib/fwupd
 persist /var/cache/fwupd
 systemd -e fwupd-refresh.timer
-
-package htop
-copy -um 444 res/htop.conf .config/htop/htoprc
-
-package tmux
-symlink -u res/tmux.conf .config/tmux/tmux.conf
-
-copy -x res/bin/ntfy.sh /usr/local/bin/ntfy
-copy -sm 444 ntfy /usr/local/lib/ntfy/token
 
 systemd -e fstrim.timer
 systemd -d systemd-userdbd.socket

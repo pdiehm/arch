@@ -6,5 +6,4 @@ copy -x bin/manager.sh /usr/local/lib/syscfg/bin/manager.sh
 copy -x bin/lib.sh /usr/local/lib/syscfg/bin/lib.sh
 timer -n auto-upgrade "Sun 03:00" /bin/sh -c "/usr/local/lib/syscfg/bin/manager.sh upgrade && reboot"
 
-run sed -Ei "s/^pascal .*$/pascal ALL=(ALL:ALL) NOPASSWD: ALL/" /etc/sudoers
 systemd -e systemd-networkd.service

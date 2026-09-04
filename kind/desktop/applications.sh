@@ -1,4 +1,4 @@
-package xdg-utils archlinux-xdg-menu
+package xdg-utils archlinux-xdg-menu adwaita-icon-theme
 symlink -u res/mimeapps.list .config/mimeapps.list
 copy -um 444 res/user-places.xml .local/share/user-places.xbel
 

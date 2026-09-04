@@ -3,13 +3,13 @@
 COMMAND="$1"
 
 if [[ $COMMAND == power ]]; then
-  if [[ $(bluetoothctl show | sed -En "s/^\s*Powered: (\w+)$/\1/p") == no ]]; then
+  if [[ $(bluetoothctl show | sed -n "s/^\s*Powered: //p") == no ]]; then
     bluetoothctl power on
   else
     bluetoothctl power off
   fi
 elif [[ $COMMAND == discoverable ]]; then
-  if [[ $(bluetoothctl show | sed -En "s/^\s*Discoverable: (\w+)$/\1/p") == no ]]; then
+  if [[ $(bluetoothctl show | sed -n "s/^\s*Discoverable: //p") == no ]]; then
     bluetoothctl discoverable on
   else
     bluetoothctl discoverable off

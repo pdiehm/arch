@@ -1,5 +1,5 @@
 import ./network
-write -au .config/dropin/hyprland.lua 'hl.monitor({ output = "eDP-1", mode = "preferred", position = "auto", scale = 1.33 })'
+write -au .config/dropin/hyprland.lua 'hl.monitor({ output = "eDP-1", scale = 1.33 })'
 
 package tlp
 systemd -m systemd-rfkill.service systemd-rfkill.socket

@@ -140,7 +140,7 @@ if [[ $HOSTKIND == desktop ]]; then
     if (($#)); then
       tldr "$@"
     else
-      tldr --list | fzf --preview "tldr --color always {}" --preview-window 80% | xargs --no-run-if-empty tldr
+      tldr --list | fzf --preview "tldr --color always {}" --preview-window 80% | xargs -r tldr
     fi
   }
 elif [[ $HOSTKIND == server ]]; then
@@ -149,7 +149,7 @@ elif [[ $HOSTKIND == server ]]; then
       docker compose --file "$HOME/docker/$HOSTNAME/$1/compose.yaml" "${@:2}"
     else
       docker container ls --all --format $'\e[2m{{ .ID }}\e[m\x09\e[1;34m{{ .Names }}\e[m\x09\e[36mCreated {{ .RunningFor }}\e[m\x09{{ .Status }}' |
-        sed $'s/\x09Up .*$/\e[32m\\0\e[m/;s/\x09Exited .*$/\e[31m\\0\e[m/;s/\x09Created$/\e[33m\\0\e[m/' |
+        sed $'s/\x09Up .*/\e[32m\\0\e[m/; s/\x09Exited .*/\e[31m\\0\e[m/; s/\x09Created .*/\e[33m\\0\e[m/' |
         column --table --separator $'\x09'
     fi
   }
@@ -208,7 +208,7 @@ _prompt_git() {
     echo -n " %F{1}(merge)%f"
   elif [[ -f $git/REVERT_HEAD ]]; then
     echo -n " %F{1}(revert)%f"
-  elif [[ -f $git/REBASE_HEAD ]]; then
+  elif [[ -d $git/rebase-merge ]]; then
     local step="$(< "$git/rebase-merge/msgnum")"
     local total="$(< "$git/rebase-merge/end")"
     echo -n " %F{1}(rebase)%f %F{6}$step%F{8}/%F{6}$total%f"

@@ -1,4 +1,6 @@
-write /etc/hostname "$HOST_NAME"
+copy res/systemd/resolved.conf /etc/systemd/resolved.conf
+systemd -i resolvconf.service
+systemd -e systemd-resolved.service resolvconf.service
 
 write /etc/hosts << EOF
 127.0.0.1            localhost
@@ -17,19 +19,15 @@ pascal-pc     192.168.1.90 fd42:6c77:9a2f::1001
 pascal-laptop 192.168.1.91 fd42:6c77:9a2f::1002
 EOF
 
-copy res/systemd/resolved.conf /etc/systemd/resolved.conf
-systemd -i resolvconf.service
-systemd -e systemd-resolved.service resolvconf.service
-
 if ((DRY)); then
   TCP=(1234)
   UDP=(1234)
+else
+  var TCP "$(IFS=, && echo "${TCP[*]}")"
+  var UDP "$(IFS=, && echo "${UDP[*]}")"
+  copy -e res/nftables.conf /etc/nftables.conf
+  systemd -e nftables.service
 fi
-
-var TCP "$(IFS=, && echo "${TCP[*]}")"
-var UDP "$(IFS=, && echo "${UDP[*]}")"
-copy -e res/nftables.conf /etc/nftables.conf
-systemd -e nftables.service
 
 write /etc/sysctl.d/forwarding.conf << EOF
 net.ipv4.ip_forward = 1

@@ -10,8 +10,9 @@ fatal() {
 }
 
 enter() {
-  if [[ ! -d $1 ]]; then fatal "No such repo: $1"; fi
-  cd "$1"
+  if ! cd "$1" 2> /dev/null; then
+    fatal "No such repo: $1"
+  fi
 }
 
 conflict() {
@@ -38,7 +39,7 @@ git-head() {
 }
 
 git-is-local() {
-  if git rev-parse "$1@{upstream}" &> /dev/null; then return 1; else return 0; fi
+  ! git rev-parse "$1@{upstream}" &> /dev/null
 }
 
 git-is-dirty() {
@@ -52,10 +53,9 @@ git-branches() {
 }
 
 git-status() {
-  if git-is-dirty; then echo "change"; fi
+  if git-is-dirty; then echo "changes"; fi
   if [[ $(git stash list) ]]; then echo "stash"; fi
 
-  local branch
   git-branches | while read -r branch; do
     if git-is-local "$branch"; then
       echo "local 0 0 $branch"
@@ -79,7 +79,7 @@ help() {
   echo "  remove <name>           Remove repo"
   echo "  run <name> <cmd> ...    Run command in repo"
   echo "  shell <name> [path]     Open shell in repo"
-  echo "  status [name]           Print status of repo(s)"
+  echo "  status <name>           Print status of repo"
   echo "  update [name]           Update repo(s)"
 }
 
@@ -129,27 +129,25 @@ fetch() {
 list() {
   for repo in *; do
     cd "$repo"
+
+    local icon=""
     url="$(git-url)"
     head="$(git-head)"
 
-    if [[ $head == NULL ]]; then
-      printf "\e[1;34m%s \e[0;31m%s \e[0;2m%s\e[m\n" "$repo" "N/A" "$url"
-    elif [[ $head == HEAD ]]; then
-      printf "\e[1;34m%s \e[0;33m%s \e[0;2m%s\e[m\n" "$repo" "$(git rev-parse --short HEAD)" "$url"
-    else
-      local icon=""
+    while read -r type ahead behind _; do
+      case "$type" in
+        changes) icon="*" ;;
+        stash) if [[ ! $icon ]]; then icon="~"; fi ;;
+        local) if [[ $icon != "*" ]]; then icon="+"; fi ;;
+        branch) if [[ $icon != "*" ]] && ((ahead || behind)); then icon="+"; fi ;;
+      esac
+    done < <(git-status)
 
-      while read -r type ahead behind _; do
-        case "$type" in
-          change) icon="*" ;;
-          stash) if [[ ! $icon ]]; then icon="~"; fi ;;
-          local) if [[ $icon != "*" ]]; then icon="+"; fi ;;
-          branch) if [[ $icon != "*" ]] && ((ahead || behind)); then icon="+"; fi ;;
-        esac
-      done < <(git-status)
-
-      printf "\e[1;34m%s \e[0;32m%s\e[36m%s \e[0;2m%s\e[m\n" "$repo" "$head" "$icon" "$url"
-    fi
+    case "$head" in
+      NULL) printf "\e[1;34m%s \e[0;31m%s\e[36m%s \e[0;2m%s\e[m\n" "$repo" "N/A" "$icon" "$url" ;;
+      HEAD) printf "\e[1;34m%s \e[0;33m%s\e[36m%s \e[0;2m%s\e[m\n" "$repo" "$(git rev-parse --short HEAD)" "$icon" "$url" ;;
+      *) printf "\e[1;34m%s \e[0;32m%s\e[36m%s \e[0;2m%s\e[m\n" "$repo" "$head" "$icon" "$url" ;;
+    esac
 
     cd ..
   done | column --table
@@ -162,7 +160,7 @@ remove() {
   local changes=()
   while read -r type ahead behind branch; do
     case "$type" in
-      change) changes+=("Uncommited changes") ;;
+      changes) changes+=("Uncommited changes") ;;
       stash) changes+=("Stashed changes") ;;
       local) changes+=("Local branch ($branch)") ;;
       branch) if ((ahead)); then changes+=("Unpushed commits ($branch)"); fi ;;
@@ -175,7 +173,7 @@ remove() {
     echo
 
     read -rp "Are you sure you want to remove this repository? [y/N] "
-    if [[ $REPLY != y ]]; then exit 1; fi
+    if [[ $REPLY != y ]]; then return 1; fi
   fi
 
   cd ..
@@ -195,37 +193,21 @@ shell() {
   enter "$name"
 
   if [[ ! -d $path ]]; then fatal "No such directory: $path"; fi
-  cd "$path"
-
-  exec "$SHELL"
+  exec env -C "$path" "$SHELL"
 }
 
 status() {
-  local name="${1:-}"
-
-  if [[ ! $name ]]; then
-    local div=0
-
-    for name in *; do
-      if ((div)); then echo -e "\n\n"; fi
-      status "$name"
-      div=1
-    done
-
-    return
-  fi
+  local name="$1"
 
   enter "$name"
   url="$(git-url)"
   head="$(git-head)"
 
-  if [[ $head == NULL ]]; then
-    printf "\e[1mRepo: \e[34m%s \e[m(\e[31m%s\e[m, \e[2m%s\e[m)\n\n" "$name" "empty" "$url"
-  elif [[ $head == HEAD ]]; then
-    printf "\e[1mRepo: \e[34m%s \e[m(\e[33m%s\e[m, \e[2m%s\e[m)\n\n" "$name" "$(git rev-parse --short HEAD)" "$url"
-  else
-    printf "\e[1mRepo: \e[34m%s \e[m(\e[32m%s\e[m, \e[2m%s\e[m)\n\n" "$name" "$head" "$url"
-  fi
+  case "$head" in
+    NULL) printf "\e[1mRepo: \e[34m%s \e[m(\e[31m%s\e[m, \e[2m%s\e[m)\n" "$name" "empty" "$url" ;;
+    HEAD) printf "\e[1mRepo: \e[34m%s \e[m(\e[33m%s\e[m, \e[2m%s\e[m)\n\n" "$name" "$(git rev-parse --short HEAD)" "$url" ;;
+    *) printf "\e[1mRepo: \e[34m%s \e[m(\e[32m%s\e[m, \e[2m%s\e[m)\n\n" "$name" "$head" "$url" ;;
+  esac
 
   git-status | while read -r type ahead behind branch; do
     if [[ $branch ]]; then
@@ -238,8 +220,16 @@ status() {
     esac
   done | column --table --separator $'\x09'
 
-  if [[ $(git stash list) ]]; then echo && git stash list --oneline; fi
-  if git-is-dirty; then echo && git status --short; fi
+  if [[ $(git stash list) ]]; then
+    echo
+    git stash list --oneline
+  fi
+
+  if git-is-dirty; then
+    echo
+    git status --short
+  fi
+
   cd ..
 }
 
