@@ -17,5 +17,6 @@ CMAKE_GENERATOR="Ninja"
 CMAKE_EXPORT_COMPILE_COMMANDS="ON"
 EOF
 
+write -ux .local/bin/cargo "#!/bin/sh" "mkdir -p ~/.cargo" 'exec bw --bind ~/.cargo ~/.cargo cargo "$@"'
 write -ux .local/bin/npm "#!/bin/sh" "mkdir -p ~/.npm" 'exec bw --bind ~/.npm ~/.npm npm "$@"'
 write -ux .local/bin/npx "#!/bin/sh" "mkdir -p ~/.npm" 'exec bw --bind ~/.npm ~/.npm npx "$@"'
