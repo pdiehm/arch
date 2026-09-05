@@ -462,7 +462,7 @@ timer() {
 
   shift "$((OPTIND - 1))"
   local name="$1" time="$2" command="$3" args=("${@:4}")
-  local timer=("[Timer]" "OnCalendar=$time" "Persistent=true" "RandomizedDelaySec=10" "[Install]" "WantedBy=timers.target")
+  local timer=("[Timer]" "OnCalendar=$time" "Persistent=true" "[Install]" "WantedBy=timers.target")
 
   local service=("[Service]" "Type=oneshot")
   if ((network)); then service+=('ExecStartPre=/bin/sh -c "until ping -c 1 1.1.1.1; do sleep 1; done"'); fi
