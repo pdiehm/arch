@@ -127,7 +127,7 @@ run() {
   local command="${*@Q}"
   if ((DRY)); then return; fi
 
-  if ((user)); then command="sudo -u pascal env -C /home/pascal $command"; fi
+  if ((user)); then command="sudo -Eu pascal env -C /home/pascal $command"; fi
   echo "$command" >> "$TMP/stages/$STAGE/build.sh"
   sha <<< "$command" >> "$TMP/stages/$STAGE/hash"
 }
@@ -152,22 +152,22 @@ script() {
   run $user bash -eu "$path" "${args[@]}"
 }
 
-# write [-aeux] [-m mode] [-o owner] <path> [content ...]
+# write [-auvx] [-m mode] [-o owner] <path> [content ...]
 #   -a   append
-#   -e   substitute environment variables
 #   -u   as user in home directory
+#   -v   substitute variables
 #   -x   set executable
 #   -m   change mode
 #   -o   change owner
 write() {
   local OPTIND OPTARG opt
-  local append=0 env=0 user="" exec=0 mode="" owner=""
+  local append=0 user="" vars=0 exec=0 mode="" owner=""
 
-  while getopts "aeuxm:o:" opt; do
+  while getopts "auvxm:o:" opt; do
     case "$opt" in
       a) append=1 ;;
-      e) env=1 ;;
       u) user="-u" ;;
+      v) vars=1 ;;
       x) exec=1 ;;
       m) mode="$OPTARG" ;;
       o) owner="$OPTARG" ;;
@@ -182,31 +182,33 @@ write() {
   if ((${#lines[@]})); then file="$(printf "%s\n" "${lines[@]}" | use)"; else file="$(use)"; fi
 
   local cmd="mkdir -p ${dir@Q} && "
-  if ((env)); then cmd+="envsubst < ${file@Q} "; else cmd+="cat ${file@Q} "; fi
+  if ((vars)); then cmd+="sed \"\$VARS\" ${file@Q} "; else cmd+="cat ${file@Q} "; fi
   if ((append)); then cmd+=">> ${path@Q}"; else cmd+="> ${path@Q}"; fi
 
   if [[ $owner ]]; then cmd+=" && chown ${owner@Q} ${path@Q}"; fi
   if [[ $mode ]]; then cmd+=" && chmod ${mode@Q} ${path@Q}"; fi
   if ((exec)); then cmd+=" && chmod +x ${path@Q}"; fi
+
   run $user sh -c "$cmd"
+  if ((vars)); then run unset "VARS"; fi
 }
 
-# copy [-esux] [-m mode] [-o owner] <src> <dst>
-#   -e   substitute environment variables
+# copy [-suvx] [-m mode] [-o owner] <src> <dst>
 #   -s   interpret src as secret name
 #   -u   as user in home directory
+#   -v   substitute variables
 #   -x   set executable
 #   -m   change mode
 #   -o   change owner
 copy() {
   local OPTIND OPTARG opt
-  local env=0 secret=0 user="" exec=0 mode="" owner=""
+  local secret=0 user="" vars=0 exec=0 mode="" owner=""
 
-  while getopts "esuxm:o:" opt; do
+  while getopts "suvxm:o:" opt; do
     case "$opt" in
-      e) env=1 ;;
       s) secret=1 ;;
       u) user="-u" ;;
+      v) vars=1 ;;
       x) exec=1 ;;
       m) mode="$OPTARG" ;;
       o) owner="$OPTARG" ;;
@@ -222,12 +224,14 @@ copy() {
   dir="$(dirname "$dst")"
 
   local cmd="mkdir -p ${dir@Q} && "
-  if ((env)); then cmd+="envsubst < ${src@Q} > ${dst@Q}"; else cmd+="cp ${src@Q} ${dst@Q}"; fi
+  if ((vars)); then cmd+="sed \"\$VARS\" ${src@Q} > ${dst@Q}"; else cmd+="cp ${src@Q} ${dst@Q}"; fi
 
   if [[ $owner ]]; then cmd+=" && chown ${owner@Q} ${dst@Q}"; fi
   if [[ $mode ]]; then cmd+=" && chmod ${mode@Q} ${dst@Q}"; fi
   if ((exec)); then cmd+=" && chmod +x ${dst@Q}"; fi
+
   run $user sh -c "$cmd"
+  if ((vars)); then run unset "VARS"; fi
 }
 
 # symlink [-u] <src> <dst>
@@ -306,7 +310,7 @@ persist() {
 # var <name> <value>
 var() {
   local name="$1" value="$2"
-  run export "$name=$value"
+  run export "VARS+=s|@$name@|$value|g;"
 }
 
 # conf [-de] <path> <name> ...

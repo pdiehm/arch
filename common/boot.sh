@@ -7,7 +7,7 @@ run mkinitcpio --allpresets
 package limine "$HOST_CPU-ucode"
 var CPU "$HOST_CPU"
 var KERNEL "$HOST_KERNEL"
-copy -e res/limine.conf /boot/limine.conf
+copy -v res/limine.conf /boot/limine.conf
 
 if [[ $HOST_BOOT == efi ]]; then
   script <<< "mkdir -p /boot/EFI/BOOT && cp /usr/share/limine/BOOTX64.EFI /boot/EFI/BOOT"

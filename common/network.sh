@@ -25,7 +25,7 @@ if ((DRY)); then
 else
   var TCP "$(IFS=, && echo "${TCP[*]}")"
   var UDP "$(IFS=, && echo "${UDP[*]}")"
-  copy -e res/nftables.conf /etc/nftables.conf
+  copy -v res/nftables.conf /etc/nftables.conf
   systemd -e nftables.service
 fi
 
