@@ -13,5 +13,5 @@ elif [[ -e $TARGET ]]; then
   echo "$TARGET already exists"
   exit 1
 else
-  sed "s/@YEAR@/$(date "+%Y")/" "/home/pascal/.local/share/mk/$SOURCE" > "$TARGET"
+  sed "s/@YEAR@/$(date "+%Y")/g" "/home/pascal/.local/share/mk/$SOURCE" > "$TARGET"
 fi

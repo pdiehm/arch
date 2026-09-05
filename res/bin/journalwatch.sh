@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-SCRIPT="s/^\w+ \w+ \S+ \S+ ([^:[]+)[^:]*: (.+)$/\1:::\2/;"
+SCRIPT="s/^\w+ \w+ \S+ \S+ ([^:[]+)[^:]*: (.+)/\1:::\2/;"
 SCRIPT+="s/^systemd:::Startup finished in .+ = (.+)\.$/[systemd] Booted in \1/p;"
 SCRIPT+="s/^systemd:::(\S+): Failed with result '(.+)'\.$/[systemd] \1 failed: \2/p;"
 SCRIPT+="/^sudo:::\s*root : .*$/! s/^sudo:::\s+(\S+) : .* USER=(\S+) .* COMMAND=(.+)$/[sudo] \1 as \2: \3/p;"
