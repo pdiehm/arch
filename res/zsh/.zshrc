@@ -1,4 +1,4 @@
-# shellcheck disable=SC1094,SC2016,SC2034,SC2140,SC2154,SC2155,SC2164
+# shellcheck disable=SC1090,SC1094,SC2034,SC2140,SC2154,SC2155,SC2164
 
 PROMPT='%F{4}%~%f$(_prompt_git) %F{%(?.5.1)}$(_prompt_char)%f '
 RPROMPT='$(_prompt_host)'
@@ -47,20 +47,7 @@ compdef _files mkcd
 compdef _sm sm
 compdef _xh xhs
 compdef '_arguments ":cmd:_command_names" "*::args:_normal"' await
-compdef '_arguments ":cmd:_command_names" "*::args:_normal"' bw
 compdef '_arguments ":cmd:_command_names" "*::args:_normal"' watch
-
-if [[ $HOSTKIND == desktop ]]; then
-  compdef _nothing genpw
-  compdef _nothing wp-toggle
-  compdef _mk mk
-  compdef _mnt mnt
-  compdef _repo repo
-  compdef _tldr tl
-  compdef '_arguments ":cmd:(power discoverable)"' bt-toggle
-elif [[ $HOSTKIND == server ]]; then
-  compdef _service service
-fi
 
 alias dog="doggo"
 alias fd="fd --follow --hidden"
@@ -72,13 +59,6 @@ alias parallel="parallel --group --keep-order"
 alias rg="rg --follow --hidden --smart-case"
 alias tx="tmux new -As main"
 alias type="type -as"
-
-if [[ $HOSTKIND == desktop ]]; then
-  alias mktex='latexmk -cd -pdf -outdir="$PWD/build"'
-  alias open="xdg-open"
-  alias play="mpv --no-audio-display"
-  alias py="python3"
-fi
 
 await() {
   local pre="$(date "+%s%3N")"
@@ -119,19 +99,6 @@ ed() {
   fi
 }
 
-man() {
-  if (($#)); then
-    /usr/bin/man "$@"
-  else
-    local width="$((COLUMNS / 2))"
-
-    /usr/bin/man -k . |
-      sed -E "s/^(\S+) \((\S+)\).*/\1.\2/" |
-      fzf --preview "MANWIDTH='$width' man {} 2> /dev/null | bat --plain --language man --color always" --preview-window "$width" |
-      xargs -r /usr/bin/man
-  fi
-}
-
 mkcd() {
   mkdir -p "$1"
   cd "$1"
@@ -148,26 +115,6 @@ watch() (
     sleep 1
   done
 )
-
-if [[ $HOSTKIND == desktop ]]; then
-  tl() {
-    if (($#)); then
-      tldr "$@"
-    else
-      tldr --list | fzf --preview "tldr --color always {}" --preview-window 80% | xargs -r tldr
-    fi
-  }
-elif [[ $HOSTKIND == server ]]; then
-  service() {
-    if (($#)); then
-      docker compose --file "$HOME/docker/$HOSTNAME/$1/compose.yaml" "${@:2}"
-    else
-      docker container ls --all --format $'\e[2m{{ .ID }}\e[m\x09\e[1;34m{{ .Names }}\e[m\x09\e[36mCreated {{ .RunningFor }}\e[m\x09{{ .Status }}' |
-        sed $'s/\x09Up .*/\e[32m\\0\e[m/; s/\x09Exited .*/\e[31m\\0\e[m/; s/\x09Created .*/\e[33m\\0\e[m/' |
-        column --table --separator $'\x09'
-    fi
-  }
-fi
 
 _prompt_git() {
   if ! git rev-parse HEAD &> /dev/null; then
@@ -243,71 +190,6 @@ _prompt_host() {
   fi
 }
 
-_mk() {
-  if ((CURRENT == 2)); then
-    local cmp=(~/.local/share/mk/*)
-    compadd "${cmp[@]##*/}"
-  elif ((CURRENT == 3)); then
-    _files
-  fi
-}
-
-_mnt() {
-  if ((CURRENT == 2)); then
-    local cmp=("tmpfs" "android" /dev/{sd,hd,md,vd,sr,nvme,loop}* /dev/disk/by-label/* /dev/disk/by-partlabel/*)
-    compadd "${cmp[@]##*/}"
-    compadd -S "" "ssh://"
-    _files
-  fi
-}
-
-_repo() {
-  local repos=(~/Repos/*)
-  repos=("${repos[@]##*/}")
-
-  if ((CURRENT == 2)); then
-    compadd help clone edit fetch list remove run shell status update
-  elif [[ ${words[2]} == edit ]]; then
-    if ((CURRENT == 3)); then
-      compadd "${repos[@]}"
-    elif ((CURRENT == 4)); then
-      _files -W "$HOME/Repos/${words[3]}"
-    fi
-  elif [[ ${words[2]} == fetch ]]; then
-    if ((CURRENT == 3)); then compadd "${repos[@]}"; fi
-  elif [[ ${words[2]} == remove ]]; then
-    if ((CURRENT == 3)); then compadd "${repos[@]}"; fi
-  elif [[ ${words[2]} == run ]]; then
-    if ((CURRENT == 3)); then
-      compadd "${repos[@]}"
-    else
-      compset -n 4
-      _normal
-    fi
-  elif [[ ${words[2]} == shell ]]; then
-    if ((CURRENT == 3)); then
-      compadd "${repos[@]}"
-    elif ((CURRENT == 4)); then
-      _files -/ -W "$HOME/Repos/${words[3]}"
-    fi
-  elif [[ ${words[2]} == status ]]; then
-    if ((CURRENT == 3)); then compadd "${repos[@]}"; fi
-  elif [[ ${words[2]} == update ]]; then
-    if ((CURRENT == 3)); then compadd "${repos[@]}"; fi
-  fi
-}
-
-_service() {
-  if ((CURRENT == 2)); then
-    local cmp=("$HOME/docker/$HOSTNAME"/*)
-    compadd "${cmp[@]##*/}"
-  elif [[ -f $HOME/docker/$HOSTNAME/${words[2]}/compose.yaml ]]; then
-    words=("docker" "compose" "--file" "$HOME/docker/$HOSTNAME/${words[2]}/compose.yaml" "${words[3,-1]}")
-    CURRENT="$((CURRENT + 2))"
-    _docker
-  fi
-}
-
 _sm() {
   if ((CURRENT == 2)); then
     compadd help edit fix rebuild secrets sync upgrade
@@ -320,12 +202,6 @@ _sm() {
   fi
 }
 
-if [[ ${KITTY_INSTALLATION_DIR:+x} ]]; then
-  export KITTY_SHELL_INTEGRATION="enabled"
-  autoload -Uz "$KITTY_INSTALLATION_DIR/shell-integration/zsh/kitty-integration"
-  kitty-integration
-  unfunction kitty-integration
-fi
-
+source "$HOME/.config/zsh/$HOSTKIND.zsh"
 source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
