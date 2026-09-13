@@ -2,7 +2,7 @@
 What=bowser:shared
 Where=%h/Shared
 Type=sshfs
-Options=_netdev,user,reconnect,delay_connect,idmap=user,ControlMaster=no,ConnectTimeout=5,ServerAliveInterval=5
+Options=_netdev,user,delay_connect,reconnect,idmap=user,ConnectTimeout=5,ServerAliveInterval=5,ControlPath=none
 
 [Install]
 WantedBy=default.target
