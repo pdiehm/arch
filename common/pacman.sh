@@ -7,6 +7,8 @@ run pacman-key --lsign-key "FE3A61A8A1C70F006D5718250AAB0BC4ED614894"
 write -a /etc/pacman.conf "[aur]" "Server = https://pdiehm.github.io/aur"
 
 run pacman --files --refresh
+package arch-install-scripts btrfs-progs cryptsetup sudo git
+
 upgrade pacman --noconfirm --sync --refresh --sysupgrade
 upgrade pacman --files --refresh
 timer pacman-gc monthly /usr/bin/pacman --noconfirm --sync --clean

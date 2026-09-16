@@ -538,14 +538,7 @@ if [[ -d $TMP/root/build ]]; then btrfs subvolume delete --recursive "$TMP/root/
 
 if [[ ${SM_CLEAN:+x} || ! -d $TMP/root/imgs/$HASH ]]; then
   btrfs subvolume create "$TMP/root/build"
-  mount --bind "$TMP/root/build" "$TMP/root/build"
-  mount --mkdir --bind "$TMP/root/pkgs" "$TMP/root/build/var/cache/pacman/pkg"
-
-  pacstrap -G "$TMP/root/build" base arch-install-scripts btrfs-progs cryptsetup sudo git
-  arch-chroot "$TMP/root/build" sh -c "pacman-key --init && pacman-key --populate"
-  arch-chroot "$TMP/root/build" useradd --create-home --skel /var/empty --uid 1000 pascal
-  arch-chroot "$TMP/root/build" mkdir -m 1777 /keep
-  unmount "$TMP/root/build"
+  pacstrap -Kc "$TMP/root/build"
 
   if [[ -d $TMP/root/imgs/$HASH ]]; then btrfs subvolume delete --recursive "$TMP/root/imgs/$HASH"; fi
   mv "$TMP/root/build" "$TMP/root/imgs/$HASH"

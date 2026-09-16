@@ -1,3 +1,4 @@
+run useradd --create-home --skel /var/empty --uid 1000 pascal
 run usermod --password "$(secret password)" pascal
 run usermod --append --groups wheel pascal
 

@@ -1,4 +1,6 @@
 write /etc/hostname "$HOST_NAME"
+run mkdir -m 1777 /keep
+
 copy -s "keys/$HOST_NAME" /usr/local/lib/syscfg/key
 if secret -q keys/master; then copy -s keys/master /usr/local/lib/syscfg/master; fi
 
