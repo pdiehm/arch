@@ -1,4 +1,5 @@
 compdef _nothing genpw
+compdef _nothing help
 compdef _nothing wp-toggle
 compdef _mk mk
 compdef _mnt mnt
@@ -11,6 +12,10 @@ alias mktex='latexmk -cd -pdf -outdir="$PWD/build"'
 alias open="xdg-open"
 alias play="mpv --no-audio-display"
 alias py="python3"
+
+help() {
+  bash -c "help $*"
+}
 
 man() {
   if (($#)); then
