@@ -18,8 +18,8 @@ hl.config({
   },
 
   decoration = {
-    rounding = 10,
     dim_special = 0.5,
+    rounding = 10,
   },
 
   dwindle = {
@@ -27,8 +27,8 @@ hl.config({
   },
 
   ecosystem = {
-    no_update_news = true,
     no_donation_nag = true,
+    no_update_news = true,
   },
 
   general = {
@@ -46,7 +46,6 @@ hl.config({
 
   input = {
     kb_file = "~/.local/share/keyboard.xkb",
-    numlock_by_default = true,
     repeat_delay = 200,
   },
 
@@ -54,6 +53,7 @@ hl.config({
     disable_splash_rendering = true,
     enable_anr_dialog = false,
     key_press_enables_dpms = true,
+    middle_click_paste = false,
     mouse_move_enables_dpms = true,
   },
 })
