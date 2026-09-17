@@ -17,7 +17,7 @@ SYLLABLES=(
 )
 
 HELP=0
-ENTROPY=256
+ENTROPY=270
 WORDLEN=3
 
 while getopts "he:w:" opt; do
