@@ -13,12 +13,8 @@ if ! ping -c 1 1.1.1.1 &> /dev/null; then
 fi
 
 if [[ ! -f bin/lib.sh ]]; then
-  TMP="$(mktemp -d)"
-  pacman --noconfirm --sync --refresh --needed git
-  git clone --depth 1 https://github.com/pdiehm/arch.git "$TMP"
-
-  cd "$TMP"
-  exec bin/install.sh < /dev/tty
+  curl -fsSL https://github.com/pdiehm/arch/archive/refs/heads/main.tar.gz | tar xz
+  exec env -C arch-main bin/install.sh < /dev/tty
 fi
 
 source bin/lib.sh

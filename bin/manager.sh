@@ -61,7 +61,7 @@ fix() {
 }
 
 rebuild() {
-  local OPTIND opt
+  local OPTIND OPTARG opt
   local help=0 break=0 clean=0 dry=0
 
   while getopts "hbcn" opt; do
@@ -99,7 +99,7 @@ rebuild() {
 }
 
 secrets() {
-  local OPTIND opt
+  local OPTIND OPTARG opt
   local help=0 rotate=0
 
   while getopts "hr" opt; do
@@ -194,10 +194,11 @@ secrets() {
 sync() {
   git pull
   ahead="$(git rev-list --count "@{upstream}..")"
-  if ((ahead == 0)); then return; fi
 
-  read -rp "Push local commits? [y/N] "
-  if [[ $REPLY == y ]]; then git push; fi
+  if ((ahead)); then
+    read -rp "Push local commits? [y/N] "
+    if [[ $REPLY == y ]]; then git push; fi
+  fi
 }
 
 upgrade() {

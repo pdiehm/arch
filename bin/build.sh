@@ -86,7 +86,7 @@ use() {
 #   -f   return path to file
 #   -q   query secret existence
 secret() {
-  local OPTIND opt
+  local OPTIND OPTARG opt
   local file=0 query=0
 
   while getopts "fq" opt; do
@@ -113,7 +113,7 @@ secret() {
 # run [-u] <command> ...
 #   -u   as user in home directory
 run() {
-  local OPTIND opt
+  local OPTIND OPTARG opt
   local user=0
 
   while getopts "u" opt; do
@@ -135,7 +135,7 @@ run() {
 # script [-u] [path [args ...]]
 #   -u   as user in home directory
 script() {
-  local OPTIND opt
+  local OPTIND OPTARG opt
   local user=""
 
   while getopts "u" opt; do
@@ -176,21 +176,18 @@ write() {
   done
 
   shift "$((OPTIND - 1))"
-  local path="$1" lines=("${@:2}") dir file
+  local path="$1" lines=("${@:2}") src cmd
 
-  dir="$(dirname "$path")"
-  if ((${#lines[@]})); then file="$(printf "%s\n" "${lines[@]}" | use)"; else file="$(use)"; fi
+  if ((${#lines[@]})); then src="$(printf "%s\n" "${lines[@]}" | use)"; else src="$(use)"; fi
+  if ((vars)); then cmd="sed \"\$VARS\" ${src@Q}"; else cmd="cat ${src@Q}"; fi
+  if ((append)); then cmd+=" >> ${path@Q}"; else cmd+=" > ${path@Q}"; fi
 
-  local cmd="mkdir -p ${dir@Q} && "
-  if ((vars)); then cmd+="sed \"\$VARS\" ${file@Q} "; else cmd+="cat ${file@Q} "; fi
-  if ((append)); then cmd+=">> ${path@Q}"; else cmd+="> ${path@Q}"; fi
-
-  if [[ $owner ]]; then cmd+=" && chown ${owner@Q} ${path@Q}"; fi
-  if [[ $mode ]]; then cmd+=" && chmod ${mode@Q} ${path@Q}"; fi
-  if ((exec)); then cmd+=" && chmod +x ${path@Q}"; fi
-
+  run $user mkdir -p "$(dirname "$path")"
   run $user sh -c "$cmd"
-  if ((vars)); then run unset "VARS"; fi
+  if [[ $owner ]]; then run $user chown "$owner" "$path"; fi
+  if [[ $mode ]]; then run $user chmod "$mode" "$path"; fi
+  if ((exec)); then run $user chmod +x "$path"; fi
+  if ((vars)); then run unset VARS; fi
 }
 
 # copy [-suvx] [-m mode] [-o owner] <src> <dst>
@@ -217,27 +214,27 @@ copy() {
   done
 
   shift "$((OPTIND - 1))"
-  local src="$1" dst="$2" dir
-  if ((secret)); then mode="${mode:-400}"; fi
+  local src="$1" dst="$2"
 
-  if ((secret)); then src="$(secret -f "$src")"; else src="$(use "$src")"; fi
-  dir="$(dirname "$dst")"
+  if ((secret)); then
+    mode="${mode:-400}"
+    src="$(secret -f "$src")"
+  else
+    src="$(use "$src")"
+  fi
 
-  local cmd="mkdir -p ${dir@Q} && "
-  if ((vars)); then cmd+="sed \"\$VARS\" ${src@Q} > ${dst@Q}"; else cmd+="cp ${src@Q} ${dst@Q}"; fi
-
-  if [[ $owner ]]; then cmd+=" && chown ${owner@Q} ${dst@Q}"; fi
-  if [[ $mode ]]; then cmd+=" && chmod ${mode@Q} ${dst@Q}"; fi
-  if ((exec)); then cmd+=" && chmod +x ${dst@Q}"; fi
-
-  run $user sh -c "$cmd"
-  if ((vars)); then run unset "VARS"; fi
+  run $user mkdir -p "$(dirname "$dst")"
+  if ((vars)); then run $user sh -c "sed \"\$VARS\" ${src@Q} > ${dst@Q}"; else run $user cp "$src" "$dst"; fi
+  if [[ $owner ]]; then run $user chown "$owner" "$dst"; fi
+  if [[ $mode ]]; then run $user chmod "$mode" "$dst"; fi
+  if ((exec)); then run $user chmod +x "$dst"; fi
+  if ((vars)); then run unset VARS; fi
 }
 
 # symlink [-u] <src> <dst>
 #   -u   as user in home directory
 symlink() {
-  local OPTIND opt
+  local OPTIND OPTARG opt
   local user=""
 
   while getopts "u" opt; do
@@ -248,17 +245,12 @@ symlink() {
   done
 
   shift "$((OPTIND - 1))"
-  local src="$1" dst="$2" dir
-  dir="$(dirname "$dst")"
+  local src="$1" dst="$2"
+  if [[ $src != /* ]]; then src="/home/pascal/.config/syscfg/$(resolve "$src")"; fi
 
-  if [[ $src != /* ]]; then
-    src="$(realpath -e "$(resolve "$src")")"
-    src="${src/#$PWD//home/pascal/.config/syscfg}"
-  fi
-
-  local cmd="if [[ -e ${dst@Q} ]]; then echo 'Cannot create symlink' ${dst@Q} '- File exists' >&2; exit 1; fi && "
-  cmd+="mkdir -p ${dir@Q} && ln -s ${src@Q} ${dst@Q}"
-  run $user sh -c "$cmd"
+  run $user sh -c "if [[ -e ${dst@Q} ]]; then echo 'Cannot create symlink' ${dst@Q} '- File exists' >&2; exit 1; fi"
+  run $user mkdir -p "$(dirname "$dst")"
+  run $user ln -s "$src" "$dst"
 }
 
 # persist [-fu] [-m mode] <path>
@@ -279,7 +271,7 @@ persist() {
   done
 
   shift "$((OPTIND - 1))"
-  local path="$1" dir target
+  local path="$1"
   if [[ $path =~ ([[:space:]]|\\) ]]; then error "Invalid path: $path"; fi
 
   if [[ $path != /* ]]; then
@@ -290,20 +282,15 @@ persist() {
     fi
   fi
 
-  dir="$(dirname "$path")"
-  target="${path//[^a-zA-Z0-9.-]/_}"
+  local target="${path//[^a-zA-Z0-9.-]/_}"
   target="/keep/${target:1}"
 
-  local cmd="if [[ -e ${target@Q} ]]; then echo 'Cannot persist' ${path@Q} '- Already persisted' >&2; exit 1; fi && "
-  cmd+="if [[ -e ${path@Q} ]]; then mv ${path@Q} ${target@Q}; else mkdir -p ${dir@Q}; fi && "
-  if ((file)); then cmd+="touch ${path@Q}"; else cmd+="mkdir ${path@Q}"; fi
+  run $user sh -c "if [[ -e ${target@Q} ]]; then echo 'Cannot persist' ${path@Q} '- Already persisted' >&2; exit 1; fi"
+  run $user sh -c "if [[ -e ${path@Q} ]]; then mv ${path@Q} ${target@Q}; fi"
+  run $user mkdir -p "$(dirname "$path")"
 
-  cmd+=" && if [[ ! -e ${target@Q} ]]; then "
-  if ((file)); then cmd+="touch ${target@Q}; "; else cmd+="mkdir ${target@Q}; "; fi
-  if [[ $mode ]]; then cmd+="chmod ${mode@Q} ${target@Q}; "; fi
-  cmd+="fi"
-
-  run $user sh -c "$cmd"
+  if ((file)); then run $user touch "$path" "$target"; else run $user mkdir -p "$path" "$target"; fi
+  if [[ $mode ]]; then run $user chmod "$mode" "$target"; fi
   write -a /etc/fstab "$target $path none bind 0 0"
 }
 
@@ -317,7 +304,7 @@ var() {
 #   -d   disable options
 #   -e   enable options
 conf() {
-  local OPTIND opt
+  local OPTIND OPTARG opt
   local disable=0 enable=0
 
   while getopts "de" opt; do
@@ -334,11 +321,11 @@ conf() {
 
   for name in "${names[@]}"; do
     if ((disable)); then
-      run sed -Ei "s|^#?($name)\b|#\1|" "$path"
+      run sed -Ei "s|^#?\s*($name)\b|#\1|" "$path"
     elif ((enable)); then
-      run sed -Ei "s|^#?($name)\b|\1|" "$path"
+      run sed -Ei "s|^#?\s*($name)\b|\1|" "$path"
     else
-      run sed -Ei "s|^#?${name%%=*}\s*=.*|$name|" "$path"
+      run sed -Ei "s|^#?\s*${name%%=*}\s*=.*|$name|" "$path"
     fi
   done
 }
@@ -351,7 +338,7 @@ package() {
 # upgrade [-u] [command ...]
 #   -u   as user in home directory
 upgrade() {
-  local OPTIND opt
+  local OPTIND OPTARG opt
   local user=0
 
   while getopts "u" opt; do
@@ -449,7 +436,7 @@ systemd() {
 #   -n   wait for network
 #   -u   in user manager
 timer() {
-  local OPTIND opt
+  local OPTIND OPTARG opt
   local network=0 user=0
 
   while getopts "nu" opt; do
@@ -462,7 +449,7 @@ timer() {
 
   shift "$((OPTIND - 1))"
   local name="$1" time="$2" command="$3" args=("${@:4}")
-  local timer=("[Timer]" "OnCalendar=$time" "Persistent=true" "[Install]" "WantedBy=timers.target")
+  local timer=("[Timer]" "OnCalendar=$time" "Persistent=true" "" "[Install]" "WantedBy=timers.target")
 
   local service=("[Service]" "Type=oneshot")
   if ((network)); then service+=('ExecStartPre=/bin/sh -c "until ping -c 1 1.1.1.1; do sleep 1; done"'); fi
@@ -538,7 +525,7 @@ if [[ -d $TMP/root/build ]]; then btrfs subvolume delete --recursive "$TMP/root/
 
 if [[ ${SM_CLEAN:+x} || ! -d $TMP/root/imgs/$HASH ]]; then
   btrfs subvolume create "$TMP/root/build"
-  pacstrap -Kc "$TMP/root/build"
+  pacstrap -Gc "$TMP/root/build"
 
   if [[ -d $TMP/root/imgs/$HASH ]]; then btrfs subvolume delete --recursive "$TMP/root/imgs/$HASH"; fi
   mv "$TMP/root/build" "$TMP/root/imgs/$HASH"
