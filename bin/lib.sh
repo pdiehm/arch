@@ -9,11 +9,6 @@ warn() {
   echo -e "[\e[33mWARNING\e[m] $*" >&2
 }
 
-# info <message> ...
-info() {
-  echo -e "[\e[36mINFO\e[m] $*"
-}
-
 # sha [data ...]
 sha() {
   if (($#)); then

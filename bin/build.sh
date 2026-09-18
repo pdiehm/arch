@@ -51,7 +51,7 @@ import() {
     if [[ ! -f $mod ]]; then continue; fi
     if [[ -f $TMP/stages/$STAGE/build.sh ]]; then mkdir "$TMP/stages/$((++STAGE))"; fi
 
-    if ((DRY)); then info "Loading module $mod"; else info "Evaluating module $mod"; fi
+    if ((DRY)); then echo "Loading module $mod"; else echo "Evaluating module $mod"; fi
     echo "$mod" > "$TMP/stages/$STAGE/module"
 
     # shellcheck disable=SC1090
