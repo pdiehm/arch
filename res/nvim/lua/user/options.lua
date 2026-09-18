@@ -23,6 +23,7 @@ vim.opt.spelllang = { "en", "de" }
 
 vim.o.clipboard = "unnamedplus"
 vim.o.exrc = true
+vim.o.gdefault = true
 vim.o.list = true
 vim.o.mouse = ""
 vim.o.pumheight = 8
