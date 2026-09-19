@@ -1,5 +1,4 @@
 compdef _nothing genpw
-compdef _nothing help
 compdef _nothing wp-toggle
 compdef _mk mk
 compdef _mnt mnt
@@ -8,14 +7,11 @@ compdef _tldr tl
 compdef '_arguments ":cmd:(power discoverable)"' bt-toggle
 compdef '_arguments ":cmd:_command_names" "*::args:_normal"' bw
 
+alias help='bash -c "help \$0"'
 alias mktex='latexmk -cd -pdf -outdir="$PWD/build"'
 alias open="xdg-open"
 alias play="mpv --no-audio-display"
 alias py="python3"
-
-help() {
-  bash -c "help $*"
-}
 
 man() {
   if (($#)); then
