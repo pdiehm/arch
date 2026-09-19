@@ -12,7 +12,7 @@ if ((UID)); then fatal "Not root"; fi
 if (($# != 1)); then fatal "Usage: build.sh <host>"; fi
 if ! load_host "$1"; then fatal "Unknown host: $1"; fi
 
-trap 'unmount "$TMP/root"; unmount "$TMP/boot"; rm -rf --one-file-system "$TMP"' EXIT
+trap 'printf "\e[s\e[r\e[u"; unmount "$TMP/root"; unmount "$TMP/boot"; rm -rf --one-file-system "$TMP"' EXIT
 TMP="$(mktemp -d)"
 chmod 700 "$TMP"
 
@@ -516,11 +516,9 @@ if [[ ${SM_BREAK:+x} ]]; then
   fi
 fi
 
-read -r LINES COLUMNS < <(stty size)
-printf "\e[0;%dr\e[H\e[J" "$((LINES - 1))"
-printf "\e[s\e[%d;0H\e[KBuilding system...\e[u" "$LINES"
-
 HASH="$(sha base)"
+printf "\e[s\e[2r\e[H\e[K\e[1mBuilding system...\e[m\e[u\n"
+
 mount --mkdir --label root "$TMP/root"
 if [[ -d $TMP/root/imgs/$HASH ]]; then touch "$TMP/root/imgs/$HASH"; fi
 
@@ -531,7 +529,7 @@ if [[ ! -d $TMP/root/pkgs ]]; then btrfs subvolume create "$TMP/root/pkgs"; fi
 if [[ -d $TMP/root/build ]]; then btrfs subvolume delete --recursive "$TMP/root/build"; fi
 
 if [[ ${SM_CLEAN:+x} || ! -d $TMP/root/imgs/$HASH ]]; then
-  printf "\e[s\e[%d;0H\e[KInstalling base system...\e[u" "$LINES"
+  printf "\e[s\e[H\e[K\e[1mInstalling base system...\e[m\e[u"
   btrfs subvolume create "$TMP/root/build"
   pacstrap -Gc "$TMP/root/build"
 
@@ -544,7 +542,7 @@ for ((stage = 0; stage < STAGE; stage++)); do
   hash="$(sha "$HASH+$hash")"
 
   if [[ ${SM_CLEAN:+x} || ! -d $TMP/root/imgs/$hash ]]; then
-    printf "\e[s\e[%d;0H\e[KStage %d of %d: %s\e[u" "$LINES" "$((stage + 1))" "$STAGE" "$(< "$TMP/stages/$stage/module")"
+    printf "\e[s\e[H\e[K\e[1mStage %d of %d: %s\e[m\e[u" "$((stage + 1))" "$STAGE" "$(< "$TMP/stages/$stage/module")"
     btrfs subvolume snapshot "$TMP/root/imgs/$HASH" "$TMP/root/build"
     mount --bind "$TMP/root/build" "$TMP/root/build"
     mount --bind "$TMP/root/pkgs" "$TMP/root/build/var/cache/pacman/pkg"
@@ -562,8 +560,7 @@ for ((stage = 0; stage < STAGE; stage++)); do
   touch "$TMP/root/imgs/$HASH"
 done
 
-printf "\e[s\e[%d;0H\e[K\e[u" "$LINES"
-printf "\e[s\e[0;%dr\e[u" "$LINES"
+printf "\e[s\e[H\e[K\e[1mDone!\e[m\e[r\e[u"
 
 if [[ ${SM_DRY:+x} ]]; then
   btrfs subvolume snapshot "$TMP/root/imgs/$HASH" "$TMP/root/build"
