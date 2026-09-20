@@ -1,4 +1,4 @@
-package pipewire pipewire-alsa pipewire-pulse wireplumber wiremix alsa-utils
+package pipewire pipewire-alsa pipewire-pulse wireplumber wiremix alsa-utils rtkit
 persist -u .local/state/wireplumber
 
 package networkmanager nm-connection-editor
