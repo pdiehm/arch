@@ -16,5 +16,4 @@ ExecStartPost=/usr/bin/ssh-add "%h/.ssh/github"
 EOF
 
 package sshfs
-systemd -iu home-pascal-Shared.mount
-systemd -eu home-pascal-Shared.mount
+systemd -ieu home-pascal-Shared.mount

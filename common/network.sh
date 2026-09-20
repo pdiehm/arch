@@ -1,6 +1,6 @@
 copy res/systemd/resolved.conf /etc/systemd/resolved.conf
-systemd -i resolvconf.service
-systemd -e systemd-resolved.service resolvconf.service
+systemd -e systemd-resolved.service
+systemd -ie resolvconf.service
 
 write /etc/hosts << EOF
 127.0.0.1            localhost

@@ -1,6 +1,5 @@
 copy -x res/bin/journalwatch.sh /usr/local/lib/journalwatch/journalwatch.sh
-systemd -i journalwatch.service
-systemd -e journalwatch.service
+systemd -ie journalwatch.service
 
 copy -x bin/manager.sh /usr/local/lib/syscfg/bin/manager.sh
 copy -x bin/lib.sh /usr/local/lib/syscfg/bin/lib.sh

@@ -399,7 +399,7 @@ systemd() {
   shift "$((OPTIND - 1))"
   local unit
 
-  if ((enable + disable + mask + install != 1)); then error "Exactly one of '-e', '-d', '-m' or '-i' is required"; fi
+  if ((enable + disable + mask + install != 1 + (enable && install))); then error "Exactly one of '-e', '-d', '-m', '-i' or '-ie' is required"; fi
   if [[ $target ]] && ((enable + user != 2)); then error "Option '-t' requires '-e' and '-u'"; fi
   target="${target:-default.target}"
 
@@ -409,10 +409,12 @@ systemd() {
         if [[ $unit == /* ]]; then
           symlink -u "$unit" ".config/systemd/user/$target.wants/${unit##*/}"
         else
+          if ((install)); then systemd -iu "$unit"; fi
           symlink -u "/home/pascal/.config/systemd/user/$unit" ".config/systemd/user/$target.wants/$unit"
         fi
       done
     else
+      if ((install)); then systemd -i "$@"; fi
       run systemctl enable "$@"
     fi
   elif ((disable)); then
