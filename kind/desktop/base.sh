@@ -1,7 +1,7 @@
 package pipewire pipewire-alsa pipewire-pulse wireplumber wiremix alsa-utils rtkit
 persist -u .local/state/wireplumber
 
-package networkmanager nm-connection-editor
+package networkmanager nm-connection-editor network-manager-applet
 systemd -e NetworkManager.service
 
 package bluez bluez-utils

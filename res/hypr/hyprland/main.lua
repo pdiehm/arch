@@ -5,6 +5,7 @@ hl.on("hyprland.start", function()
   hl.exec_cmd("hyprpaper")
   hl.exec_cmd("hypridle")
   hl.exec_cmd("waybar")
+  hl.exec_cmd("nm-applet --no-agent")
   hl.exec_cmd("XDG_MENU_PREFIX=arch- kbuildsycoca6")
 end)
 

@@ -10,6 +10,21 @@ addresses=192.168.1.90/16
 gateway=192.168.1.1
 EOF
 
+package networkmanager-openconnect
+
+write -m 400 /etc/NetworkManager/system-connections/uni.nmconnection << EOF
+[connection]
+id=@uni
+type=vpn
+autoconnect=false
+
+[vpn]
+service-type=org.freedesktop.NetworkManager.openconnect
+gateway=vpngw.uni-wuerzburg.de
+useragent=AnyConnect - OpenConnect
+xmlconfig-flags=0
+EOF
+
 write -m 400 /etc/NetworkManager/system-connections/wg.nmconnection << EOF
 [connection]
 id=@wg
