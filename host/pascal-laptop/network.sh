@@ -50,14 +50,14 @@ key-mgmt=wpa-eap
 eap=tls
 identity=$(secret net/eduroam/identity)
 private-key-password=$(secret net/eduroam/password)
-private-key=/etc/NetworkManager/system-connections/eduroam/private-key
-client-cert=/etc/NetworkManager/system-connections/eduroam/client-cert
-ca-cert=/etc/NetworkManager/system-connections/eduroam/ca-cert
+private-key=/etc/NetworkManager/secrets/eduroam/private-key
+client-cert=/etc/NetworkManager/secrets/eduroam/client-cert
+ca-cert=/etc/NetworkManager/secrets/eduroam/ca-cert
 EOF
 
-copy -s net/eduroam/private-key /etc/NetworkManager/system-connections/eduroam/private-key
-copy -s net/eduroam/client-cert /etc/NetworkManager/system-connections/eduroam/client-cert
-copy -s net/eduroam/ca-cert /etc/NetworkManager/system-connections/eduroam/ca-cert
+copy -s net/eduroam/private-key /etc/NetworkManager/secrets/eduroam/private-key
+copy -s net/eduroam/client-cert /etc/NetworkManager/secrets/eduroam/client-cert
+copy -s net/eduroam/ca-cert /etc/NetworkManager/secrets/eduroam/ca-cert
 
 write -m 400 /etc/NetworkManager/system-connections/wg.nmconnection << EOF
 [connection]
