@@ -32,9 +32,9 @@ hl.bind("SUPER + Escape", dpms, { locked = true })
 hl.bind("SUPER + SHIFT + Escape", hl.dsp.exec_cmd("loginctl lock-session"))
 hl.bind("CTRL + SUPER + SHIFT + Escape", hl.dsp.exit(), { bypass = true })
 
-hl.bind("Print", hl.dsp.exec_cmd("hyprshot --mode active --mode output --output-folder /home/pascal/Temp"))
-hl.bind("SUPER + Print", hl.dsp.exec_cmd("hyprshot --mode active --mode window --output-folder /home/pascal/Temp"))
-hl.bind("SUPER + SHIFT + Print", hl.dsp.exec_cmd("hyprshot --mode region --output-folder /home/pascal/Temp"))
+hl.bind("Print", hl.dsp.exec_cmd("hyprshot --mode active --mode output --output-folder ~/Temp"))
+hl.bind("SUPER + Print", hl.dsp.exec_cmd("hyprshot --mode active --mode window --output-folder ~/Temp"))
+hl.bind("SUPER + SHIFT + Print", hl.dsp.exec_cmd("hyprshot --mode region --output-folder ~/Temp"))
 hl.bind("ALT + Print", hl.dsp.exec_cmd("hyprpicker --autocopy"))
 
 hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("brightnessctl set +5%"), { locked = true })
