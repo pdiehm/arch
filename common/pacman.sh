@@ -14,3 +14,9 @@ package arch-install-scripts btrfs-progs cryptsetup sudo git
 upgrade pacman --noconfirm --sync --refresh --sysupgrade
 upgrade pacman --files --refresh
 timer pacman-gc monthly /usr/bin/pacman --noconfirm --sync --clean
+
+# HACK: https://gitlab.archlinux.org/pacman/pacman/-/work_items/297
+write /etc/systemd/system/pacman-gc.service.d/remove-dirs.conf << EOF
+[Service]
+ExecStartPost=/usr/bin/find /var/cache/pacman/pkg -type d -empty -delete
+EOF
