@@ -1,5 +1,9 @@
 local function map(key, fn)
   vim.keymap.set("i", key, function()
+    if vim.api.nvim_get_option_value("filetype", {}) == "TelescopePrompt" then
+      return key
+    end
+
     local line = vim.api.nvim_get_current_line()
     local col = vim.api.nvim_win_get_cursor(0)[2]
     return fn(line:sub(col, col + 1), line:sub(1, col), line:sub(col + 1))
