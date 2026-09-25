@@ -91,6 +91,7 @@ help() {
   echo "  run <name> <cmd> ...   Run command in repo"
   echo "  shell <name> [path]    Open shell in repo"
   echo "  status <name>          Print status of repo"
+  echo "  temp <url>             Open shell in temporary clone"
   echo "  update [name ...]      Update repos"
 }
 
@@ -226,7 +227,17 @@ status() {
     echo
     git status --short
   fi
+}
 
+temp() {
+  SRC="$(resolve "$1")"
+  if [[ ! $SRC ]]; then fatal "Not found: $1"; fi
+
+  trap 'rm -rf "$TMP"' EXIT
+  TMP="$(mktemp -d)"
+
+  git clone "$SRC" "$TMP"
+  env -C "$TMP" "$SHELL"
 }
 
 update() {
@@ -260,7 +271,7 @@ update() {
 
 case "${1:-help}" in
   help) help ;;
-  clone | edit | list | remove | run | shell | status) "$@" ;;
+  clone | edit | list | remove | run | shell | status | temp) "$@" ;;
   fetch | update) if (($# > 1)); then "$@"; else "$1" ./*; fi ;;
   *) fatal "Illegal command: $1" ;;
 esac
