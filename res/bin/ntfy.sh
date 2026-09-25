@@ -18,7 +18,7 @@ done
 shift "$((OPTIND - 1))"
 
 if ((HELP)); then
-  echo "Usage: ntfy [-c channel] [-p priority] [-t title] <message> ..."
+  echo "Usage: ntfy [-h] [-c channel] [-p priority] [-t title] <message> ..."
   echo
   echo "Options:"
   echo "  -h   Print this help message"
@@ -29,7 +29,7 @@ if ((HELP)); then
 fi
 
 if (($# == 0)); then
-  echo "Usage: ntfy [-c channel] [-p priority] [-t title] <message> ..."
+  echo "Usage: ntfy [-h] [-c channel] [-p priority] [-t title] <message> ..."
   exit 1
 fi
 

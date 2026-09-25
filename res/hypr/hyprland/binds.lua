@@ -22,7 +22,7 @@ hl.bind("CTRL + SUPER + 0", hl.dsp.window.move({ workspace = "special:special", 
 hl.bind("SUPER + F", hl.dsp.window.fullscreen({ action = "toggle" }))
 hl.bind("SUPER + SHIFT + F", hl.dsp.window.float({ action = "toggle" }))
 hl.bind("SUPER + SHIFT + Q", hl.dsp.window.close())
-hl.bind("CTRL + SUPER + SHIFT + Q", hl.dsp.window.kill(), { bypass = true })
+hl.bind("CTRL + SUPER + SHIFT + Q", hl.dsp.window.kill(), { dont_inhibit = true })
 
 hl.bind("SUPER + Return", hl.dsp.exec_cmd("kitty"))
 hl.bind("SUPER + Space", hl.dsp.exec_cmd("rofi -show drun"))
@@ -30,7 +30,7 @@ hl.bind("SUPER + E", hl.dsp.exec_cmd("dolphin"))
 
 hl.bind("SUPER + Escape", dpms, { locked = true })
 hl.bind("SUPER + SHIFT + Escape", hl.dsp.exec_cmd("loginctl lock-session"))
-hl.bind("CTRL + SUPER + SHIFT + Escape", hl.dsp.exit(), { bypass = true })
+hl.bind("CTRL + SUPER + SHIFT + Escape", hl.dsp.exec_cmd("hyprshutdown"), { dont_inhibit = true })
 
 hl.bind("Print", hl.dsp.exec_cmd("hyprshot --mode active --mode output --output-folder ~/Temp"))
 hl.bind("SUPER + Print", hl.dsp.exec_cmd("hyprshot --mode active --mode window --output-folder ~/Temp"))

@@ -42,7 +42,7 @@ load_host() {
         export "HOST_${head[key]}=${line[key]}"
       done
 
-      return 0
+      return
     fi
   done < hosts.csv
 
@@ -51,13 +51,11 @@ load_host() {
 
 # unmount <path>
 unmount() {
-  local path="$1"
-  if ! mountpoint --quiet "$path"; then return; fi
+  local path="$1" count=0
 
-  for _ in {0..9}; do
+  while mountpoint --quiet "$path"; do
     if umount --recursive "$path"; then return; fi
+    if ((++count >= 10)); then return 1; fi
     sleep 1
   done
-
-  return 1
 }

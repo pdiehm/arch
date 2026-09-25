@@ -2,22 +2,10 @@ copy res/systemd/resolved.conf /etc/systemd/resolved.conf
 systemd -e systemd-resolved.service
 systemd -ie resolvconf.service
 
-write /etc/hosts << EOF
-127.0.0.1            localhost
-::1                  localhost
-192.168.1.89         homeassistant
-91.99.52.233         goomba
-2a01:4f8:c0c:988b::1 goomba
-EOF
-
 package dynhostmgr
 systemd -e dynhostmgr.service
-
-write /etc/dynhosts << EOF
-bowser        192.168.1.88 fd42:6c77:9a2f::2
-pascal-pc     192.168.1.90 fd42:6c77:9a2f::1001
-pascal-laptop 192.168.1.91 fd42:6c77:9a2f::1002
-EOF
+copy res/hosts/static /etc/hosts
+copy res/hosts/dynamic /etc/dynhosts
 
 if ((DRY)); then
   TCP=(1234)

@@ -8,13 +8,13 @@ conf -e /etc/paru.conf BottomUp CleanAfter RemoveMake SudoLoop
 package nix
 persist /nix
 copy res/nix.conf /etc/nix/nix.conf
-write -au .config/dropin/env.sh "NIX_PATH=nixpkgs=flake:nixpkgs"
 systemd -e nix-daemon.service
 timer nix-gc monthly /usr/bin/nix-collect-garbage --delete-old
 
 write -au .config/dropin/env.sh << EOF
 CMAKE_GENERATOR="Ninja"
 CMAKE_EXPORT_COMPILE_COMMANDS="ON"
+NIX_PATH="nixpkgs=flake:nixpkgs"
 EOF
 
 write -ux .local/bin/cargo "#!/bin/sh" "mkdir -p ~/.cargo" 'exec bw --bind ~/.cargo ~/.cargo cargo "$@"'

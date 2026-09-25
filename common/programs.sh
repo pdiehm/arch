@@ -5,7 +5,6 @@ symlink -u res/zsh .config/zsh
 
 package vim
 copy res/vimrc.vim /etc/vimrc
-write -a /etc/environment "EDITOR=vim"
 
 package git git-delta
 symlink -u res/git.conf .config/git/config

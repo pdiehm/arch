@@ -65,7 +65,7 @@ _repo() {
       _files -W "$HOME/Repos/${words[3]}"
     fi
   elif [[ ${words[2]} == fetch ]]; then
-    if ((CURRENT == 3)); then compadd "${repos[@]}"; fi
+    compadd "${repos[@]}"
   elif [[ ${words[2]} == remove ]]; then
     if ((CURRENT == 3)); then compadd "${repos[@]}"; fi
   elif [[ ${words[2]} == run ]]; then
@@ -84,7 +84,7 @@ _repo() {
   elif [[ ${words[2]} == status ]]; then
     if ((CURRENT == 3)); then compadd "${repos[@]}"; fi
   elif [[ ${words[2]} == update ]]; then
-    if ((CURRENT == 3)); then compadd "${repos[@]}"; fi
+    compadd "${repos[@]}"
   fi
 }
 

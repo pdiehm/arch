@@ -6,8 +6,16 @@ shopt -s nullglob
 cd "$(dirname "$(realpath "$0")")/.."
 source bin/lib.sh
 
+as_root() {
+  if ((UID)); then
+    exec sudo "$0" "$@"
+  else
+    "$@"
+  fi
+}
+
 overlay() {
-  trap 'unmount "$TMP/root"; unmount "$TMP/boot"; rm -rf --one-file-system "$TMP"' EXIT
+  trap 'unmount "$TMP/boot"; unmount "$TMP/root"; rm -rf --one-file-system "$TMP"' EXIT
   TMP="$(mktemp -d)"
   chmod 700 "$TMP"
 
@@ -22,16 +30,15 @@ overlay() {
     fatal "Process '$*' exited with non-zero status, aborting..."
   fi
 
-  touch "$TMP/root/build"
+  HASH="$(readlink "$TMP/root/base")"
+  HASH="$(sha "${HASH##*/}++")"
   unmount "$TMP/root/build"
 
-  hash="$(readlink "$TMP/root/base")"
-  hash="$(sha "${hash##*/}++")"
-  if [[ -d $TMP/root/imgs/$hash ]]; then btrfs subvolume delete --recursive "$TMP/root/imgs/$hash"; fi
+  if [[ -d $TMP/root/imgs/$HASH ]]; then btrfs subvolume delete --recursive "$TMP/root/imgs/$HASH"; fi
+  mv "$TMP/root/build" "$TMP/root/imgs/$HASH"
 
-  mv "$TMP/root/build" "$TMP/root/imgs/$hash"
   rm -f "$TMP/root/base"
-  ln -s "imgs/$hash" "$TMP/root/base"
+  ln -s "imgs/$HASH" "$TMP/root/base"
 
   mount --mkdir --label BOOT "$TMP/boot"
   find "$TMP/boot" -mindepth 1 -delete
@@ -39,16 +46,16 @@ overlay() {
 }
 
 help() {
-  echo "Usage: sm <command> [args...]"
+  echo "Usage: sm <command> [args ...]"
   echo
   echo "Commands:"
-  echo "  help             Print this help message"
-  echo "  edit             Open editor in configuration repository"
-  echo "  fix              Edit latest image"
-  echo "  rebuild [-hbc]   Rebuild system configuration"
-  echo "  secrets [-hr]    Manage secrets"
-  echo "  sync             Sync configuration repository"
-  echo "  upgrade          Upgrade system"
+  echo "  help                     Print this help message"
+  echo "  edit                     Open editor in configuration repository"
+  echo "  fix                      Edit latest image"
+  echo "  rebuild [-hbcn] [host]   Rebuild system configuration"
+  echo "  secrets [-hr]            Manage secrets"
+  echo "  sync                     Sync configuration repository"
+  echo "  upgrade                  Upgrade system"
 }
 
 edit() {
@@ -56,61 +63,50 @@ edit() {
 }
 
 fix() {
-  if ((UID)); then exec sudo "$0" fix; fi
   overlay bash
 }
 
 rebuild() {
-  local OPTIND OPTARG opt
-  local help=0 break=0 clean=0 dry=0
+  HELP=0
 
   while getopts "hbcn" opt; do
     case "$opt" in
-      h) help=1 ;;
-      b) break=1 ;;
-      c) clean=1 ;;
-      n) dry=1 ;;
+      h) HELP=1 ;;
+      b) export SM_BREAK=1 ;;
+      c) export SM_CLEAN=1 ;;
+      n) export SM_DRY=1 ;;
       *) fatal "Illegal option" ;;
     esac
   done
 
-  if ((help)); then
-    echo "Usage: sm rebuild [-hbcn] [host]"
+  if ((HELP)); then
+    echo "Usage: sm rebuild [-hcbn] [host]"
     echo
     echo "Options:"
     echo "  -h   Print this help message"
     echo "  -b   Break after evaluation"
-    echo "  -c   Clean rebuild"
+    echo "  -c   Ignore cached images"
     echo "  -n   Skip activation"
     return
   fi
 
-  if ((UID)); then
-    exec sudo "$0" rebuild "$@"
-  fi
-
   shift "$((OPTIND - 1))"
-  local host="${1:-$HOSTNAME}"
-
-  if ((break)); then export SM_BREAK=1; fi
-  if ((clean)); then export SM_CLEAN=1; fi
-  if ((dry)); then export SM_DRY=1; fi
-  exec bin/build.sh "$host"
+  exec bin/build.sh "${@:-$HOSTNAME}"
 }
 
 secrets() {
-  local OPTIND OPTARG opt
-  local help=0 rotate=0
+  HELP=0
+  ROTATE=0
 
   while getopts "hr" opt; do
     case "$opt" in
-      h) help=1 ;;
-      r) rotate=1 ;;
+      h) HELP=1 ;;
+      r) ROTATE=1 ;;
       *) fatal "Illegal option" ;;
     esac
   done
 
-  if ((help)); then
+  if ((HELP)); then
     echo "Usage: sm secrets [-hr]"
     echo
     echo "Options:"
@@ -119,7 +115,6 @@ secrets() {
     return
   fi
 
-  if ((UID)); then exec sudo "$0" secrets "$@"; fi
   trap 'rm -rf "$TMP"' EXIT
   TMP="$(mktemp -d)"
 
@@ -151,37 +146,29 @@ secrets() {
     fatal "Shell exited with non-zero status, aborting..."
   fi
 
-  mkdir "$TMP/keys"
-  mv "$TMP/store/keys/master" "$TMP/keys"
-
-  if ((rotate)); then
+  if ((ROTATE)); then
     read -rsp "Enter new master password: "
     echo
 
-    sha "$REPLY" > "$TMP/keys/master"
-    rm -rf "$TMP/store/keys"
+    find "$TMP/store/keys" -mindepth 1 -delete
+    sha "$REPLY" > "$TMP/store/keys/master"
   fi
 
   while read -r host _; do
     if [[ $host == master || $host =~ [^a-zA-Z0-9-] ]]; then
       fatal "Illegal host name: $host"
-    elif [[ -f $TMP/store/keys/$host ]]; then
-      mv "$TMP/store/keys/$host" "$TMP/keys"
-    else
+    elif [[ ! -f $TMP/store/keys/$host ]]; then
       head -c 64 /dev/urandom | sha > "$TMP/keys/$host"
     fi
   done < "$TMP/store/ACL"
 
-  rm -rf "$TMP/store/keys"
-  mv "$TMP/keys" "$TMP/store"
-
   mkdir "$TMP/secrets"
   store_secrets "$TMP/secrets/master" "$TMP/store" "$(< "$TMP/store/keys/master")" .
 
-  while read -ra line; do
-    local host="${line[0]}"
+  while read -r host spec; do
+    read -ra spec <<< "$spec"
 
-    if ! store_secrets "$TMP/secrets/$host" "$TMP/store" "$(< "$TMP/store/keys/$host")" "keys/$host" "${line[@]:1}"; then
+    if ! store_secrets "$TMP/secrets/$host" "$TMP/store" "$(< "$TMP/store/keys/$host")" "keys/$host" "${spec[@]}"; then
       warn "Illegal ACL for host '$host', store might be incomplete."
     fi
   done < "$TMP/store/ACL"
@@ -193,31 +180,20 @@ secrets() {
 
 sync() {
   git pull
-  ahead="$(git rev-list --count "@{upstream}..")"
 
-  if ((ahead)); then
+  if (($(git rev-list --count "@{upstream}.."))); then
     read -rp "Push local commits? [y/N] "
     if [[ $REPLY == y ]]; then git push; fi
   fi
 }
 
 upgrade() {
-  if ((UID)); then exec sudo "$0" upgrade; fi
   overlay bash -eu /usr/local/lib/syscfg/upgrade.sh
 }
 
-if (($# == 0)); then
-  help
-  exit 1
-fi
-
-case "$1" in
+case "${1:-help}" in
   help) help ;;
-  edit) edit ;;
-  fix) fix ;;
-  rebuild) rebuild "${@:2}" ;;
-  secrets) secrets "${@:2}" ;;
-  sync) sync ;;
-  upgrade) upgrade ;;
+  edit | sync) "$@" ;;
+  fix | rebuild | secrets | upgrade) as_root "$@" ;;
   *) fatal "Illegal command: $1" ;;
 esac

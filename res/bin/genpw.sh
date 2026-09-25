@@ -39,13 +39,7 @@ if ((HELP)); then
   exit
 fi
 
-STRING=()
-
 for ((i = 0; i < ENTROPY; i += 6)); do
-  STRING+=("${SYLLABLES[SRANDOM % 64]}")
-done
-
-for ((i = 0; i < ${#STRING[@]}; i++)); do
-  if ((i > 0 && i % WORDLEN == 0)); then echo -n " "; fi
-  echo -n "${STRING[i]}"
+  if ((i > 0 && i % (WORDLEN * 6) == 0)); then echo -n " "; fi
+  echo -n "${SYLLABLES[SRANDOM % 64]}"
 done

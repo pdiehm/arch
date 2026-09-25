@@ -12,7 +12,7 @@ if ((UID)); then fatal "Not root"; fi
 if (($# != 1)); then fatal "Usage: build.sh <host>"; fi
 if ! load_host "$1"; then fatal "Unknown host: $1"; fi
 
-trap 'printf "\e[s\e[r\e[u"; unmount "$TMP/root"; unmount "$TMP/boot"; rm -rf --one-file-system "$TMP"' EXIT
+trap 'unmount "$TMP/boot"; unmount "$TMP/root"; printf "\e[s\e[r\e[u"; rm -rf --one-file-system "$TMP"' EXIT
 TMP="$(mktemp -d)"
 chmod 700 "$TMP"
 
@@ -106,7 +106,7 @@ secret() {
   if ((file + query > 1)); then error "Options '-f' and '-q' are mutually exclusive"; fi
 
   if [[ -f $TMP/secrets/$name ]]; then
-    if ((query)); then return 0; fi
+    if ((query)); then return; fi
     if ((file)); then use "$TMP/secrets/$name"; else cat "$TMP/secrets/$name"; fi
   else
     if ((query)); then return 1; fi
@@ -519,10 +519,10 @@ if [[ ${SM_BREAK:+x} ]]; then
 fi
 
 HASH="$(sha base)"
-printf "\e[s\e[2r\e[H\e[K\e[1mBuilding system...\e[m\e[u\n"
+USED=("$HASH")
 
+printf "\e[s\e[2r\e[H\e[K\e[1mBuilding system...\e[m\e[u\n"
 mount --mkdir --label root "$TMP/root"
-if [[ -d $TMP/root/imgs/$HASH ]]; then touch "$TMP/root/imgs/$HASH"; fi
 
 btrfs property set "$TMP/root" compression zstd
 if [[ ! -d $TMP/root/imgs ]]; then mkdir "$TMP/root/imgs"; fi
@@ -533,7 +533,7 @@ if [[ -d $TMP/root/build ]]; then btrfs subvolume delete --recursive "$TMP/root/
 if [[ ${SM_CLEAN:+x} || ! -d $TMP/root/imgs/$HASH ]]; then
   printf "\e[s\e[H\e[K\e[1mInstalling base system...\e[m\e[u"
   btrfs subvolume create "$TMP/root/build"
-  pacstrap -Gc "$TMP/root/build"
+  pacstrap -G "$TMP/root/build"
 
   if [[ -d $TMP/root/imgs/$HASH ]]; then btrfs subvolume delete --recursive "$TMP/root/imgs/$HASH"; fi
   mv "$TMP/root/build" "$TMP/root/imgs/$HASH"
@@ -559,10 +559,8 @@ for ((stage = 0; stage < STAGE; stage++)); do
   fi
 
   HASH="$hash"
-  touch "$TMP/root/imgs/$HASH"
+  USED+=("$HASH")
 done
-
-printf "\e[s\e[H\e[K\e[1mDone!\e[m\e[r\e[u"
 
 if [[ ${SM_DRY:+x} ]]; then
   btrfs subvolume snapshot "$TMP/root/imgs/$HASH" "$TMP/root/build"
@@ -574,9 +572,9 @@ if [[ ${SM_DRY:+x} ]]; then
   exit
 fi
 
+printf "\e[s\e[H\e[K\e[1mDone!\e[m\e[u"
 rm -f "$TMP/root/base"
 ln -s "imgs/$HASH" "$TMP/root/base"
-find "$TMP/root/imgs" -mindepth 1 -maxdepth 1 -mtime +0 -exec btrfs subvolume delete --recursive "{}" +
 
 mount --mkdir --label BOOT "$TMP/boot"
 find "$TMP/boot" -mindepth 1 -delete
@@ -585,10 +583,17 @@ cp -r "$TMP/root/base/boot/." "$TMP/boot"
 for path in "$TMP/root/base/keep"/*; do
   target="$TMP/root/keep/${path##*/}"
   if [[ ! -e $target ]]; then cp -a "$path" "$target"; fi
-  touch "$target"
 done
 
-while read -ru 3 path; do
-  read -rp "Remove '/keep/${path##*/}'? [y/N] "
-  if [[ $REPLY == y ]]; then rm -rf "$path"; fi
-done 3< <(find "$TMP/root/keep" -mindepth 1 -maxdepth 1 -mtime +0)
+for path in "$TMP/root/imgs"/*; do
+  if [[ "${USED[*]}" != *${path##*/}* ]]; then
+    btrfs subvolume delete --recursive "$path"
+  fi
+done
+
+for path in "$TMP/root/keep"/*; do
+  if [[ ! -e $TMP/root/base/keep/${path##*/} ]]; then
+    read -rp "Remove '/keep/${path##*/}'? [y/N] "
+    if [[ $REPLY == y ]]; then rm -rf "$path"; fi
+  fi
+done

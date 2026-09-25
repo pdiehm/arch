@@ -9,8 +9,19 @@ fatal() {
   exit 1
 }
 
+resolve() {
+  local src="${1%.git}.git"
+
+  for src in "$src" "gh:/$src" "gh:$src" ""; do
+    if git ls-remote "$src" &> /dev/null; then
+      echo "$src"
+      return
+    fi
+  done
+}
+
 enter() {
-  if ! cd "$1" 2> /dev/null; then
+  if ! cd "$HOME/Repos/$1" 2> /dev/null; then
     fatal "No such repo: $1"
   fi
 }
@@ -43,8 +54,8 @@ git-is-local() {
 }
 
 git-is-dirty() {
-  if [[ $(git diff --staged --name-only) ]]; then return 0; fi
-  if [[ $(git ls-files --modified --others --exclude-standard) ]]; then return 0; fi
+  if [[ $(git diff --staged --name-only) ]]; then return; fi
+  if [[ $(git ls-files --modified --others --exclude-standard) ]]; then return; fi
   return 1
 }
 
@@ -71,82 +82,75 @@ help() {
   echo "Usage: repo <command> [args ...]"
   echo
   echo "Commands:"
-  echo "  help                    Print this help message"
-  echo "  clone <url> [name]      Clone repo"
-  echo "  edit <name> [path]      Open editor in repo"
-  echo "  fetch [name]            Fetch repo(s)"
-  echo "  list                    List repos"
-  echo "  remove <name>           Remove repo"
-  echo "  run <name> <cmd> ...    Run command in repo"
-  echo "  shell <name> [path]     Open shell in repo"
-  echo "  status <name>           Print status of repo"
-  echo "  update [name]           Update repo(s)"
+  echo "  help                   Print this help message"
+  echo "  clone <url> [name]     Clone repo"
+  echo "  edit <name> [path]     Open editor in repo"
+  echo "  fetch [name ...]       Fetch repos"
+  echo "  list                   List repos"
+  echo "  remove <name>          Remove repo"
+  echo "  run <name> <cmd> ...   Run command in repo"
+  echo "  shell <name> [path]    Open shell in repo"
+  echo "  status <name>          Print status of repo"
+  echo "  update [name ...]      Update repos"
 }
 
 clone() {
-  local src="${1%.git}.git" name="${2:-}"
+  SRC="$(resolve "$1")"
+  NAME="${2:-}"
 
-  for url in "$src" "gh:/$src" "gh:$src" ""; do
-    if git ls-remote "$url" &> /dev/null; then break; fi
-  done
-
-  if [[ ! $url ]]; then
-    fatal "Not found: $src"
-  elif [[ ! $name ]]; then
-    git clone "$url"
+  if [[ ! $SRC ]]; then
+    fatal "Not found: $1"
+  elif [[ ! $NAME ]]; then
+    git clone "$SRC"
   else
-    git clone "$url" "$name"
+    git clone "$SRC" "$NAME"
   fi
 }
 
 edit() {
-  local name="$1" path="${2:-.}"
-  enter "$name"
+  enter "$1"
+  TARGET="${2:-.}"
 
-  if [[ -d $path ]]; then
-    cd "$path"
-    exec "$EDITOR" .
-  elif [[ -f $path ]]; then
-    cd "$(dirname "$path")"
-    exec "$EDITOR" "$(basename "$path")"
+  if [[ -d $TARGET ]]; then
+    exec env -C "$TARGET" "$EDITOR" .
+  elif [[ -f $TARGET ]]; then
+    exec "$EDITOR" "$TARGET"
   else
-    fatal "No such file or directory: $path"
+    fatal "No such file or directory: $TARGET"
   fi
 }
 
 fetch() {
-  local name="${1:-}"
-
-  if [[ ! $name ]]; then
-    for name in *; do fetch "$name"; done
-  elif [[ ! -d $name ]]; then
-    fatal "No such repo: $name"
-  else
-    git -C "$name" fetch
-  fi
+  for repo in "$@"; do
+    if [[ -d $repo ]]; then
+      git -C "$repo" fetch
+    else
+      fatal "No such repo: $repo"
+    fi
+  done
 }
 
 list() {
   for repo in *; do
     cd "$repo"
 
-    local icon=""
-    url="$(git-url)"
-    head="$(git-head)"
+    ICON=""
+    URL="$(git-url)"
+    HEAD="$(git-head)"
 
     while read -r type ahead behind _; do
       case "$type" in
-        changes) icon="*" ;;
-        stash) if [[ ! $icon ]]; then icon="~"; fi ;;
-        local) if [[ $icon != "*" ]]; then icon="+"; fi ;;
-        branch) if [[ $icon != "*" ]] && ((ahead || behind)); then icon="+"; fi ;;
+        changes) ICON="*" ;;
+        stash) if [[ ! $ICON ]]; then ICON="~"; fi ;;
+        local) if [[ $ICON != "*" ]]; then ICON="+"; fi ;;
+        branch) if [[ $ICON != "*" ]] && ((ahead || behind)); then ICON="+"; fi ;;
       esac
     done < <(git-status)
 
-    case "$head" in
-      NULL) printf "\e[1;34m%s \e[0;31m%s\e[36m%s \e[0;2m%s\e[m\n" "$repo" "N/A" "$icon" "$url" ;;
-      HEAD) printf "\e[1;34m%s \e[0;33m%s\e[36m%s \e[0;2m%s\e[m\n" "$repo" "$(git rev-parse --short HEAD)" "$icon" "$url" ;;
-      *) printf "\e[1;34m%s \e[0;32m%s\e[36m%s \e[0;2m%s\e[m\n" "$repo" "$head" "$icon" "$url" ;;
+    case "$HEAD" in
+      NULL) printf "\e[1;34m%s \e[0;31m%s\e[36m%s \e[0;2m%s\e[m\n" "$repo" "N/A" "$ICON" "$URL" ;;
+      HEAD) printf "\e[1;34m%s \e[0;33m%s\e[36m%s \e[0;2m%s\e[m\n" "$repo" "$(git rev-parse --short HEAD)" "$ICON" "$URL" ;;
+      *) printf "\e[1;34m%s \e[0;32m%s\e[36m%s \e[0;2m%s\e[m\n" "$repo" "$HEAD" "$ICON" "$URL" ;;
     esac
 
     cd ..
@@ -154,22 +158,21 @@ list() {
 }
 
 remove() {
-  local name="$1"
-  enter "$name"
+  NAME="$1"
+  enter "$NAME"
 
-  local changes=()
   while read -r type ahead behind branch; do
     case "$type" in
-      changes) changes+=("Uncommited changes") ;;
-      stash) changes+=("Stashed changes") ;;
-      local) changes+=("Local branch ($branch)") ;;
-      branch) if ((ahead)); then changes+=("Unpushed commits ($branch)"); fi ;;
+      changes) CHANGES+=("Uncommited changes") ;;
+      stash) CHANGES+=("Stashed changes") ;;
+      local) CHANGES+=("Local branch ($branch)") ;;
+      branch) if ((ahead)); then CHANGES+=("Unpushed commits ($branch)"); fi ;;
     esac
   done < <(git-status)
 
-  if ((${#changes[@]})); then
+  if ((${#CHANGES[@]})); then
     echo "The repository contains local changes:"
-    printf "  - %s\n" "${changes[@]}"
+    printf "  - %s\n" "${CHANGES[@]}"
     echo
 
     read -rp "Are you sure you want to remove this repository? [y/N] "
@@ -177,36 +180,30 @@ remove() {
   fi
 
   cd ..
-  rm -rf "$name"
+  rm -rf "$NAME"
 }
 
 run() {
-  local name="$1" cmd=("${@:2}")
-  if ((${#cmd[@]} == 0)); then fatal "Usage: repo run <name> <cmd> ..."; fi
-
-  enter "$name"
-  exec "${cmd[@]}"
+  enter "$1"
+  exec "${@:2}"
 }
 
 shell() {
-  local name="$1" path="${2:-.}"
-  enter "$name"
-
-  if [[ ! -d $path ]]; then fatal "No such directory: $path"; fi
-  exec env -C "$path" "$SHELL"
+  enter "$1"
+  exec env -C "${2:-.}" "$SHELL"
 }
 
 status() {
-  local name="$1"
+  NAME="$1"
+  enter "$NAME"
 
-  enter "$name"
-  url="$(git-url)"
-  head="$(git-head)"
+  URL="$(git-url)"
+  HEAD="$(git-head)"
 
-  case "$head" in
-    NULL) printf "\e[1mRepo: \e[34m%s \e[m(\e[31m%s\e[m, \e[2m%s\e[m)\n" "$name" "empty" "$url" ;;
-    HEAD) printf "\e[1mRepo: \e[34m%s \e[m(\e[33m%s\e[m, \e[2m%s\e[m)\n\n" "$name" "$(git rev-parse --short HEAD)" "$url" ;;
-    *) printf "\e[1mRepo: \e[34m%s \e[m(\e[32m%s\e[m, \e[2m%s\e[m)\n\n" "$name" "$head" "$url" ;;
+  case "$HEAD" in
+    NULL) printf "\e[1mRepo: \e[34m%s \e[m(\e[31m%s\e[m, \e[2m%s\e[m)\n" "$NAME" "empty" "$URL" ;;
+    HEAD) printf "\e[1mRepo: \e[34m%s \e[m(\e[33m%s\e[m, \e[2m%s\e[m)\n\n" "$NAME" "$(git rev-parse --short HEAD)" "$URL" ;;
+    *) printf "\e[1mRepo: \e[34m%s \e[m(\e[32m%s\e[m, \e[2m%s\e[m)\n\n" "$NAME" "$HEAD" "$URL" ;;
   esac
 
   git-status | while read -r type ahead behind branch; do
@@ -230,24 +227,17 @@ status() {
     git status --short
   fi
 
-  cd ..
 }
 
 update() {
-  local name="${1:-}"
+  enter "$1"
+  STASH=0
 
-  if [[ ! $name ]]; then
-    for name in *; do update "$name"; done
-    return
-  fi
+  HEAD="$(git-head)"
+  if [[ $HEAD == HEAD ]]; then HEAD="$(git rev-parse HEAD)"; fi
 
-  enter "$name"
-  head="$(git-head)"
-  if [[ $head == HEAD ]]; then head="$(git rev-parse HEAD)"; fi
-
-  local stashed=0
   if git-is-dirty; then
-    stashed=1
+    STASH=1
     git stash push --include-untracked
   fi
 
@@ -264,26 +254,13 @@ update() {
     fi
   done
 
-  if [[ $head != NULL ]]; then git checkout "$head"; fi
-  if ((stashed)); then git stash pop || conflict; fi
-  cd ..
+  if [[ $HEAD != NULL ]]; then git checkout "$HEAD"; fi
+  if ((STASH)); then git stash pop || conflict; fi
 }
 
-if (($# == 0)); then
-  help
-  exit 1
-fi
-
-case "$1" in
+case "${1:-help}" in
   help) help ;;
-  clone) clone "${@:2}" ;;
-  edit) edit "${@:2}" ;;
-  fetch) fetch "${@:2}" ;;
-  list) list ;;
-  remove) remove "${@:2}" ;;
-  run) run "${@:2}" ;;
-  shell) shell "${@:2}" ;;
-  status) status "${@:2}" ;;
-  update) update "${@:2}" ;;
+  clone | edit | list | remove | run | shell | status) "$@" ;;
+  fetch | update) if (($# > 1)); then "$@"; else "$1" ./*; fi ;;
   *) fatal "Illegal command: $1" ;;
 esac

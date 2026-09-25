@@ -5,7 +5,7 @@ systemd -e greetd.service
 package fontconfig noto-fonts noto-fonts-extra noto-fonts-cjk noto-fonts-emoji ttf-cascadia-code-nerd
 symlink -u res/fontconfig.xml .config/fontconfig/fonts.conf
 
-package hyprland hyprpaper hyprlock hypridle hyprshot hyprpicker xdg-desktop-portal-hyprland
+package hyprland hyprpaper hyprlock hypridle hyprshot hyprpicker hyprshutdown xdg-desktop-portal-hyprland
 symlink -u res/hypr .config/hypr
 symlink -u res/keyboard.xkb .local/share/keyboard.xkb
 symlink -u res/wallpaper.jpg .local/share/wallpaper.jpg
