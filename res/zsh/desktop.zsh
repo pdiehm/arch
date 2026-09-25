@@ -13,6 +13,7 @@ alias mktex='latexmk -cd -pdf -outdir="$PWD/build"'
 alias open="xdg-open"
 alias play="mpv --no-audio-display"
 alias py="python3"
+alias rplay="play --shuffle --loop-playlist"
 
 man() {
   if (($#)); then
