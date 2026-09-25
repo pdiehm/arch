@@ -8,9 +8,8 @@ import ./backup
 import ./docker
 import ./programs
 
-write /etc/modules-load.d/zram.conf "zram"
-copy res/udev/zram.rules /etc/udev/rules.d/99-zram.rules
-write -a /etc/fstab "/dev/zram0 none swap x-systemd.makefs 0 0"
+package zram-generator
+write /etc/systemd/zram-generator.conf "[zram0]"
 
 package openssh
 copy res/ssh/sshd_config /etc/ssh/sshd_config
