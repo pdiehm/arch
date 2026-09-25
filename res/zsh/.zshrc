@@ -117,50 +117,51 @@ watch() (
 )
 
 _prompt_git() {
-  if ! git rev-parse HEAD &> /dev/null; then
-    return
-  fi
+  local git ref remote stash line changed=0 staged=0
+  read -r git ref remote stash < <(git rev-parse --git-dir --abbrev-ref HEAD "HEAD@{upstream}" refs/stash 2> /dev/null | tr "\n" " ")
+  if [[ ! $git ]]; then return; fi
 
-  local branch="$(git rev-parse --abbrev-ref HEAD)"
-  if [[ $branch == HEAD ]]; then
+  if [[ $ref == HEAD ]]; then
     echo -n " %F{3}$(git rev-parse --short HEAD)%f"
   else
-    echo -n " %F{8}$branch%f"
+    echo -n " %F{8}$ref%f"
   fi
 
-  local staged="$(git diff --staged --name-only)"
-  local changed="$(git ls-files --modified --others --exclude-standard)"
+  while IFS= read -r line; do
+    if [[ ${line:1:1} != " " ]]; then
+      changed=1
+      if ((staged)); then break; fi
+    elif [[ ${line:0:1} != " " ]]; then
+      staged=1
+      if ((changed)); then break; fi
+    fi
+  done < <(git status --porcelain)
 
-  if [[ $staged && $changed ]]; then
+  if ((changed && staged)); then
     echo -en "%F{6}\u203d%f"
-  elif [[ $staged ]]; then
-    echo -n "%F{6}!%f"
-  elif [[ $changed ]]; then
+  elif ((changed)); then
     echo -n "%F{6}?%f"
+  elif ((staged)); then
+    echo -n "%F{6}!%f"
   fi
 
-  if [[ $(git stash list) ]]; then
+  if [[ $stash == stash ]]; then
     echo -en " %F{6}\u2026%f"
   fi
 
-  if [[ $(git remote show) && $branch != HEAD ]]; then
-    if git rev-parse "@{upstream}" &> /dev/null; then
-      local ahead="$(git rev-list --count "@{upstream}..")"
-      local behind="$(git rev-list --count "..@{upstream}")"
+  if [[ $remote && -f $git/refs/remotes/$remote && $(< "$git/refs/heads/$ref") != $(< "$git/refs/remotes/$remote") ]]; then
+    local ahead behind
+    read -r ahead behind < <(git rev-list --left-right --count "HEAD...HEAD@{upstream}")
 
-      if ((ahead && behind)); then
-        echo -en " %F{6}\u296f%f"
-      elif ((ahead)); then
-        echo -en " %F{6}\u2191%f"
-      elif ((behind)); then
-        echo -en " %F{6}\u2193%f"
-      fi
-    else
-      echo -en " %F{6}\u21a5%f"
+    if ((ahead && behind)); then
+      echo -en " %F{6}\u296f%f"
+    elif ((ahead)); then
+      echo -en " %F{6}\u2191%f"
+    elif ((behind)); then
+      echo -en " %F{6}\u2193%f"
     fi
   fi
 
-  local git="$(git rev-parse --git-dir)"
   if [[ -f $git/BISECT_LOG ]]; then
     echo -n " %F{1}(bisect)%f"
   elif [[ -f $git/CHERRY_PICK_HEAD ]]; then
@@ -170,9 +171,7 @@ _prompt_git() {
   elif [[ -f $git/REVERT_HEAD ]]; then
     echo -n " %F{1}(revert)%f"
   elif [[ -d $git/rebase-merge ]]; then
-    local step="$(< "$git/rebase-merge/msgnum")"
-    local total="$(< "$git/rebase-merge/end")"
-    echo -n " %F{1}(rebase)%f %F{6}$step%F{8}/%F{6}$total%f"
+    echo -n " %F{1}(rebase)%f %F{6}$(< "$git/rebase-merge/msgnum")%F{8}/%F{6}$(< "$git/rebase-merge/end")%f"
   fi
 }
 
