@@ -25,7 +25,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
     vim.keymap.set("n", "gr", function()
       ts.lsp_references({
-        include_declaration = false,
         include_current_line = true,
         jump_type = "never",
       })
