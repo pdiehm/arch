@@ -49,14 +49,16 @@ git-head() {
   fi
 }
 
-git-is-local() {
-  ! git rev-parse "$1@{upstream}" &> /dev/null
+git-is-dirty() {
+  [[ $(git status --porcelain) ]]
 }
 
-git-is-dirty() {
-  if [[ $(git diff --staged --name-only) ]]; then return; fi
-  if [[ $(git ls-files --modified --others --exclude-standard) ]]; then return; fi
-  return 1
+git-has-stash() {
+  git rev-parse refs/stash &> /dev/null
+}
+
+git-is-local() {
+  ! git rev-parse "$1@{upstream}" &> /dev/null
 }
 
 git-branches() {
@@ -65,14 +67,13 @@ git-branches() {
 
 git-status() {
   if git-is-dirty; then echo "changes"; fi
-  if [[ $(git stash list) ]]; then echo "stash"; fi
+  if git-has-stash; then echo "stash"; fi
 
   git-branches | while read -r branch; do
     if git-is-local "$branch"; then
       echo "local 0 0 $branch"
     else
-      ahead="$(git rev-list --count "$branch@{upstream}..$branch")"
-      behind="$(git rev-list --count "$branch..$branch@{upstream}")"
+      read -r ahead behind < <(git rev-list --left-right --count "$branch...$branch@{upstream}")
       echo "branch $ahead $behind $branch"
     fi
   done
@@ -218,7 +219,7 @@ status() {
     esac
   done | column --table --separator $'\x09'
 
-  if [[ $(git stash list) ]]; then
+  if git-has-stash; then
     echo
     git stash list --oneline
   fi
