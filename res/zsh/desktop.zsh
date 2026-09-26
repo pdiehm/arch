@@ -41,7 +41,7 @@ _mk() {
     local cmp=(~/.local/share/mk/*)
     compadd "${cmp[@]##*/}"
   elif ((CURRENT == 3)); then
-    _files
+    _files -/
   fi
 }
 

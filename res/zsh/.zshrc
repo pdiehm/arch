@@ -4,7 +4,6 @@ PROMPT='%F{4}%~%f$(_prompt_git) %F{%(?.5.1)}$(_prompt_char)%f '
 RPROMPT='$(_prompt_host)'
 
 setopt PROMPT_SUBST
-setopt PUSHD_SILENT
 setopt SHARE_HISTORY
 
 mkdir -p ~/.local/state/zsh
@@ -86,16 +85,11 @@ ed() {
   if (($# == 0)); then
     "$EDITOR"
   elif [[ -d $1 ]]; then
-    pushd "$1"
-    "$EDITOR" .
-    popd
+    env -C "$1" "$EDITOR" .
   else
     local dir="$(dirname "$1")"
     mkdir -p "$dir"
-
-    pushd "$dir"
-    "$EDITOR" "$(basename "$1")"
-    popd
+    env -C "$dir" "$EDITOR" "$(basename "$1")"
   fi
 }
 
@@ -201,3 +195,4 @@ _sm() {
 source "$HOME/.config/zsh/$HOSTKIND.zsh"
 source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+FZF_ALT_C_COMMAND="" FZF_CTRL_T_COMMAND="" source /usr/share/fzf/key-bindings.zsh

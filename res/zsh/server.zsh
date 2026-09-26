@@ -12,8 +12,8 @@ service() {
 
 _service() {
   if ((CURRENT == 2)); then
-    local cmp=("$HOME/docker/$HOSTNAME"/*)
-    compadd "${cmp[@]##*/}"
+    local services=("$HOME/docker/$HOSTNAME"/*)
+    compadd "${services[@]##*/}"
   elif [[ -f $HOME/docker/$HOSTNAME/${words[2]}/compose.yaml ]]; then
     words=("docker" "compose" "--file" "$HOME/docker/$HOSTNAME/${words[2]}/compose.yaml" "${words[3,-1]}")
     CURRENT="$((CURRENT + 2))"
