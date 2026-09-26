@@ -117,12 +117,13 @@ watch() (
 )
 
 _prompt_git() {
-  local git ref remote stash line staged=0 changed=0
-  read -r git ref remote stash < <(git rev-parse --git-dir --abbrev-ref HEAD "HEAD@{upstream}" refs/stash 2> /dev/null | tr "\n" " ")
+  local git ref remote line staged=0 changed=0
+  read -rd "" git ref remote < <(git rev-parse --git-dir --abbrev-ref HEAD "HEAD@{upstream}" 2> /dev/null)
   if [[ ! $git ]]; then return; fi
 
   if [[ $ref == HEAD ]]; then
-    echo -n " %F{3}$(git rev-parse --short HEAD)%f"
+    local hash="$(git rev-parse --short HEAD 2> /dev/null)"
+    if [[ $hash ]]; then echo -n " %F{3}$hash%f"; fi
   else
     echo -n " %F{8}$ref%f"
   fi
@@ -141,7 +142,7 @@ _prompt_git() {
     echo -n "%F{6}?%f"
   fi
 
-  if [[ $stash == stash ]]; then
+  if [[ -f $git/refs/stash ]]; then
     echo -en " %F{6}\u2026%f"
   fi
 
