@@ -5,6 +5,7 @@ RPROMPT='$(_prompt_host)'
 
 setopt PROMPT_SUBST
 setopt SHARE_HISTORY
+setopt HIST_IGNORE_SPACE
 
 mkdir -p ~/.local/state/zsh
 HISTFILE="$HOME/.local/state/zsh/history"
