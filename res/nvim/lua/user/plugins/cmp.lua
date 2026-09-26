@@ -42,6 +42,7 @@ require("blink.cmp").setup({
       path = {
         opts = {
           show_hidden_files_by_default = true,
+          trailing_slash = false,
         },
       },
     },
