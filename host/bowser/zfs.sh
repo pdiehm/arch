@@ -2,11 +2,11 @@ package zfs-linux-lts
 run sed -i "s/Priority: high/Priority: default/" /etc/zfs/zed.d/zed-functions.sh
 write -x /usr/bin/hostname "#!/bin/sh" "cat /etc/hostname"
 
-systemd -e zfs.target zfs-import.target zfs-import-scan.service zfs-mount.service zfs-zed.service
-timer zfs-scrub-all weekly /usr/bin/zpool scrub -a
-
 conf /etc/mkinitcpio.conf "HOOKS=(base udev autodetect microcode modconf keyboard block encrypt zfs filesystems root fsck)"
 run mkinitcpio --allpresets
+
+systemd -e zfs.target zfs-import.target zfs-import-scan.service zfs-mount.service zfs-zed.service
+timer zfs-scrub-all weekly /usr/bin/zpool scrub -a
 
 write /etc/zfs/zed.d/zed.rc << EOF
 ZED_NOTIFY_VERBOSE=1
