@@ -117,7 +117,7 @@ watch() (
 )
 
 _prompt_git() {
-  local git ref remote stash line changed=0 staged=0
+  local git ref remote stash line staged=0 changed=0
   read -r git ref remote stash < <(git rev-parse --git-dir --abbrev-ref HEAD "HEAD@{upstream}" refs/stash 2> /dev/null | tr "\n" " ")
   if [[ ! $git ]]; then return; fi
 
@@ -128,21 +128,17 @@ _prompt_git() {
   fi
 
   while IFS= read -r line; do
-    if [[ ${line:1:1} != " " ]]; then
-      changed=1
-      if ((staged)); then break; fi
-    elif [[ ${line:0:1} != " " ]]; then
-      staged=1
-      if ((changed)); then break; fi
-    fi
+    if [[ ${line:0:1} != " " && ${line:0:1} != "?" ]]; then staged=1; fi
+    if [[ ${line:1:1} != " " ]]; then changed=1; fi
+    if ((changed && staged)); then break; fi
   done < <(git status --porcelain)
 
-  if ((changed && staged)); then
+  if ((staged && changed)); then
     echo -en "%F{6}\u203d%f"
-  elif ((changed)); then
-    echo -n "%F{6}?%f"
   elif ((staged)); then
     echo -n "%F{6}!%f"
+  elif ((changed)); then
+    echo -n "%F{6}?%f"
   fi
 
   if [[ $stash == stash ]]; then
