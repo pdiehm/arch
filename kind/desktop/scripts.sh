@@ -9,6 +9,7 @@ symlink -u res/bin/hyprshot.sh .local/bin/hyprshot
 package android-file-transfer sshfs
 symlink -u res/bin/mnt.sh .local/bin/mnt
 
+package archiso grub
 symlink -u res/mk .local/share/mk
 symlink -u res/bin/mk.sh .local/bin/mk
 

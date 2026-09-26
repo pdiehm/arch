@@ -39,7 +39,7 @@ tl() {
 _mk() {
   if ((CURRENT == 2)); then
     local cmp=(~/.local/share/mk/*)
-    compadd "${cmp[@]##*/}"
+    compadd "${cmp[@]##*/}" arch.iso
   elif ((CURRENT == 3)); then
     _files -/
   fi

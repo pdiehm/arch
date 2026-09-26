@@ -1,3 +1,10 @@
+Match tagged="iso"
+  User root
+  ControlMaster no
+  IdentityFile ~/.ssh/iso
+  StrictHostKeyChecking no
+  UserKnownHostsFile /dev/null
+
 Host *
   ControlMaster auto
   ControlPath ~/.ssh/.%r@%h:%p
