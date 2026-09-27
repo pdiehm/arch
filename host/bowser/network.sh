@@ -1,4 +1,4 @@
-write /etc/systemd/network/main.network << EOF
+write /etc/systemd/network/10-main.network << EOF
 [Match]
 Kind=!*
 Type=ether
