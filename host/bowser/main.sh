@@ -4,4 +4,4 @@ import ./zfs
 persist -u shared
 BACKUP+=("/home/pascal/shared")
 
-timer -u backup-gc monthly /usr/bin/find archive/Backups -mtime +30 -delete
+timer backup-gc monthly /usr/bin/find /home/pascal/archive/Backups -mindepth 1 -mtime +30 -delete
