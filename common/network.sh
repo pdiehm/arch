@@ -1,6 +1,6 @@
 copy res/systemd/resolved.conf /etc/systemd/resolved.conf
+write /etc/tmpfiles.d/resolvconf.conf "L+! /etc/resolv.conf - - - - ../run/systemd/resolve/stub-resolv.conf"
 systemd -e systemd-resolved.service
-systemd -ie resolvconf.service
 
 package dynhostmgr
 systemd -e dynhostmgr.service
