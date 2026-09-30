@@ -146,21 +146,29 @@ secrets() {
     fatal "Shell exited with non-zero status, aborting..."
   fi
 
+  mkdir "$TMP/keys"
+  mv "$TMP/store/keys/master" "$TMP/keys"
+
   if ((ROTATE)); then
     read -rsp "Enter new master password: "
     echo
 
-    find "$TMP/store/keys" -mindepth 1 -delete
-    sha "$REPLY" > "$TMP/store/keys/master"
+    sha "$REPLY" > "$TMP/keys/master"
+    rm -rf "$TMP/store/keys"
   fi
 
   while read -r host _; do
     if [[ $host == master || $host =~ [^a-zA-Z0-9-] ]]; then
       fatal "Illegal host name: $host"
-    elif [[ ! -f $TMP/store/keys/$host ]]; then
+    elif [[ -f $TMP/store/keys/$host ]]; then
+      mv "$TMP/store/keys/$host" "$TMP/keys"
+    else
       head -c 64 /dev/urandom | sha > "$TMP/keys/$host"
     fi
   done < "$TMP/store/ACL"
+
+  rm -rf "$TMP/store/keys"
+  mv "$TMP/keys" "$TMP/store"
 
   mkdir "$TMP/secrets"
   store_secrets "$TMP/secrets/master" "$TMP/store" "$(< "$TMP/store/keys/master")" .
