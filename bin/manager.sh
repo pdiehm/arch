@@ -160,6 +160,8 @@ secrets() {
   while read -r host _; do
     if [[ $host == master || $host =~ [^a-zA-Z0-9-] ]]; then
       fatal "Illegal host name: $host"
+    elif [[ -f $TMP/keys/$host ]]; then
+      fatal "Duplicate host name: $host"
     elif [[ -f $TMP/store/keys/$host ]]; then
       mv "$TMP/store/keys/$host" "$TMP/keys"
     else
