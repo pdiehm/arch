@@ -1,5 +1,4 @@
 package gnupg
-persist -um 700 .local/share/gnupg
 write -a /etc/gnupg/gpg-agent.conf "pinentry-program /usr/bin/pinentry-tty"
 
 write -au .config/dropin/env.sh << "EOF"
@@ -8,7 +7,10 @@ GPG_TTY="$TTY"
 EOF
 
 script -u << EOF
-export GNUPGHOME="/keep/home_pascal_.local_share_gnupg"
+export GNUPGHOME="/home/pascal/.local/share/gnupg"
+mkdir -pm 700 "\$GNUPGHOME"
 gpg --import "$(use res/key.gpg)"
 gpg --quick-set-ownertrust 32104A99C1849AF79B2C92FCE85EB0566C779A2F ultimate
 EOF
+
+persist -u .local/share/gnupg

@@ -5,7 +5,6 @@ conf /etc/mkinitcpio.conf "HOOKS=(base udev autodetect microcode modconf keyboar
 run mkinitcpio --allpresets
 
 package limine "$HOST_CPU-ucode"
-var CPU "$HOST_CPU"
 var KERNEL "$HOST_KERNEL"
 copy -v res/limine.conf /boot/limine.conf
 

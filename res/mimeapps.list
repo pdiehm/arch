@@ -5,6 +5,7 @@ application/pdf=firefox.desktop
 application/x-tar=org.kde.dolphin.desktop
 application/x-xz=org.kde.dolphin.desktop
 application/zip=org.kde.dolphin.desktop
+application/zlib=org.kde.dolphin.desktop
 application/zstd=org.kde.dolphin.desktop
 audio/aac=mpv.desktop
 audio/flac=mpv.desktop

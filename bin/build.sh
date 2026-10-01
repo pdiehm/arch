@@ -78,9 +78,9 @@ use() {
   fi
 
   cp "$path" "$TMP/res"
-  hash="$(sha < "$TMP/res")"
-  if [[ $path == /dev/stdin ]]; then chmod 444 "$TMP/res"; fi
+  chmod 644 "$TMP/res"
 
+  hash="$(sha < "$TMP/res")"
   mv "$TMP/res" "$TMP/stages/$STAGE/$hash"
   echo "$hash" >> "$TMP/stages/$STAGE/hash"
   echo "/stage/$hash"
@@ -154,6 +154,12 @@ script() {
 
   path="$(use "$path")"
   run $user bash -eu "$path" "${args[@]}"
+}
+
+# var <name> <value>
+var() {
+  local name="$1" value="$2"
+  run export "VARS+=s|@$name@|$value|g;"
 }
 
 # write [-auvx] [-m mode] [-o owner] <path> [content ...]
@@ -296,12 +302,6 @@ persist() {
   if ((file)); then run $user touch "$path" "$target"; else run $user mkdir -p "$path" "$target"; fi
   if [[ $mode ]]; then run $user chmod "$mode" "$target"; fi
   write -a /etc/fstab "$target $path none bind 0 0"
-}
-
-# var <name> <value>
-var() {
-  local name="$1" value="$2"
-  run export "VARS+=s|@$name@|$value|g;"
 }
 
 # conf [-de] <path> <name> ...
@@ -454,12 +454,12 @@ timer() {
   done
 
   shift "$((OPTIND - 1))"
-  local name="$1" time="$2" command="$3" args=("${@:4}")
+  local name="$1" time="$2" command=("${@:3}")
   local timer=("[Timer]" "OnCalendar=$time" "Persistent=true" "" "[Install]" "WantedBy=timers.target")
 
   local service=("[Service]" "Type=oneshot")
   if ((network)); then service+=('ExecStartPre=/bin/sh -c "until ping -c 1 1.1.1.1; do sleep 1; done"'); fi
-  service+=("ExecStart=$command ${args[*]@Q}")
+  service+=("ExecStart=${command[*]@Q}")
 
   if ((user)); then
     write -u ".config/systemd/user/$name.service" "${service[@]}"
@@ -481,7 +481,7 @@ if [[ -f /usr/local/lib/syscfg/key ]]; then
   fi
 fi
 
-if [[ ! -f $TMP/secrets/keys/$HOST_NAME ]]; then
+if [[ ! -d $TMP/secrets/keys ]]; then
   mkdir "$TMP/master"
 
   if [[ -f /usr/local/lib/syscfg/master ]]; then
@@ -550,7 +550,7 @@ for ((stage = 0; stage < STAGE; stage++)); do
     mount --bind "$TMP/root/pkgs" "$TMP/root/build/var/cache/pacman/pkg"
     mount --mkdir --bind "$TMP/stages/$stage" "$TMP/root/build/stage"
 
-    arch-chroot "$TMP/root/build" env -i SHELL=/bin/bash SYSTEMD_IN_CHROOT=1 bash -eu /stage/build.sh
+    arch-chroot "$TMP/root/build" env -i PATH=/bin SHELL=/bin/bash SYSTEMD_IN_CHROOT=1 bash -eu /stage/build.sh
     unmount "$TMP/root/build"
     rmdir "$TMP/root/build/stage"
 
@@ -580,15 +580,15 @@ mount --mkdir --label BOOT "$TMP/boot"
 find "$TMP/boot" -mindepth 1 -delete
 cp -r "$TMP/root/base/boot/." "$TMP/boot"
 
-for path in "$TMP/root/base/keep"/*; do
-  target="$TMP/root/keep/${path##*/}"
-  if [[ ! -e $target ]]; then cp -a "$path" "$target"; fi
-done
-
 for path in "$TMP/root/imgs"/*; do
   if [[ "${USED[*]}" != *${path##*/}* ]]; then
     btrfs subvolume delete --recursive "$path"
   fi
+done
+
+for path in "$TMP/root/base/keep"/*; do
+  target="$TMP/root/keep/${path##*/}"
+  if [[ ! -e $target ]]; then cp -a "$path" "$target"; fi
 done
 
 for path in "$TMP/root/keep"/*; do

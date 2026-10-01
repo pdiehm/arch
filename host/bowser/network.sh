@@ -8,7 +8,7 @@ Address=192.168.1.88/16
 Gateway=192.168.1.1
 EOF
 
-write -m 400 -o systemd-network /etc/systemd/network/wg.netdev << EOF
+write -o systemd-network -m 400 /etc/systemd/network/wg.netdev << EOF
 [NetDev]
 Name=wg
 Kind=wireguard

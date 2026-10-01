@@ -33,6 +33,10 @@ key-mgmt=wpa-psk
 psk=$(secret net/hotspot/psk)
 EOF
 
+copy -s net/eduroam/private-key /etc/NetworkManager/secrets/eduroam/private-key
+copy -s net/eduroam/client-cert /etc/NetworkManager/secrets/eduroam/client-cert
+copy -s net/eduroam/ca-cert /etc/NetworkManager/secrets/eduroam/ca-cert
+
 write -m 400 /etc/NetworkManager/system-connections/eduroam.nmconnection << EOF
 [connection]
 id=eduroam
@@ -54,10 +58,6 @@ private-key=/etc/NetworkManager/secrets/eduroam/private-key
 client-cert=/etc/NetworkManager/secrets/eduroam/client-cert
 ca-cert=/etc/NetworkManager/secrets/eduroam/ca-cert
 EOF
-
-copy -s net/eduroam/private-key /etc/NetworkManager/secrets/eduroam/private-key
-copy -s net/eduroam/client-cert /etc/NetworkManager/secrets/eduroam/client-cert
-copy -s net/eduroam/ca-cert /etc/NetworkManager/secrets/eduroam/ca-cert
 
 write -m 400 /etc/NetworkManager/system-connections/wg.nmconnection << EOF
 [connection]

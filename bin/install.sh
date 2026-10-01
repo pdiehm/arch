@@ -26,10 +26,10 @@ done
 
 DISK=""
 until [[ -b $DISK ]]; do
-  lsblk --output NAME,VENDOR,MODEL,SIZE,PARTLABEL,LABEL
+  lsblk --output NAME,TYPE,SIZE,PARTLABEL,LABEL
   echo
 
-  read -rp "Enter disk: " DISK
+  read -rp "Select disk: " DISK
   if [[ ! -b $DISK ]]; then DISK="/dev/$DISK"; fi
 done
 
