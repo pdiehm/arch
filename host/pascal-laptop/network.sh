@@ -71,7 +71,7 @@ addresses=fd42:6c77:9a2f::1002/112
 addr-gen-mode=stable-privacy
 
 [wireguard]
-private-key=$(secret wg/pascal-laptop)
+private-key=$(secret host/pascal-laptop/wg)
 private-key-flags=0
 
 [wireguard-peer.$(secret wg/pub/goomba)]

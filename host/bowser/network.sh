@@ -14,7 +14,7 @@ Name=wg
 Kind=wireguard
 
 [WireGuard]
-PrivateKey=$(secret wg/bowser)
+PrivateKey=$(secret host/bowser/wg)
 RouteTable=main
 
 [WireGuardPeer]

@@ -1,11 +1,11 @@
 symlink -u res/ssh/ssh_config .ssh/config
-copy -su ssh/keys/pascal-pc .ssh/pascal-pc
-copy -su ssh/keys/pascal-laptop .ssh/pascal-laptop
-copy -su ssh/keys/bowser .ssh/bowser
-copy -su ssh/keys/goomba .ssh/goomba
-copy -su ssh/keys/github .ssh/github
-copy -su ssh/keys/uni-gitlab .ssh/uni-gitlab
-copy -su ssh/keys/iso .ssh/iso
+copy -su ssh/pascal-pc .ssh/pascal-pc
+copy -su ssh/pascal-laptop .ssh/pascal-laptop
+copy -su ssh/bowser .ssh/bowser
+copy -su ssh/goomba .ssh/goomba
+copy -su ssh/github .ssh/github
+copy -su ssh/uni-gitlab .ssh/uni-gitlab
+copy -su ssh/iso .ssh/iso
 
 systemd -eu /usr/lib/systemd/user/ssh-agent.service
 write -au .config/dropin/env.sh 'SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"'

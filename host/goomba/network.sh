@@ -17,7 +17,7 @@ Name=wg
 Kind=wireguard
 
 [WireGuard]
-PrivateKey=$(secret wg/goomba)
+PrivateKey=$(secret host/goomba/wg)
 ListenPort=51820
 RouteTable=main
 

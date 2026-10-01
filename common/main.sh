@@ -14,8 +14,8 @@ write /etc/systemd/zram-generator.conf "[zram0]"
 package openssh
 copy res/ssh/sshd_config /etc/ssh/sshd_config
 copy res/ssh/known_hosts /etc/ssh/ssh_known_hosts
-copy -s "ssh/$HOST_NAME/host" /etc/ssh/host_key
-copy -sm 444 "ssh/$HOST_NAME/auth" /etc/ssh/authorized_keys
+copy -s "host/$HOST_NAME/ssh/host" /etc/ssh/host_key
+copy -sm 444 "host/$HOST_NAME/ssh/auth" /etc/ssh/authorized_keys
 systemd -m sshdgenkeys.service
 systemd -e sshd.service
 TCP+=(1970)
