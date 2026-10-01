@@ -111,7 +111,7 @@ secrets() {
     echo
     echo "Options:"
     echo "  -h   Print this help message"
-    echo "  -r   Rotate master password"
+    echo "  -r   Rotate keys"
     return
   fi
 
@@ -154,6 +154,7 @@ secrets() {
     echo
 
     sha "$REPLY" > "$TMP/keys/master"
+    rm -rf "$TMP/store/keys"
   fi
 
   while read -r host _; do
