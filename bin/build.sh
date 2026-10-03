@@ -263,19 +263,21 @@ symlink() {
   run $user ln -s "$src" "$dst"
 }
 
-# persist [-fu] [-m mode] <path>
+# persist [-fu] [-m mode] [-o owner] <path>
 #   -f   persist file
 #   -u   as user in home directory
-#   -m   change mode if created
+#   -m   change mode
+#   -o   change owner
 persist() {
   local OPTIND OPTARG opt
-  local file=0 user="" mode=""
+  local file=0 user="" mode="" owner=""
 
-  while getopts "fum:" opt; do
+  while getopts "fum:o:" opt; do
     case "$opt" in
       f) file=1 ;;
       u) user="-u" ;;
       m) mode="$OPTARG" ;;
+      o) owner="$OPTARG" ;;
       *) error "Illegal option" ;;
     esac
   done
@@ -300,7 +302,8 @@ persist() {
   run $user mkdir -p "$(dirname "$path")"
 
   if ((file)); then run $user touch "$path" "$target"; else run $user mkdir -p "$path" "$target"; fi
-  if [[ $mode ]]; then run $user chmod "$mode" "$target"; fi
+  if [[ $owner ]]; then run chown "$owner" "$target"; fi
+  if [[ $mode ]]; then run chmod "$mode" "$target"; fi
   write -a /etc/fstab "$target $path none bind 0 0"
 }
 
@@ -588,7 +591,13 @@ done
 
 for path in "$TMP/root/base/keep"/*; do
   target="$TMP/root/keep/${path##*/}"
-  if [[ ! -e $target ]]; then cp -a "$path" "$target"; fi
+
+  if [[ -e $target ]]; then
+    chown --reference "$path" "$target"
+    chmod --reference "$path" "$target"
+  else
+    cp -a "$path" "$target"
+  fi
 done
 
 for path in "$TMP/root/keep"/*; do
