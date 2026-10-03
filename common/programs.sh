@@ -19,4 +19,4 @@ package tmux
 symlink -u res/tmux.conf .config/tmux/tmux.conf
 
 copy -x res/bin/ntfy.sh /usr/local/bin/ntfy
-copy -sm 444 ntfy /usr/local/lib/ntfy/token
+copy -sm 444 ntfy /usr/local/keys/ntfy

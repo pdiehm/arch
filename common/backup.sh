@@ -5,6 +5,6 @@ elif ((${#BACKUP[@]})); then
   var TARGETS "${BACKUP[*]}"
   copy -vx res/bin/backup.sh /usr/local/lib/backup/backup.sh
 
-  copy -s ssh/backup /usr/local/lib/backup/key
+  copy -s ssh/backup /usr/local/keys/backup
   timer -n backup "Sat 03:00" /usr/local/lib/backup/backup.sh
 fi

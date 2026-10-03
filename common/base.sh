@@ -1,11 +1,11 @@
 write /etc/hostname "$HOST_NAME"
 run mkdir -m 1777 /keep
 
-copy -s "keys/$HOST_NAME" /usr/local/lib/syscfg/key
-if secret -q keys/master; then copy -s keys/master /usr/local/lib/syscfg/master; fi
+copy -s "keys/$HOST_NAME" /usr/local/keys/syscfg/host
+if secret -q keys/master; then copy -s keys/master /usr/local/keys/syscfg/master; fi
 
 script << EOF
-sha256sum /usr/local/lib/syscfg/key | head -c 32 > /etc/machine-id
+sha256sum /usr/local/keys/syscfg/host | head -c 32 > /etc/machine-id
 echo >> /etc/machine-id
 EOF
 

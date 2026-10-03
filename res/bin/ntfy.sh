@@ -34,7 +34,7 @@ if (($# == 0)); then
 fi
 
 curl -fsSL -d "$*" \
-  -H "Authorization: Bearer $(< /usr/local/lib/ntfy/token)" \
+  -H "Authorization: Bearer $(< /usr/local/keys/ntfy)" \
   ${PRIORITY:+-H "Priority: $PRIORITY"} \
   ${TITLE:+-H "Title: $TITLE"} \
   "https://ntfy.pdiehm.dev/$CHANNEL"

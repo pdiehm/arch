@@ -475,11 +475,50 @@ timer() {
   fi
 }
 
+# guard [-b binary] [-p path] [-u path] [group] [id]
+#   -b   for binary
+#   -p   to path
+#   -u   to path in home directory
+guard() {
+  local OPTIND OPTARG opt
+  local bins=() paths=()
+
+  while getopts "b:p:u:" opt; do
+    case "$opt" in
+      b) bins+=("$OPTARG") ;;
+      p) paths+=("$OPTARG") ;;
+      u) paths+=("/home/pascal/$OPTARG") ;;
+      *) error "Illegal option" ;;
+    esac
+  done
+
+  shift "$((OPTIND - 1))"
+  local group="${1:-_${bins[0]##*/}}" gid="${2:-}" path target
+  run groupadd ${gid:+--gid "$gid"} --key GID_MIN=10000 "$group"
+
+  for path in "${bins[@]}"; do
+    target="/usr/local/bin/${path##*/}"
+    run sh -c "if [[ -e ${target@Q} ]]; then echo 'Cannot guard' ${path@Q} '- File exists' >&2; exit 1; fi"
+
+    write launcher.c "#include <unistd.h>" "int main(int, char** argv) { return setregid(getegid(), -1) || execv(\"$path\", argv); }"
+    run gcc -s -o "$target" launcher.c
+    run rm launcher.c
+
+    run chown "root:$group" "$target"
+    run chmod 2755 "$target"
+  done
+
+  for path in "${paths[@]}"; do
+    run chown "root:$group" "$path"
+    run chmod 770 "$path"
+  done
+}
+
 mkdir "$TMP/secrets"
 if [[ ! -f secrets/$HOST_NAME ]]; then fatal "No secrets for host"; fi
 
-if [[ -f /usr/local/lib/syscfg/key ]]; then
-  if ! load_secrets "secrets/$HOST_NAME" "$TMP/secrets" "$(< /usr/local/lib/syscfg/key)"; then
+if [[ -f /usr/local/keys/syscfg/host ]]; then
+  if ! load_secrets "secrets/$HOST_NAME" "$TMP/secrets" "$(< /usr/local/keys/syscfg/host)"; then
     warn "Stale host key"
   fi
 fi
@@ -487,8 +526,8 @@ fi
 if [[ ! -d $TMP/secrets/keys ]]; then
   mkdir "$TMP/master"
 
-  if [[ -f /usr/local/lib/syscfg/master ]]; then
-    if ! load_secrets secrets/master "$TMP/master" "$(< /usr/local/lib/syscfg/master)"; then
+  if [[ -f /usr/local/keys/syscfg/master ]]; then
+    if ! load_secrets secrets/master "$TMP/master" "$(< /usr/local/keys/syscfg/master)"; then
       warn "Stale master key"
     fi
   fi

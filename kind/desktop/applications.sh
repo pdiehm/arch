@@ -7,10 +7,12 @@ copy -um 444 res/dolphin.toml .config/dolphinrc
 copy -um 444 res/gwenview.toml .config/gwenviewrc
 
 package firefox
-persist -u .config/mozilla/firefox
+guard -b /usr/bin/firefox _firefox 9999
+persist -uo root:_firefox -m 770 .config/mozilla/firefox
 symlink res/firefox.json /etc/firefox/policies/policies.json
 
 package aerc w3m
 symlink -u res/aerc .config/aerc
-copy -su mail/gmail .local/share/aerc/keys/gmail
-copy -su mail/uni .local/share/aerc/keys/uni
+copy -su mail/gmail .local/keys/aerc/gmail
+copy -su mail/uni .local/keys/aerc/uni
+guard -b /usr/bin/aerc -u .local/keys/aerc

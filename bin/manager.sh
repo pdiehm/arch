@@ -121,8 +121,8 @@ secrets() {
   chmod 700 "$TMP"
   mkdir "$TMP/store"
 
-  if [[ -f secrets/master && -f /usr/local/lib/syscfg/master ]]; then
-    if ! load_secrets secrets/master "$TMP/store" "$(< /usr/local/lib/syscfg/master)"; then
+  if [[ -f secrets/master && -f /usr/local/keys/syscfg/master ]]; then
+    if ! load_secrets secrets/master "$TMP/store" "$(< /usr/local/keys/syscfg/master)"; then
       warn "Stale master key"
     fi
   fi

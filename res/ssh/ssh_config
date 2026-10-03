@@ -1,39 +1,39 @@
 Match tagged="iso"
   User root
   ControlMaster no
-  IdentityFile ~/.ssh/iso
+  IdentityFile ~/.local/keys/ssh/iso
   StrictHostKeyChecking no
   UserKnownHostsFile /dev/null
 
 Host *
   ControlMaster auto
-  ControlPath ~/.ssh/.%r@%h:%p
+  ControlPath ~/.ssh/%r@%h:%p
   ControlPersist 5m
   IdentitiesOnly yes
   SetEnv TERM=xterm-256color
 
 Host pascal-pc
-  IdentityFile ~/.ssh/pascal-pc
+  IdentityFile ~/.local/keys/ssh/pascal-pc
   Port 1970
 
 Host pascal-laptop
-  IdentityFile ~/.ssh/pascal-laptop
+  IdentityFile ~/.local/keys/ssh/pascal-laptop
   Port 1970
 
 Host bowser
-  IdentityFile ~/.ssh/bowser
+  IdentityFile ~/.local/keys/ssh/bowser
   ForwardAgent yes
   Port 1970
 
 Host goomba
-  IdentityFile ~/.ssh/goomba
+  IdentityFile ~/.local/keys/ssh/goomba
   ForwardAgent yes
   Port 1970
 
 Host github.com
-  IdentityFile ~/.ssh/github
+  IdentityFile ~/.local/keys/ssh/github
   User git
 
 Host gitlab.informatik.uni-wuerzburg.de
-  IdentityFile ~/.ssh/uni-gitlab
+  IdentityFile ~/.local/keys/ssh/uni-gitlab
   User git

@@ -1,0 +1,17 @@
+[Desktop Entry]
+Type=Application
+Name=Firefox
+GenericName=Web Browser
+Comment=Fast and private browser
+Icon=firefox
+Exec=firefox %u
+Actions=private-window
+MimeType=application/json;application/pdf;application/rdf+xml;application/rss+xml;application/x-xpinstall;application/xhtml+xml;application/xml;audio/flac;audio/ogg;audio/webm;image/avif;image/gif;image/jpeg;image/png;image/svg+xml;image/webp;text/html;text/xml;video/ogg;video/webm;x-scheme-handler/chrome;x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/mailto;
+Categories=GNOME;GTK;Network;WebBrowser;
+Keywords=Internet;WWW;Browser;Web;Explorer;
+StartupNotify=true
+StartupWMClass=firefox
+
+[Desktop Action private-window]
+Name=Private Window
+Exec=firefox --private-window %u
