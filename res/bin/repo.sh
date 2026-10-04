@@ -163,6 +163,7 @@ remove() {
   NAME="$1"
   enter "$NAME"
 
+  CHANGES=()
   while read -r type ahead behind branch; do
     case "$type" in
       changes) CHANGES+=("Uncommited changes") ;;
