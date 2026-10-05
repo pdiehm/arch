@@ -1,0 +1,12 @@
+[Unit]
+Description=Install disk decryption key to boot partition
+ConditionPathExists=/usr/local/keys/disk
+DefaultDependencies=no
+Before=umount.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/cp /usr/local/keys/disk /boot/crypt
+
+[Install]
+WantedBy=reboot.target

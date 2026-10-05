@@ -622,6 +622,11 @@ mount --mkdir --label BOOT "$TMP/boot"
 find "$TMP/boot" -mindepth 1 -delete
 cp -r "$TMP/root/base/boot/." "$TMP/boot"
 
+if [[ ${SM_CRYPT:+x} ]]; then
+  cryptsetup luksKillSlot --batch-mode /dev/disk/by-label/crypt 1 || true
+  cryptsetup luksAddKey /dev/disk/by-label/crypt "$TMP/root/base/usr/local/keys/disk" <<< "$SM_CRYPT"
+fi
+
 for path in "$TMP/root/imgs"/*; do
   if [[ "${USED[*]}" != *${path##*/}* ]]; then
     btrfs subvolume delete --recursive "$path"
@@ -645,3 +650,9 @@ for path in "$TMP/root/keep"/*; do
     if [[ $REPLY == y ]]; then rm -rf "$path"; fi
   fi
 done
+
+if [[ ${SM_REBOOT:+x} ]]; then
+  cp "$TMP/root/base/usr/local/keys/disk" "$TMP/boot/crypt"
+  read -rsp "Press enter to reboot..."
+  systemctl reboot
+fi

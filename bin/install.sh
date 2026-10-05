@@ -33,14 +33,13 @@ until [[ -b $DISK ]]; do
   if [[ ! -b $DISK ]]; then DISK="/dev/$DISK"; fi
 done
 
-while true; do
+CRYPT="" REPLY="-"
+while [[ $CRYPT != "$REPLY" ]]; do
   read -rsp "Enter disk encryption password: " CRYPT
   echo
-  if [[ ! $CRYPT ]]; then break; fi
 
   read -rsp "Confirm password: "
   echo
-  if [[ $REPLY == "$CRYPT" ]]; then break; fi
 done
 
 if [[ $HOST_BOOT == efi ]]; then
@@ -53,24 +52,18 @@ fi
 
 wipefs --all "$DISK"
 printf "%s\n" "${CFG[@]}" | sfdisk "$DISK"
-while [[ ! ${PARTS[1]:+x} ]]; do mapfile -t PARTS < <(lsblk --noheadings --paths --output KNAME "$DISK"); done
+until [[ -b ${PARTS[1]:-} ]]; do mapfile -t PARTS < <(lsblk --noheadings --paths --output KNAME "$DISK"); done
 
-PART_BOOT="${PARTS[1]}"
-PART_ROOT="${PARTS[2]}"
+cryptsetup luksFormat --label crypt "${PARTS[2]}" <<< "$CRYPT"
+cryptsetup open "${PARTS[2]}" root <<< "$CRYPT"
 
-until [[ -b $PART_BOOT ]]; do sleep 1; done
-until [[ -b $PART_ROOT ]]; do sleep 1; done
-
-if [[ $CRYPT ]]; then
-  cryptsetup luksFormat "$PART_ROOT" <<< "$CRYPT"
-  cryptsetup open "$PART_ROOT" root <<< "$CRYPT"
-  PART_ROOT="/dev/mapper/root"
-fi
-
-mkfs.fat -F 32 -n BOOT "$PART_BOOT"
-mkfs.btrfs --force --label root "$PART_ROOT"
+mkfs.fat -F 32 -n BOOT "${PARTS[1]}"
+mkfs.btrfs --force --label root /dev/mapper/root
 
 until [[ -b /dev/disk/by-label/BOOT ]]; do sleep 1; done
+until [[ -b /dev/disk/by-label/crypt ]]; do sleep 1; done
 until [[ -b /dev/disk/by-label/root ]]; do sleep 1; done
 
+export SM_REBOOT=1
+export SM_CRYPT="$CRYPT"
 exec bin/build.sh "$HOST_NAME"

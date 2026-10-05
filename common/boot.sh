@@ -1,8 +1,11 @@
 package "$HOST_KERNEL" linux-firmware
 copy res/initcpio/root/hook.sh /etc/initcpio/hooks/root
 copy res/initcpio/root/install.sh /etc/initcpio/install/root
-conf /etc/mkinitcpio.conf "HOOKS=(base udev autodetect microcode modconf keyboard block encrypt filesystems root fsck)"
+conf /etc/mkinitcpio.conf "HOOKS=(base udev keyboard autodetect microcode modconf block filesystems root fsck)"
 run mkinitcpio --allpresets
+
+copy -s "host/$HOST_NAME/disk" /usr/local/keys/disk
+systemd -ie autocrypt.service
 
 package limine "$HOST_CPU-ucode"
 var KERNEL "$HOST_KERNEL"
