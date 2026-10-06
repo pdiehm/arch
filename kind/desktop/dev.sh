@@ -1,6 +1,5 @@
 package make gdb strace cmake ninja gcc rust python python-pip nodejs npm jdk-openjdk php sqlite \
-  texlive-basic texlive-latex texlive-latexrecommended texlive-latexextra texlive-fontsrecommended texlive-langgerman \
-  texlive-binextra perl-file-homedir perl-yaml-tiny
+  texlive-{basic,latex,latexrecommended,latexextra,fontsrecommended,binextra,langgerman} perl-file-homedir perl-yaml-tiny
 
 package base-devel paru devtools nvchecker
 conf -e /etc/paru.conf BottomUp CleanAfter RemoveMake SudoLoop

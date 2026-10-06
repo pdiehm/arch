@@ -2,7 +2,7 @@ package greetd greetd-tuigreet
 copy res/greetd.toml /etc/greetd/config.toml
 systemd -e greetd.service
 
-package fontconfig noto-fonts noto-fonts-extra noto-fonts-cjk noto-fonts-emoji ttf-cascadia-code-nerd
+package fontconfig noto-fonts noto-fonts-{extra,cjk,emoji} ttf-cascadia-code-nerd
 symlink -u res/fontconfig.xml .config/fontconfig/fonts.conf
 
 package hyprland hyprpaper hyprlock hypridle hyprshutdown xdg-desktop-portal-hyprland

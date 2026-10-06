@@ -1,16 +1,9 @@
 package neovim vim-spell-de nvim-plugins-pd \
-  clang rust-analyzer yaml-language-server \
-  prettier prettier-plugin-css-order prettier-plugin-organize-imports prettier-plugin-xml \
-  typescript-language-server eslint-language-server tailwindcss-language-server \
-  vscode-css-languageserver vscode-html-languageserver vscode-json-languageserver \
-  bash-language-server shellcheck shfmt \
-  cmake-language-server cmake-format \
-  dockerfile-language-server dockerfmt \
-  lua-language-server stylua \
-  nixd nixfmt \
-  phpactor prettier-plugin-php \
-  python-lsp-server python-black python-isort \
-  texlab bibtex-tidy
+  {bash,cmake,dockerfile,eslint,lua,tailwindcss,typescript,yaml}-language-server \
+  vscode-{css,html,json}-languageserver python-{lsp-server,black,isort} \
+  clang nixd phpactor rust-analyzer shellcheck texlab \
+  prettier prettier-plugin-{php,xml,css-order,organize-imports} \
+  bibtex-tidy cmake-format dockerfmt nixfmt shfmt stylua
 
 symlink -u res/nvim .config/nvim
 write -au .config/dropin/env.sh "EDITOR=nvim"

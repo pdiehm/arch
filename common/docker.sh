@@ -1,4 +1,4 @@
-package docker docker-compose docker-buildx
+package docker docker-{compose,buildx}
 copy res/docker.json /etc/docker/daemon.json
 
 persist /var/lib/docker
@@ -14,8 +14,8 @@ elif [[ $HOST_KIND == server ]]; then
   persist -u docker
 
   BACKUP+=("/home/pascal/docker/**/.env" "/var/lib/docker/volumes/*/")
-  write -ax /usr/local/lib/backup/pre.sh "systemctl stop docker.service docker.socket"
-  write -ax /usr/local/lib/backup/post.sh "systemctl start docker.service docker.socket"
+  write -ax /usr/local/lib/backup/pre.sh "systemctl stop docker.{service,socket}"
+  write -ax /usr/local/lib/backup/post.sh "systemctl start docker.{service,socket}"
 else
   error "Illegal host kind: $HOST_KIND"
 fi

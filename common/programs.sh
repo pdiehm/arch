@@ -1,4 +1,4 @@
-package zsh zsh-autosuggestions zsh-completions zsh-syntax-highlighting
+package zsh zsh-{autosuggestions,completions,syntax-highlighting}
 write -a /etc/zsh/zshenv 'ZDOTDIR="$HOME/.config/zsh"'
 run chsh --shell /usr/bin/zsh pascal
 symlink -u res/zsh .config/zsh
@@ -9,7 +9,7 @@ copy res/vimrc.vim /etc/vimrc
 package git git-delta
 symlink -u res/git.conf .config/git/config
 
-package man-db man-pages
+package man-{db,pages}
 persist /var/cache/man
 
 package htop

@@ -5,7 +5,7 @@ write -x /usr/bin/hostname "#!/bin/sh" "cat /etc/hostname"
 conf /etc/mkinitcpio.conf "HOOKS=(base udev keyboard autodetect microcode modconf block filesystems root zfs fsck)"
 run mkinitcpio --allpresets
 
-systemd -e zfs.target zfs-import.target zfs-import-scan.service zfs-mount.service zfs-zed.service
+systemd -e {zfs,zfs-import}.target {zfs-import-scan,zfs-mount,zfs-zed}.service
 timer zfs-scrub-all weekly /usr/bin/zpool scrub -a
 
 write /etc/zfs/zed.d/zed.rc << EOF
