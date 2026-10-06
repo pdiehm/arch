@@ -14,6 +14,11 @@ package prismlauncher
 persist -u .local/share/PrismLauncher
 BACKUP+=("/home/pascal/.local/share/PrismLauncher/instances/*/minecraft/saves")
 
+package supertuxkart
+persist -u .config/supertuxkart
+persist -u .local/share/supertuxkart
+BACKUP+=("/home/pascal/{.config,.local/share}/supertuxkart")
+
 write /etc/systemd/system/alsa-restore.service.d/auto-mute.conf << EOF
 [Service]
 ExecStartPost=/usr/bin/amixer -c 2 sset "Auto-Mute Mode" Disabled
