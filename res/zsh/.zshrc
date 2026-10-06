@@ -196,4 +196,4 @@ _sm() {
 source "$HOME/.config/zsh/$HOSTKIND.zsh"
 source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-FZF_ALT_C_COMMAND="" FZF_CTRL_T_COMMAND="" source /usr/share/fzf/key-bindings.zsh
+if [[ ! ${VIMRUNTIME:+x} ]]; then FZF_ALT_C_COMMAND="" FZF_CTRL_T_COMMAND="" source /usr/share/fzf/key-bindings.zsh; fi
