@@ -1,7 +1,7 @@
 import ./network
 
-package cups ipp-usb
-systemd -e {cups,ipp-usb}.service
+package cups cups-browsed ipp-usb
+systemd -e {cups,cups-browsed,ipp-usb}.service
 
 package via-bin
 copy res/udev/via.rules /etc/udev/rules.d/10-via.rules
