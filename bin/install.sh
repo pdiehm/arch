@@ -61,7 +61,6 @@ mkfs.fat -F 32 -n BOOT "${PARTS[1]}"
 mkfs.btrfs --force --label root /dev/mapper/root
 
 until [[ -b /dev/disk/by-label/BOOT ]]; do sleep 1; done
-until [[ -b /dev/disk/by-label/crypt ]]; do sleep 1; done
 until [[ -b /dev/disk/by-label/root ]]; do sleep 1; done
 
 export SM_REBOOT=1
