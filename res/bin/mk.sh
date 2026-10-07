@@ -18,7 +18,7 @@ elif [[ $SOURCE == arch.iso ]]; then
 
   mkdir -p "$TMP/config/airootfs"/{etc/pacman.d,root/.ssh}
   cp /etc/pacman.d/mirrorlist "$TMP/config/airootfs/etc/pacman.d"
-  printf "%s\n" arch-install-scripts dosfstools btrfs-progs cryptsetup >> "$TMP/config/packages.x86_64"
+  printf "%s\n" linux-firmware arch-install-scripts dosfstools btrfs-progs cryptsetup >> "$TMP/config/packages.x86_64"
   echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPFQ+VK4y/tYvIGxEwalz6CPuDckHooWvJT8+ZmXvUv8" > "$TMP/config/airootfs/root/.ssh/authorized_keys"
   echo "pacman-key --init && pacman-key --populate && curl -fsSL https://pdiehm.github.io/arch | sh" > "$TMP/config/airootfs/root/.bash_profile"
 
