@@ -11,8 +11,8 @@ require("conform").setup({
     html = { "prettier" },
     javascript = { "prettier-js" },
     javascriptreact = { "prettier-js" },
-    json = { "prettier-cfg" },
-    jsonc = { "prettier-cfg" },
+    json = { "prettier-json" },
+    jsonc = { "prettier-json" },
     lua = { "stylua" },
     markdown = { "prettier" },
     nix = { "nixfmt" },
@@ -24,13 +24,13 @@ require("conform").setup({
     typescript = { "prettier-js" },
     typescriptreact = { "prettier-js" },
     xml = { "prettier-xml" },
-    yaml = { "prettier-cfg" },
+    yaml = { "prettier-json" },
     zsh = { "shfmt" },
   },
 
   formatters = {
-    ["clang-format"] = { prepend_args = { "-style=file:/home/pascal/.config/clangd/format.yaml" } },
     black = { prepend_args = { "--line-length=120" } },
+    ["clang-format"] = { prepend_args = { "-style=file:/home/pascal/.config/clangd/format.yaml" } },
     cmake_format = { prepend_args = { "--line-width=120", "--tab-size=2" } },
     dockerfmt = { prepend_args = { "--indent=2", "--newline", "--space-redirects" } },
     latexindent = { prepend_args = { "--local=/home/pascal/.config/latexindent.yaml", "--logfile=/dev/null" } },
@@ -54,9 +54,17 @@ require("conform").setup({
       },
     },
 
+    ["prettier-css"] = {
+      inherit = "prettier",
+      prepend_args = {
+        "--plugin=/usr/lib/node_modules/prettier-plugin-css-order/src/main.mjs",
+        "--print-width=120",
+        "--tab-width=2",
+      },
+    },
+
     ["prettier-js"] = {
       inherit = "prettier",
-
       prepend_args = {
         "--plugin=/usr/lib/node_modules/prettier-plugin-organize-imports/index.js",
         "--print-width=120",
@@ -65,24 +73,13 @@ require("conform").setup({
       },
     },
 
-    ["prettier-cfg"] = {
+    ["prettier-json"] = {
       inherit = "prettier",
       prepend_args = { "--print-width=120", "--tab-width=2", "--trailing-comma=none" },
     },
 
-    ["prettier-css"] = {
-      inherit = "prettier",
-
-      prepend_args = {
-        "--plugin=/usr/lib/node_modules/prettier-plugin-css-order/src/main.mjs",
-        "--print-width=120",
-        "--tab-width=2",
-      },
-    },
-
     ["prettier-php"] = {
       inherit = "prettier",
-
       prepend_args = {
         "--plugin=/usr/lib/node_modules/@prettier/plugin-php/standalone.js",
         "--print-width=120",
@@ -93,7 +90,6 @@ require("conform").setup({
 
     ["prettier-xml"] = {
       inherit = "prettier",
-
       prepend_args = {
         "--plugin=/usr/lib/node_modules/@prettier/plugin-xml/src/plugin.js",
         "--print-width=120",
