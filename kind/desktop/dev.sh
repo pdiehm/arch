@@ -1,4 +1,4 @@
-package make gdb strace gcc cmake ninja rust python python-pip nodejs npm jdk-openjdk php sqlite \
+package make gdb strace gcc cmake ninja rust python python-pip nodejs npm jdk-openjdk gradle php sqlite \
   texlive-{basic,latex,latexrecommended,latexextra,fontsrecommended,binextra,langgerman} perl-{file-homedir,yaml-tiny}
 
 package base-devel paru devtools nvchecker
