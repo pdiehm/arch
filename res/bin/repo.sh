@@ -85,6 +85,7 @@ help() {
   echo "Commands:"
   echo "  help                   Print this help message"
   echo "  clone <url> [name]     Clone repo"
+  echo "  create <name>          Create repo"
   echo "  edit <name> [path]     Open editor in repo"
   echo "  fetch [name ...]       Fetch repos"
   echo "  list                   List repos"
@@ -107,6 +108,11 @@ clone() {
   else
     git clone "$SRC" "$NAME"
   fi
+}
+
+create() {
+  mkdir "$1"
+  git -C "$1" init
 }
 
 edit() {
@@ -273,7 +279,7 @@ update() {
 
 case "${1:-help}" in
   help) help ;;
-  clone | edit | list | remove | run | shell | status | temp) "$@" ;;
+  clone | create | edit | list | remove | run | shell | status | temp) "$@" ;;
   fetch | update) if (($# > 1)); then "$@"; else "$1" ./*; fi ;;
   *) fatal "Illegal command: $1" ;;
 esac

@@ -59,7 +59,7 @@ _repo() {
   repos=("${repos[@]##*/}")
 
   if ((CURRENT == 2)); then
-    compadd help clone edit fetch list remove run shell status temp update
+    compadd help clone create edit fetch list remove run shell status temp update
   elif [[ ${words[2]} == edit ]]; then
     if ((CURRENT == 3)); then
       compadd "${repos[@]}"
