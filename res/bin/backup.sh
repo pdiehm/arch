@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-shopt -s nullglob dotglob globstar
+shopt -s dotglob globstar nullglob
 CODE=0
 
 if [[ -x /usr/local/lib/backup/pre.sh ]]; then

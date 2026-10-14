@@ -4,9 +4,9 @@ service() {
   if (($#)); then
     docker compose --file "$HOME/docker/$HOSTNAME/$1/compose.yaml" "${@:2}"
   else
-    docker container ls --all --format $'\e[2m{{ .ID }}\e[m\x09\e[1;34m{{ .Names }}\e[m\x09\e[36mCreated {{ .RunningFor }}\e[m\x09{{ .Status }}' |
-      sed $'s/\x09Up .*/\e[32m\\0\e[m/; s/\x09Exited .*/\e[31m\\0\e[m/; s/\x09Created .*/\e[33m\\0\e[m/' |
-      column --table --separator $'\x09'
+    docker container ls --all --format $'\e[2m{{ .ID }}\e[m\t\e[1;34m{{ .Names }}\e[m\t\e[36mCreated {{ .RunningFor }}\e[m\t{{ .Status }}' |
+      sed $'s/\tUp .*/\e[32m\\0\e[m/; s/\tExited .*/\e[31m\\0\e[m/; s/\tCreated .*/\e[33m\\0\e[m/' |
+      column --table --separator $'\t'
   fi
 }
 

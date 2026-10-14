@@ -221,10 +221,10 @@ status() {
     fi
 
     case "$type" in
-      local) printf "\e[32m%s\x09\e[36mlocal\x09\e[33m%s \e[m%s\n" "$branch" "$hash" "$message" ;;
-      branch) printf "\e[32m%s\x09\e[36m\u2191\e[m%d \e[36m\u2193\e[m%d\x09\e[33m%s \e[m%s\n" "$branch" "$ahead" "$behind" "$hash" "$message" ;;
+      local) printf "\e[32m%s\t\e[36mlocal\t\e[33m%s \e[m%s\n" "$branch" "$hash" "$message" ;;
+      branch) printf "\e[32m%s\t\e[36m\u2191\e[m%d \e[36m\u2193\e[m%d\t\e[33m%s \e[m%s\n" "$branch" "$ahead" "$behind" "$hash" "$message" ;;
     esac
-  done | column --table --separator $'\x09'
+  done | column --table --separator $'\t'
 
   if git-has-stash; then
     echo

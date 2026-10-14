@@ -176,7 +176,7 @@ _prompt_char() {
 }
 
 _prompt_host() {
-  if [[ ${SSH_TTY:+x} ]]; then
+  if [[ -v SSH_TTY ]]; then
     echo -n "%F{14}%n@%M%f"
   fi
 }
@@ -196,4 +196,4 @@ _sm() {
 source "$HOME/.config/zsh/$HOSTKIND.zsh"
 source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-if [[ ! ${VIMRUNTIME:+x} ]]; then FZF_ALT_C_COMMAND="" FZF_CTRL_T_COMMAND="" source /usr/share/fzf/key-bindings.zsh; fi
+if [[ ! -v VIMRUNTIME ]]; then FZF_ALT_C_COMMAND="" FZF_CTRL_T_COMMAND="" source /usr/share/fzf/key-bindings.zsh; fi

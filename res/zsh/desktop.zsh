@@ -90,7 +90,7 @@ _repo() {
   fi
 }
 
-if [[ ${KITTY_INSTALLATION_DIR:+x} ]]; then
+if [[ -v KITTY_INSTALLATION_DIR ]]; then
   export KITTY_SHELL_INTEGRATION="enabled"
   autoload -Uz "$KITTY_INSTALLATION_DIR/shell-integration/zsh/kitty-integration"
   kitty-integration

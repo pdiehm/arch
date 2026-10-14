@@ -554,7 +554,7 @@ mkdir -p "$TMP/stages/$STAGE"
 DRY=1 import main
 DRY=0 import main
 
-if [[ ${SM_BREAK:+x} ]]; then
+if [[ -v SM_BREAK ]]; then
   if ! env -C "$TMP" bash; then
     fatal "Shell exited with non-zero status, aborting..."
   fi
@@ -572,7 +572,7 @@ if [[ ! -d $TMP/root/keep ]]; then btrfs subvolume create "$TMP/root/keep"; fi
 if [[ ! -d $TMP/root/pkgs ]]; then btrfs subvolume create "$TMP/root/pkgs"; fi
 if [[ -d $TMP/root/build ]]; then btrfs subvolume delete --recursive "$TMP/root/build"; fi
 
-if [[ ${SM_CLEAN:+x} || ! -d $TMP/root/imgs/$HASH ]]; then
+if [[ -v SM_CLEAN || ! -d $TMP/root/imgs/$HASH ]]; then
   printf "\e[s\e[H\e[K\e[1mInstalling base system...\e[m\e[u"
   btrfs subvolume create "$TMP/root/build"
   pacstrap -G "$TMP/root/build"
@@ -585,7 +585,7 @@ for ((stage = 0; stage < STAGE; stage++)); do
   hash="$(sha < "$TMP/stages/$stage/hash")"
   hash="$(sha "$HASH+$hash")"
 
-  if [[ ${SM_CLEAN:+x} || ! -d $TMP/root/imgs/$hash ]]; then
+  if [[ -v SM_CLEAN || ! -d $TMP/root/imgs/$hash ]]; then
     printf "\e[s\e[H\e[K\e[1mStage %d of %d: %s\e[m\e[u" "$((stage + 1))" "$STAGE" "$(< "$TMP/stages/$stage/module")"
     btrfs subvolume snapshot "$TMP/root/imgs/$HASH" "$TMP/root/build"
     mount --bind "$TMP/root/build" "$TMP/root/build"
@@ -604,7 +604,7 @@ for ((stage = 0; stage < STAGE; stage++)); do
   USED+=("$HASH")
 done
 
-if [[ ${SM_DRY:+x} ]]; then
+if [[ -v SM_DRY ]]; then
   btrfs subvolume snapshot "$TMP/root/imgs/$HASH" "$TMP/root/build"
   mount --bind "$TMP/root/build" "$TMP/root/build"
   arch-chroot "$TMP/root/build" || true
@@ -622,7 +622,7 @@ mount --mkdir --label BOOT "$TMP/boot"
 find "$TMP/boot" -mindepth 1 -delete
 cp -r "$TMP/root/base/boot/." "$TMP/boot"
 
-if [[ ${SM_CRYPT:+x} ]]; then
+if [[ -v SM_CRYPT ]]; then
   cryptsetup luksKillSlot --batch-mode /dev/disk/by-label/crypt 1 || true
   cryptsetup luksAddKey /dev/disk/by-label/crypt "$TMP/root/base/usr/local/keys/disk" <<< "$SM_CRYPT"
 fi
@@ -651,7 +651,7 @@ for path in "$TMP/root/keep"/*; do
   fi
 done
 
-if [[ ${SM_REBOOT:+x} ]]; then
+if [[ -v SM_REBOOT ]]; then
   cp "$TMP/root/base/usr/local/keys/disk" "$TMP/boot/crypt"
   read -rsp "Press enter to reboot..."
   systemctl reboot

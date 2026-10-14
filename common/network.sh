@@ -11,8 +11,8 @@ if ((DRY)); then
   TCP=(1234)
   UDP=(1234)
 else
-  var TCP "$(IFS=, && echo "${TCP[*]}")"
-  var UDP "$(IFS=, && echo "${UDP[*]}")"
+  var TCP "$(IFS="," && echo "${TCP[*]}")"
+  var UDP "$(IFS="," && echo "${UDP[*]}")"
   copy -v res/nftables.conf /etc/nftables.conf
   systemd -e nftables.service
 fi
