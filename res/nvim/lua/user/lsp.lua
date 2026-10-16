@@ -5,6 +5,39 @@ vim.diagnostic.config({
   virtual_text = true,
 })
 
+vim.lsp.config("bashls", {
+  filetypes = { "bash", "sh", "zsh" },
+})
+
+vim.lsp.config("rust_analyzer", {
+  settings = {
+    ["rust-analyzer"] = {
+      check = {
+        command = "clippy",
+      },
+    },
+  },
+})
+
+vim.lsp.enable("bashls")
+vim.lsp.enable("clangd")
+vim.lsp.enable("cmake")
+vim.lsp.enable("cssls")
+vim.lsp.enable("dockerls")
+vim.lsp.enable("eslint")
+vim.lsp.enable("html")
+vim.lsp.enable("jdtls")
+vim.lsp.enable("jsonls")
+vim.lsp.enable("lua_ls")
+vim.lsp.enable("nixd")
+vim.lsp.enable("phpactor")
+vim.lsp.enable("pylsp")
+vim.lsp.enable("rust_analyzer")
+vim.lsp.enable("tailwindcss")
+vim.lsp.enable("texlab")
+vim.lsp.enable("ts_ls")
+vim.lsp.enable("yamlls")
+
 vim.keymap.set("n", "gp", function()
   vim.diagnostic.jump({ count = 1 })
 end)
@@ -40,9 +73,10 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
 vim.api.nvim_create_autocmd("FileType", {
   callback = function()
-    if pcall(vim.treesitter.start) then
-      local lang = vim.treesitter.language.get_lang(vim.bo.filetype)
-      if lang and vim.treesitter.query.get(lang, "indents") then
+    local lang = vim.treesitter.language.get_lang(vim.bo.filetype)
+
+    if lang and pcall(vim.treesitter.start) then
+      if vim.treesitter.query.get(lang, "indents") then
         vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
       end
     end

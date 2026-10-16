@@ -1,7 +1,6 @@
 require("user.plugins.cmp")
 require("user.plugins.conform")
 require("user.plugins.csvview")
-require("user.plugins.lsp")
 require("user.plugins.oil")
 require("user.plugins.telescope")
 require("user.plugins.todo-comments")
