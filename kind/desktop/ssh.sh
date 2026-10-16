@@ -18,4 +18,5 @@ ExecStartPost=/usr/local/bin/ssh-add "%h/.local/keys/ssh/github"
 EOF
 
 package sshfs
+conf -e /etc/fuse.conf user_allow_other
 systemd -ieu home-pascal-Shared.mount
