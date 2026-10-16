@@ -1,7 +1,6 @@
 require("user.keymaps.autoclose")
 require("user.keymaps.window")
 
-vim.keymap.set("n", "g0", "gg0")
 vim.keymap.set("n", "gl", "<C-o>")
 vim.keymap.set("n", "gq", "<Cmd>cnext<CR>")
 vim.keymap.set("n", "gQ", "<Cmd>cprev<CR>")
