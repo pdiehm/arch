@@ -35,11 +35,11 @@ load_host() {
   local name="$1" line head key
 
   while IFS="," read -ra line; do
-    if [[ -v head ]]; then
+    if [[ ! -v head ]]; then
+      head=("${line[@]}")
+    elif [[ ${line[0]} == "$name" ]]; then
       for key in "${!head[@]}"; do export "HOST_${head[key]}=${line[key]}"; done
       return
-    elif [[ ${line[0]} == "$name" ]]; then
-      head=("${line[@]}")
     fi
   done < hosts.csv
 
