@@ -22,7 +22,6 @@ TCP+=(1970)
 
 package fwupd
 persist /var/lib/fwupd
-persist /var/cache/fwupd
 systemd -e fwupd-refresh.timer
 
 systemd -e fstrim.timer
