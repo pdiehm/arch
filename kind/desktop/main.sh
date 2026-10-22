@@ -9,7 +9,6 @@ import ./nvim
 import ./scripts
 
 package tlrc
-run -u tldr --update
 upgrade -u tldr --update
 
 symlink /usr/lib/systemd/system/poweroff.target /etc/systemd/system/ctrl-alt-del.target
