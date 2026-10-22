@@ -12,6 +12,7 @@ package tlrc
 run -u tldr --update
 upgrade -u tldr --update
 
+symlink /usr/lib/systemd/system/poweroff.target /etc/systemd/system/ctrl-alt-del.target
 copy res/systemd/logind.conf /etc/systemd/logind.conf
 write /etc/sysctl.d/sysrq.conf "kernel.sysrq = 1"
 
