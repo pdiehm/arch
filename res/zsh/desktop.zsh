@@ -8,6 +8,7 @@ compdef '_arguments ":cmd:(power discoverable)"' bt-toggle
 compdef '_arguments ":cmd:_command_names" "*::args:_normal"' bw
 compdef '_arguments ":cmd:(pixel region window monitor)"' hyprshot
 
+alias docker="sudo docker"
 alias help='bash -c "help \$0"'
 alias mktex='latexmk -cd -pdf -outdir="$PWD/build"'
 alias open="xdg-open"
