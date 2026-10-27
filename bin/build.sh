@@ -28,24 +28,53 @@ error() {
   kill "$$"
 }
 
-# resolve <path>
+# resolve [-aeru] <path>
+#   -a   absolute path
+#   -e   require existence
+#   -r   relative to repo root
+#   -u   relative to home directory
 resolve() {
-  local path="$1"
+  local OPTIND OPTARG opt
+  local absolute=0 exists=0 repo=0 user=0
 
-  if [[ $path != ./* ]]; then
-    echo "$path"
-  elif [[ $MODULE != */* ]]; then
-    echo "${path#./}"
-  else
-    echo "${MODULE%/*}/${path#./}"
+  while getopts "aeru" opt; do
+    case "$opt" in
+      a) absolute=1 ;;
+      e) exists=1 ;;
+      r) repo=1 ;;
+      u) user=1 ;;
+      *) error "Illegal option" ;;
+    esac
+  done
+
+  shift "$((OPTIND - 1))"
+  if ((repo && ! absolute)); then error "Option '-r' requires '-a'"; fi
+  if ((user && ! absolute)); then error "Option '-u' requires '-a'"; fi
+  if ((repo + user > 1)); then error "Options '-r' and '-u' are mutually exclusive"; fi
+
+  local path="$1"
+  if [[ $path == ./* ]]; then path="$(dirname "$MODULE")/${path#./}"; fi
+
+  if ((absolute)) && [[ $path != /* ]]; then
+    if ((repo)); then
+      path="/home/pascal/.config/syscfg/$path"
+    elif ((user)); then
+      path="/home/pascal/$path"
+    else
+      path="/$path"
+    fi
+  elif ((! absolute)) && [[ $path == /* && $path != /dev/stdin && $path != $TMP/* ]]; then
+    error "Absolute path: $path"
   fi
+
+  if ((exists)) && [[ ! -e $path ]]; then error "No such file or directory: $path"; fi
+  echo "$path"
 }
 
 # import <path>
 import() {
   local path="$1" mod
   path="$(resolve "$path")"
-  if [[ $path == /* ]]; then error "Absolute path: $path"; fi
 
   for mod in "$path" "$path.sh" "$path/main.sh"; do
     if [[ ! -f $mod ]]; then continue; fi
@@ -68,14 +97,8 @@ import() {
 # use [path]
 use() {
   local path="${1:-/dev/stdin}" hash
-  path="$(resolve "$path")"
+  path="$(resolve -e "$path")"
   if ((DRY)); then return; fi
-
-  if [[ $path == /* && $path != /dev/stdin && $path != $TMP/* ]]; then
-    error "Absolute path: $path"
-  elif [[ ! -e $path ]]; then
-    error "No such file or directory: $path"
-  fi
 
   cp "$path" "$TMP/res"
   chmod 644 "$TMP/res"
@@ -181,6 +204,7 @@ write() {
 
   shift "$((OPTIND - 1))"
   local path="$1" lines=("${@:2}") src cmd
+  path="$(resolve -a $user "$path")"
 
   if ((${#lines[@]})); then src="$(printf "%s\n" "${lines[@]}" | use)"; else src="$(use)"; fi
   if [[ $vars ]]; then cmd="sed ${vars@Q} ${src@Q}"; else cmd="cat ${src@Q}"; fi
@@ -188,9 +212,10 @@ write() {
 
   run $user mkdir -p "$(dirname "$path")"
   run $user sh -c "$cmd"
-  if [[ $owner ]]; then run $user chown "$owner" "$path"; fi
-  if [[ $mode ]]; then run $user chmod "$mode" "$path"; fi
-  if ((exec)); then run $user chmod +x "$path"; fi
+
+  if [[ $owner ]]; then run chown "$owner" "$path"; fi
+  if [[ $mode ]]; then run chmod "$mode" "$path"; fi
+  if ((exec)); then run chmod +x "$path"; fi
 }
 
 # copy [-sux] [-m mode] [-o owner] [-v KEY=VALUE] <src> <dst>
@@ -218,6 +243,7 @@ copy() {
 
   shift "$((OPTIND - 1))"
   local src="$1" dst="$2"
+  dst="$(resolve -a $user "$dst")"
 
   if ((secret)); then
     mode="${mode:-400}"
@@ -228,9 +254,9 @@ copy() {
 
   run $user mkdir -p "$(dirname "$dst")"
   if [[ $vars ]]; then run $user sh -c "sed ${vars@Q} ${src@Q} > ${dst@Q}"; else run $user cp "$src" "$dst"; fi
-  if [[ $owner ]]; then run $user chown "$owner" "$dst"; fi
-  if [[ $mode ]]; then run $user chmod "$mode" "$dst"; fi
-  if ((exec)); then run $user chmod +x "$dst"; fi
+  if [[ $owner ]]; then run chown "$owner" "$dst"; fi
+  if [[ $mode ]]; then run chmod "$mode" "$dst"; fi
+  if ((exec)); then run chmod +x "$dst"; fi
 }
 
 # symlink [-u] <src> <dst>
@@ -248,7 +274,7 @@ symlink() {
 
   shift "$((OPTIND - 1))"
   local src="$1" dst="$2"
-  if [[ $src != /* ]]; then src="/home/pascal/.config/syscfg/$(resolve "$src")"; fi
+  src="$(resolve -ar "$src")"
 
   run $user sh -c "if [[ -e ${dst@Q} ]]; then echo 'Cannot create symlink' ${dst@Q} '- File exists' >&2; exit 1; fi"
   run $user mkdir -p "$(dirname "$dst")"
@@ -279,14 +305,7 @@ persist() {
 
   for path; do
     if [[ $path =~ [[:space:]\\] ]]; then error "Invalid path: $path"; fi
-
-    if [[ $path != /* ]]; then
-      if [[ $user ]]; then
-        path="/home/pascal/$path"
-      else
-        path="/$path"
-      fi
-    fi
+    path="$(resolve -a $user "$path")"
 
     local target="${path//[^a-zA-Z0-9.-]/_}"
     target="/keep/${target:1}"
