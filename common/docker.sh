@@ -1,8 +1,7 @@
 package docker docker-{compose,buildx}
 copy res/docker.json /etc/docker/daemon.json
 
-persist /var/lib/docker
-persist /var/lib/containerd
+persist /var/lib/{docker,containerd}
 timer docker-gc monthly /usr/bin/docker system prune --all --force --volumes
 
 if [[ $HOST_KIND == desktop ]]; then

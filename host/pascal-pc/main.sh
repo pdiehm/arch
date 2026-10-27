@@ -15,8 +15,7 @@ persist -u .local/share/PrismLauncher
 BACKUP+=("/home/pascal/.local/share/PrismLauncher/instances/*/minecraft/saves")
 
 package supertuxkart
-persist -u .config/supertuxkart
-persist -u .local/share/supertuxkart
+persist -u {.config,.local/share}/supertuxkart
 BACKUP+=("/home/pascal/{.config,.local/share}/supertuxkart")
 
 write /etc/systemd/system/alsa-restore.service.d/auto-mute.conf << EOF

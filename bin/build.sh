@@ -263,7 +263,7 @@ symlink() {
   run $user ln -s "$src" "$dst"
 }
 
-# persist [-fu] [-m mode] [-o owner] <path>
+# persist [-fu] [-m mode] [-o owner] <path> ...
 #   -f   persist file
 #   -u   as user in home directory
 #   -m   change mode
@@ -283,28 +283,31 @@ persist() {
   done
 
   shift "$((OPTIND - 1))"
-  local path="$1"
-  if [[ $path =~ ([[:space:]]|\\) ]]; then error "Invalid path: $path"; fi
+  local path
 
-  if [[ $path != /* ]]; then
-    if [[ $user ]]; then
-      path="/home/pascal/$path"
-    else
-      path="/$path"
+  for path; do
+    if [[ $path =~ [[:space:]\\] ]]; then error "Invalid path: $path"; fi
+
+    if [[ $path != /* ]]; then
+      if [[ $user ]]; then
+        path="/home/pascal/$path"
+      else
+        path="/$path"
+      fi
     fi
-  fi
 
-  local target="${path//[^a-zA-Z0-9.-]/_}"
-  target="/keep/${target:1}"
+    local target="${path//[^a-zA-Z0-9.-]/_}"
+    target="/keep/${target:1}"
 
-  run $user sh -c "if [[ -e ${target@Q} ]]; then echo 'Cannot persist' ${path@Q} '- Already persisted' >&2; exit 1; fi"
-  run $user sh -c "if [[ -e ${path@Q} ]]; then mv ${path@Q} ${target@Q}; fi"
-  run $user mkdir -p "$(dirname "$path")"
+    run $user sh -c "if [[ -e ${target@Q} ]]; then echo 'Cannot persist' ${path@Q} '- Already persisted' >&2; exit 1; fi"
+    run $user sh -c "if [[ -e ${path@Q} ]]; then mv ${path@Q} ${target@Q}; fi"
+    run $user mkdir -p "$(dirname "$path")"
 
-  if ((file)); then run $user touch "$path" "$target"; else run $user mkdir -p "$path" "$target"; fi
-  if [[ $owner ]]; then run chown "$owner" "$target"; fi
-  if [[ $mode ]]; then run chmod "$mode" "$target"; fi
-  write -a /etc/fstab "$target $path none bind 0 0"
+    if ((file)); then run $user touch "$path" "$target"; else run $user mkdir -p "$path" "$target"; fi
+    if [[ $owner ]]; then run chown "$owner" "$target"; fi
+    if [[ $mode ]]; then run chmod "$mode" "$target"; fi
+    write -a /etc/fstab "$target $path none bind 0 0"
+  done
 }
 
 # conf [-de] <path> <name> ...
