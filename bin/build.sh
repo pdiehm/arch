@@ -12,7 +12,7 @@ if ((UID)); then fatal "Not root"; fi
 if (($# != 1)); then fatal "Usage: build.sh <host>"; fi
 if ! load_host "$1"; then fatal "Unknown host: $1"; fi
 
-trap 'unmount "$TMP/boot"; unmount "$TMP/root"; printf "\e[s\e[r\e[u"; rm -rf --one-file-system "$TMP"' EXIT
+trap 'unmount "$TMP/boot"; unmount "$TMP/root"; rm -rf --one-file-system "$TMP"' EXIT
 TMP="$(mktemp -d)"
 chmod 700 "$TMP"
 
@@ -79,13 +79,10 @@ import() {
   for mod in "$path" "$path.sh" "$path/main.sh"; do
     if [[ ! -f $mod ]]; then continue; fi
     if [[ -f $TMP/stages/$STAGE/build.sh ]]; then mkdir "$TMP/stages/$((++STAGE))"; fi
-
     if ((DRY)); then echo "Loading module $mod"; else echo "Evaluating module $mod"; fi
-    echo "$mod" > "$TMP/stages/$STAGE/module"
 
     # shellcheck disable=SC1090
     MODULE="$mod" source "$mod"
-    echo "$mod" > "$TMP/stages/$STAGE/module"
 
     if [[ -f $TMP/stages/$STAGE/build.sh ]]; then mkdir "$TMP/stages/$((++STAGE))"; fi
     return
@@ -577,9 +574,7 @@ fi
 HASH="$(sha base)"
 USED=("$HASH")
 
-printf "\e[s\e[2r\e[H\e[K\e[1mBuilding system...\e[m\e[u\n"
 mount --mkdir --label root "$TMP/root"
-
 btrfs property set "$TMP/root" compression zstd
 if [[ ! -d $TMP/root/imgs ]]; then mkdir "$TMP/root/imgs"; fi
 if [[ ! -d $TMP/root/keep ]]; then btrfs subvolume create "$TMP/root/keep"; fi
@@ -587,7 +582,6 @@ if [[ ! -d $TMP/root/pkgs ]]; then btrfs subvolume create "$TMP/root/pkgs"; fi
 if [[ -d $TMP/root/build ]]; then btrfs subvolume delete --recursive "$TMP/root/build"; fi
 
 if [[ -v SM_CLEAN || ! -d $TMP/root/imgs/$HASH ]]; then
-  printf "\e[s\e[H\e[K\e[1mInstalling base system...\e[m\e[u"
   btrfs subvolume create "$TMP/root/build"
   pacstrap -G "$TMP/root/build"
 
@@ -600,7 +594,6 @@ for ((stage = 0; stage < STAGE; stage++)); do
   hash="$(sha "$HASH+$hash")"
 
   if [[ -v SM_CLEAN || ! -d $TMP/root/imgs/$hash ]]; then
-    printf "\e[s\e[H\e[K\e[1mStage %d of %d: %s\e[m\e[u" "$((stage + 1))" "$STAGE" "$(< "$TMP/stages/$stage/module")"
     btrfs subvolume snapshot "$TMP/root/imgs/$HASH" "$TMP/root/build"
     mount --bind "$TMP/root/build" "$TMP/root/build"
     mount --bind "$TMP/root/pkgs" "$TMP/root/build/var/cache/pacman/pkg"
@@ -628,7 +621,6 @@ if [[ -v SM_DRY ]]; then
   exit
 fi
 
-printf "\e[s\e[H\e[K\e[1mDone!\e[m\e[u"
 rm -f "$TMP/root/base"
 ln -s "imgs/$HASH" "$TMP/root/base"
 
