@@ -8,8 +8,7 @@ copy -s "host/$HOST_NAME/disk" /usr/local/keys/disk
 systemd -ie autocrypt.service
 
 package limine "$HOST_CPU-ucode"
-var KERNEL "$HOST_KERNEL"
-copy -v res/limine.conf /boot/limine.conf
+copy -v "KERNEL=$HOST_KERNEL" res/limine.conf /boot/limine.conf
 
 if [[ $HOST_BOOT == efi ]]; then
   upgrade <<< "mkdir -p /boot/EFI/BOOT && cp /usr/share/limine/BOOTX64.EFI /boot/EFI/BOOT"

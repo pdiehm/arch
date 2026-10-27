@@ -156,31 +156,25 @@ script() {
   run $user bash -eu "$path" "${args[@]}"
 }
 
-# var <name> <value>
-var() {
-  local name="$1" value="$2"
-  run export "VARS+=s|@$name@|$value|g;"
-}
-
-# write [-auvx] [-m mode] [-o owner] <path> [content ...]
+# write [-aux] [-m mode] [-o owner] [-v KEY=VALUE] <path> [content ...]
 #   -a   append
 #   -u   as user in home directory
-#   -v   substitute variables
 #   -x   set executable
 #   -m   change mode
 #   -o   change owner
+#   -v   substitute variables
 write() {
   local OPTIND OPTARG opt
-  local append=0 user="" vars=0 exec=0 mode="" owner=""
+  local append=0 user="" exec=0 mode="" owner="" vars=""
 
-  while getopts "auvxm:o:" opt; do
+  while getopts "auxm:o:v:" opt; do
     case "$opt" in
       a) append=1 ;;
       u) user="-u" ;;
-      v) vars=1 ;;
       x) exec=1 ;;
       m) mode="$OPTARG" ;;
       o) owner="$OPTARG" ;;
+      v) vars+="s|@${OPTARG%%=*}@|${OPTARG#*=}|g;" ;;
       *) error "Illegal option" ;;
     esac
   done
@@ -189,7 +183,7 @@ write() {
   local path="$1" lines=("${@:2}") src cmd
 
   if ((${#lines[@]})); then src="$(printf "%s\n" "${lines[@]}" | use)"; else src="$(use)"; fi
-  if ((vars)); then cmd="sed \"\$VARS\" ${src@Q}"; else cmd="cat ${src@Q}"; fi
+  if [[ $vars ]]; then cmd="sed ${vars@Q} ${src@Q}"; else cmd="cat ${src@Q}"; fi
   if ((append)); then cmd+=" >> ${path@Q}"; else cmd+=" > ${path@Q}"; fi
 
   run $user mkdir -p "$(dirname "$path")"
@@ -197,28 +191,27 @@ write() {
   if [[ $owner ]]; then run $user chown "$owner" "$path"; fi
   if [[ $mode ]]; then run $user chmod "$mode" "$path"; fi
   if ((exec)); then run $user chmod +x "$path"; fi
-  if ((vars)); then run unset VARS; fi
 }
 
-# copy [-suvx] [-m mode] [-o owner] <src> <dst>
+# copy [-sux] [-m mode] [-o owner] [-v KEY=VALUE] <src> <dst>
 #   -s   interpret src as secret name
 #   -u   as user in home directory
-#   -v   substitute variables
 #   -x   set executable
 #   -m   change mode
 #   -o   change owner
+#   -v   substitute variables
 copy() {
   local OPTIND OPTARG opt
-  local secret=0 user="" vars=0 exec=0 mode="" owner=""
+  local secret=0 user="" exec=0 mode="" owner="" vars=""
 
-  while getopts "suvxm:o:" opt; do
+  while getopts "suxm:o:v:" opt; do
     case "$opt" in
       s) secret=1 ;;
       u) user="-u" ;;
-      v) vars=1 ;;
       x) exec=1 ;;
       m) mode="$OPTARG" ;;
       o) owner="$OPTARG" ;;
+      v) vars+="s|@${OPTARG%%=*}@|${OPTARG#*=}|g;" ;;
       *) error "Illegal option" ;;
     esac
   done
@@ -234,11 +227,10 @@ copy() {
   fi
 
   run $user mkdir -p "$(dirname "$dst")"
-  if ((vars)); then run $user sh -c "sed \"\$VARS\" ${src@Q} > ${dst@Q}"; else run $user cp "$src" "$dst"; fi
+  if [[ $vars ]]; then run $user sh -c "sed ${vars@Q} ${src@Q} > ${dst@Q}"; else run $user cp "$src" "$dst"; fi
   if [[ $owner ]]; then run $user chown "$owner" "$dst"; fi
   if [[ $mode ]]; then run $user chmod "$mode" "$dst"; fi
   if ((exec)); then run $user chmod +x "$dst"; fi
-  if ((vars)); then run unset VARS; fi
 }
 
 # symlink [-u] <src> <dst>
