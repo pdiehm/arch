@@ -102,6 +102,7 @@ use() {
 
   hash="$(sha < "$TMP/res")"
   mv "$TMP/res" "$TMP/stages/$STAGE/$hash"
+
   echo "$hash" >> "$TMP/stages/$STAGE/hash"
   echo "/stage/$hash"
 }
@@ -122,8 +123,8 @@ secret() {
   done
 
   shift "$((OPTIND - 1))"
-  local name="$1"
   if ((file + query > 1)); then error "Options '-f' and '-q' are mutually exclusive"; fi
+  local name="$1"
 
   if [[ -f $TMP/secrets/$name ]]; then
     if ((query)); then return; fi
@@ -148,10 +149,11 @@ run() {
   done
 
   shift "$((OPTIND - 1))"
-  local command="${*@Q}"
   if ((DRY)); then return; fi
 
-  if ((user)); then command="sudo -Eu pascal env -C /home/pascal $command"; fi
+  local command="${*@Q}"
+  if ((user)); then command="sudo -u pascal env -C /home/pascal $command"; fi
+
   echo "$command" >> "$TMP/stages/$STAGE/build.sh"
   sha <<< "$command" >> "$TMP/stages/$STAGE/hash"
 }
@@ -334,8 +336,8 @@ conf() {
   done
 
   shift "$((OPTIND - 1))"
-  local path="$1" names=("${@:2}") name
   if ((disable + enable > 1)); then error "Options '-d' and '-e' are mutually exclusive"; fi
+  local path="$1" names=("${@:2}") name
 
   for name in "${names[@]}"; do
     if ((disable)); then
@@ -411,10 +413,10 @@ systemd() {
   done
 
   shift "$((OPTIND - 1))"
-  local unit
-
   if ((enable + disable + mask + install != 1 + (enable && install))); then error "Exactly one of '-e', '-d', '-m', '-i' or '-ie' is required"; fi
   if [[ $target ]] && ((enable + user != 2)); then error "Option '-t' requires '-e' and '-u'"; fi
+
+  local unit
   target="${target:-default.target}"
 
   if ((enable)); then
@@ -433,7 +435,7 @@ systemd() {
     fi
   elif ((disable)); then
     if ((user)); then
-      run -u sh -c "rm -f .config/systemd/user/*.wants/${unit@Q}"
+      script -u <<< "rm -f .config/systemd/user/*.wants/${unit@Q}"
     else
       run systemctl disable "$@"
     fi
@@ -504,11 +506,11 @@ guard() {
   done
 
   shift "$((OPTIND - 1))"
-  local group="${1:-_${bins[0]##*/}}" gid="${2:-}" path target
+  local group="${1:-_${bins[0]##*/}}" gid="${2:-}" path
   run groupadd ${gid:+--gid "$gid"} --key GID_MIN=10000 "$group"
 
   for path in "${bins[@]}"; do
-    target="/usr/local/bin/${path##*/}"
+    local target="/usr/local/bin/${path##*/}"
     run sh -c "if [[ -e ${target@Q} ]]; then echo 'Cannot guard' ${path@Q} '- File exists' >&2; exit 1; fi"
 
     write launcher.c "#include <unistd.h>" "int main(int, char** argv) { return setregid(getegid(), -1) || execv(\"$path\", argv); }"
