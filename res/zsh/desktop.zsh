@@ -1,11 +1,11 @@
 compdef _nothing genpw
 compdef _nothing wp-toggle
+compdef _bwrap bw
 compdef _mk mk
 compdef _mnt mnt
 compdef _repo repo
 compdef _tldr tl
 compdef '_arguments ":cmd:(power discoverable)"' bt-toggle
-compdef '_arguments ":cmd:_command_names" "*::args:_normal"' bw
 compdef '_arguments ":cmd:(pixel region window monitor)"' hyprshot
 
 alias docker="sudo docker"
