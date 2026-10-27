@@ -323,11 +323,11 @@ conf() {
 
   for name in "${names[@]}"; do
     if ((disable)); then
-      run sed -Ei "s|^#?\s*($name)\b|#\1|" "$path"
+      run sed -Ei "s|^#?\s?($name)\b|#\1|" "$path"
     elif ((enable)); then
-      run sed -Ei "s|^#?\s*($name)\b|\1|" "$path"
+      run sed -Ei "s|^#?\s?($name)\b|\1|" "$path"
     else
-      run sed -Ei "s|^#?\s*${name%%=*}\s*=.*|$name|" "$path"
+      run sed -Ei "s|^#?\s?${name%%=*}\s*=.*|$name|" "$path"
     fi
   done
 }
