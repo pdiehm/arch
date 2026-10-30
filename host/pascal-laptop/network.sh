@@ -2,6 +2,21 @@ copy -s net/eduroam/private-key /etc/NetworkManager/secrets/eduroam/private-key
 copy -s net/eduroam/client-cert /etc/NetworkManager/secrets/eduroam/client-cert
 copy -s net/eduroam/ca-cert /etc/NetworkManager/secrets/eduroam/ca-cert
 
+write -m 400 /etc/NetworkManager/system-connections/home-ether.nmconnection << EOF
+[connection]
+id=home-ether
+type=ethernet
+autoconnect-priority=100
+
+[802-3-ethernet]
+mac-address=00:e0:4c:68:20:f1
+
+[ipv4]
+method=manual
+addresses=192.168.1.91/16
+gateway=192.168.1.1
+EOF
+
 write -m 400 /etc/NetworkManager/system-connections/home-wifi.nmconnection << EOF
 [connection]
 id=home-wifi
@@ -18,7 +33,7 @@ psk=$(secret net/home-wifi/psk)
 
 [ipv4]
 method=manual
-addresses=192.168.1.91/16
+addresses=192.168.1.92/16
 gateway=192.168.1.1
 EOF
 
