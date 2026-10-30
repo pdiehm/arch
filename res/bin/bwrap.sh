@@ -7,7 +7,7 @@ for path in "/bin" "/etc" "/lib" "/lib64" "/sbin" "/usr" "/var"; do
   FLAGS+=("--ro-bind" "$path" "$path")
 done
 
-for path in "$(realpath /etc/resolv.conf)" "$XDG_RUNTIME_DIR/wayland-1" "/tmp/.X11-unix"; do
+for path in "$(realpath /etc/resolv.conf)" "$XDG_RUNTIME_DIR/wayland-1" "$XDG_RUNTIME_DIR/pipewire-0" "/tmp/.X11-unix"; do
   FLAGS+=("--ro-bind-try" "$path" "$path")
 done
 
