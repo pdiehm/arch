@@ -141,7 +141,7 @@ _prompt_git() {
     echo -en " %F{6}\u2026%f"
   fi
 
-  if [[ $remote ]]; then
+  if [[ $remote && $remote != HEAD* ]]; then
     local ahead behind
     read -r ahead behind < <(git rev-list --left-right --count "HEAD...HEAD@{upstream}")
 
