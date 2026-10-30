@@ -1,0 +1,12 @@
+name: Update
+
+on:
+  schedule:
+    - cron: 0 0 * * 0
+
+jobs:
+  update:
+    name: Update
+    uses: pdiehm/actions/.github/workflows/update.yaml@main
+    secrets:
+      CI_TOKEN: ${{ secrets.CI_TOKEN }}
