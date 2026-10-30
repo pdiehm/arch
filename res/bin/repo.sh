@@ -117,14 +117,12 @@ create() {
 
 edit() {
   enter "$1"
-  TARGET="${2:-.}"
+  cd "${2:-.}"
 
-  if [[ -d $TARGET ]]; then
-    exec env -C "$TARGET" "$EDITOR" .
-  elif [[ -f $TARGET ]]; then
-    exec "$EDITOR" "$TARGET"
+  if [[ -f shell.nix ]]; then
+    exec nix develop --file shell.nix --command sh -c 'exec "$EDITOR" .'
   else
-    fatal "No such file or directory: $TARGET"
+    exec "$EDITOR" .
   fi
 }
 
@@ -194,12 +192,24 @@ remove() {
 
 run() {
   enter "$1"
-  exec "${@:2}"
+  CMD=("${@:2}")
+
+  if [[ -f shell.nix ]]; then
+    exec nix develop --file shell.nix --command "${CMD[@]}"
+  else
+    exec "${CMD[@]}"
+  fi
 }
 
 shell() {
   enter "$1"
-  exec env -C "${2:-.}" "$SHELL"
+  cd "${2:-.}"
+
+  if [[ -f shell.nix ]]; then
+    exec nix develop --file shell.nix
+  else
+    exec "$SHELL"
+  fi
 }
 
 status() {

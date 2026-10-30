@@ -65,7 +65,7 @@ _repo() {
     if ((CURRENT == 3)); then
       compadd "${repos[@]}"
     elif ((CURRENT == 4)); then
-      _files -W "$HOME/Repos/${words[3]}"
+      _files -/ -W "$HOME/Repos/${words[3]}"
     fi
   elif [[ ${words[2]} == fetch ]]; then
     compadd "${repos[@]}"
