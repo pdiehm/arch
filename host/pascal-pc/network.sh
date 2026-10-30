@@ -1,3 +1,5 @@
+package networkmanager-openconnect
+
 write -m 400 /etc/NetworkManager/system-connections/wired.nmconnection << EOF
 [connection]
 id=wired
@@ -9,8 +11,6 @@ method=manual
 addresses=192.168.1.90/16
 gateway=192.168.1.1
 EOF
-
-package networkmanager-openconnect
 
 write -m 400 /etc/NetworkManager/system-connections/uni.nmconnection << EOF
 [connection]
