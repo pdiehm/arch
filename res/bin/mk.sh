@@ -10,7 +10,7 @@ elif [[ -e $TARGET ]]; then
   echo "$TARGET already exists"
   exit 1
 elif [[ -f ~/.local/share/mk/$SOURCE ]]; then
-  sed "s/@YEAR@/$(date "+%Y")/g" "$HOME/.local/share/mk/$SOURCE" > "$TARGET"
+  sed "s/@YEAR@/$(date +%Y)/g" "$HOME/.local/share/mk/$SOURCE" > "$TARGET"
 elif [[ $SOURCE == arch.iso ]]; then
   trap 'rm -rf --one-file-system "$TMP"' EXIT
   TMP="$(mktemp -d)"

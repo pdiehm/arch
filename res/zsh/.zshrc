@@ -61,11 +61,11 @@ alias tx="tmux new -As main"
 alias type="type -as"
 
 await() {
-  local pre="$(date "+%s%3N")"
+  local pre="$(date +%s%3N)"
   eval "$*"
 
   local result="$?"
-  local post="$(date "+%s%3N")"
+  local post="$(date +%s%3N)"
   local time="$((post - pre))"
 
   if ((time < 1000)); then
