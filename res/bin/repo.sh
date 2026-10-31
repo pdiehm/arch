@@ -21,24 +21,17 @@ resolve() {
 }
 
 enter() {
-  if ! cd "$HOME/Repos/$1" 2> /dev/null; then
-    fatal "No such repo: $1"
-  fi
+  cd "$HOME/Repos/$1" 2> /dev/null || fatal "No such repo: $1"
 }
 
 conflict() {
   git status
   read -rsp "Press enter to open editor..."
-
-  if ! "$EDITOR" .; then
-    fatal "Editor exited with non-zero status, aborting..."
-  fi
+  "$EDITOR" . || fatal "Editor exited with non-zero status, aborting..."
 }
 
 git-url() {
-  if ! git remote get-url origin 2> /dev/null; then
-    echo "local"
-  fi
+  git remote get-url origin 2> /dev/null || echo "local"
 }
 
 git-head() {
@@ -236,15 +229,8 @@ status() {
     esac
   done | column --table --separator $'\t'
 
-  if git-has-stash; then
-    echo
-    git stash list --oneline
-  fi
-
-  if git-is-dirty; then
-    echo
-    git status --short
-  fi
+  if git-has-stash; then echo && git stash list --oneline; fi
+  if git-is-dirty; then echo && git status --short; fi
 }
 
 temp() {

@@ -26,20 +26,15 @@ done
 
 DISK=""
 until [[ -b $DISK ]]; do
-  lsblk --output NAME,TYPE,SIZE,PARTLABEL,LABEL
-  echo
-
+  lsblk --output NAME,TYPE,SIZE,PARTLABEL,LABEL && echo
   read -rp "Select disk: " DISK
   if [[ ! -b $DISK ]]; then DISK="/dev/$DISK"; fi
 done
 
 CRYPT="" REPLY="-"
 while [[ $CRYPT != "$REPLY" ]]; do
-  read -rsp "Enter disk encryption password: " CRYPT
-  echo
-
-  read -rsp "Confirm password: "
-  echo
+  read -rsp "Enter disk encryption password: " CRYPT && echo
+  read -rsp "Confirm password: " && echo
 done
 
 if [[ $HOST_BOOT == efi ]]; then

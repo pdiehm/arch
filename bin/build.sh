@@ -10,7 +10,7 @@ STAGE=0
 
 if ((UID)); then fatal "Not root"; fi
 if (($# != 1)); then fatal "Usage: build.sh <host>"; fi
-if ! load_host "$1"; then fatal "Unknown host: $1"; fi
+load_host "$1" || fatal "Unknown host: $1"
 
 trap 'unmount "$TMP/boot"; unmount "$TMP/root"; rm -rf --one-file-system "$TMP"' EXIT
 TMP="$(mktemp -d)"
@@ -531,27 +531,19 @@ mkdir "$TMP/secrets"
 if [[ ! -f secrets/$HOST_NAME ]]; then fatal "No secrets for host"; fi
 
 if [[ -f /usr/local/keys/syscfg/host ]]; then
-  if ! load_secrets "secrets/$HOST_NAME" "$TMP/secrets" "$(< /usr/local/keys/syscfg/host)"; then
-    warn "Stale host key"
-  fi
+  load_secrets "secrets/$HOST_NAME" "$TMP/secrets" "$(< /usr/local/keys/syscfg/host)" || warn "Stale host key"
 fi
 
 if [[ ! -d $TMP/secrets/keys ]]; then
   mkdir "$TMP/master"
 
   if [[ -f /usr/local/keys/syscfg/master ]]; then
-    if ! load_secrets secrets/master "$TMP/master" "$(< /usr/local/keys/syscfg/master)"; then
-      warn "Stale master key"
-    fi
+    load_secrets secrets/master "$TMP/master" "$(< /usr/local/keys/syscfg/master)" || warn "Stale master key"
   fi
 
   if [[ ! -f $TMP/master/ACL ]]; then
-    read -rsp "Enter master password: "
-    echo
-
-    if ! load_secrets secrets/master "$TMP/master" "$(sha "$REPLY")"; then
-      fatal "Incorrect master password"
-    fi
+    read -rsp "Enter master password: " && echo
+    load_secrets secrets/master "$TMP/master" "$(sha "$REPLY")" || fatal "Incorrect master password"
   fi
 
   if [[ ! -f $TMP/master/keys/$HOST_NAME ]]; then

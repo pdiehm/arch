@@ -25,10 +25,7 @@ overlay() {
   btrfs subvolume snapshot "$TMP/root/base" "$TMP/root/build"
   mount --bind "$TMP/root/build" "$TMP/root/build"
   mount --bind "$TMP/root/pkgs" "$TMP/root/build/var/cache/pacman/pkg"
-
-  if ! arch-chroot "$TMP/root/build" "$@"; then
-    fatal "Process '$*' exited with non-zero status, aborting..."
-  fi
+  arch-chroot "$TMP/root/build" "$@" || fatal "Process '$*' exited with non-zero status, aborting..."
 
   HASH="$(readlink "$TMP/root/base")"
   HASH="$(sha "${HASH##*/}++")"
@@ -122,19 +119,14 @@ secrets() {
   mkdir "$TMP/store"
 
   if [[ -f secrets/master && -f /usr/local/keys/syscfg/master ]]; then
-    if ! load_secrets secrets/master "$TMP/store" "$(< /usr/local/keys/syscfg/master)"; then
-      warn "Stale master key"
-    fi
+    load_secrets secrets/master "$TMP/store" "$(< /usr/local/keys/syscfg/master)" || warn "Stale master key"
   fi
 
   if [[ ! -f $TMP/store/ACL ]]; then
-    read -rsp "Enter master password: "
-    echo
+    read -rsp "Enter master password: " && echo
 
     if [[ -f secrets/master ]]; then
-      if ! load_secrets secrets/master "$TMP/store" "$(sha "$REPLY")"; then
-        fatal "Incorrect master password"
-      fi
+      load_secrets secrets/master "$TMP/store" "$(sha "$REPLY")" || fatal "Incorrect master password"
     else
       touch "$TMP/store/ACL"
       mkdir "$TMP/store/keys"
@@ -150,8 +142,8 @@ secrets() {
   mv "$TMP/store/keys/master" "$TMP/keys"
 
   if ((ROTATE)); then
-    read -rsp "Enter new master password: "
-    echo
+    read -rsp "Enter new master password: " && echo
+    if [[ ! $REPLY ]]; then fatal "Empty master password"; fi
 
     sha "$REPLY" > "$TMP/keys/master"
     rm -rf "$TMP/store/keys"
