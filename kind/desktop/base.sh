@@ -1,3 +1,7 @@
+package xdg-utils xdg-user-dirs archlinux-xdg-menu adwaita-icon-theme
+copy res/user-dirs.defaults /etc/xdg/user-dirs.defaults
+symlink -u res/mimeapps.list .config/mimeapps.list
+
 package pipewire pipewire-{alsa,pulse} wireplumber wiremix alsa-utils rtkit
 persist -u .local/state/wireplumber
 
