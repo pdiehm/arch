@@ -1,4 +1,4 @@
-package neovim vim-spell-de nvim-plugins-pd \
+package aur/neovim vim-spell-de nvim-plugins-pd \
   {bash,cmake,dockerfile,eslint,lua,tailwindcss,typescript,yaml}-language-server \
   vscode-{css,html,json}-languageserver python-{lsp-server,black,isort} \
   clang jdtls nixd phpactor rust-analyzer shellcheck texlab \
