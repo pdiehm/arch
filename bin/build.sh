@@ -454,27 +454,31 @@ systemd() {
   fi
 }
 
-# timer [-nu] <name> <time> <command> ...
+# timer [-nu] [-h host] <name> <time> <command> ...
 #   -n   wait for network
 #   -u   in user manager
+#   -h   specific host name
 timer() {
   local OPTIND OPTARG opt
-  local network=0 user=0
+  local network=0 user=0 host="1.1.1.1"
 
-  while getopts "nu" opt; do
+  while getopts "nuh:" opt; do
     case "$opt" in
       n) network=1 ;;
       u) user=1 ;;
+      h) host="$OPTARG" ;;
       *) error "Illegal option" ;;
     esac
   done
 
   shift "$((OPTIND - 1))"
+  if [[ $host != 1.1.1.1 ]] && ((! network)); then error "Option '-h' requires '-n'"; fi
+
   local name="$1" time="$2" command=("${@:3}")
   local timer=("[Timer]" "OnCalendar=$time" "Persistent=true" "" "[Install]" "WantedBy=timers.target")
 
   local service=("[Service]" "Type=oneshot")
-  if ((network)); then service+=('ExecStartPre=/bin/sh -c "until ping -c 1 1.1.1.1; do sleep 1; done"'); fi
+  if ((network)); then service+=("ExecStartPre=/bin/sh -c \"until ping -c 1 ${host@Q}; do sleep 1; done\""); fi
   service+=("ExecStart=${command[*]@Q}")
 
   if ((user)); then

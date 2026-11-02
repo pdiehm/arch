@@ -13,7 +13,6 @@ if [[ -x /usr/local/lib/backup/post.sh ]]; then
   bash -e /usr/local/lib/backup/post.sh || CODE="$((CODE | 4))"
 fi
 
-until ping -c 1 bowser; do sleep 1; done
 scp -i /usr/local/keys/backup -P 1970 /var/tmp/backup.tgz "pascal@bowser:archive/Backups/@HOST@_$(date -I).tgz" || CODE="$((CODE | 8))"
 rm -f /var/tmp/backup.tgz
 exit "$CODE"
