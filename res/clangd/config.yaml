@@ -2,23 +2,24 @@ Diagnostics:
   MissingIncludes: Strict
 
   ClangTidy:
-    Add: "*"
-    Remove:
-      - "abseil-*"
-      - "altera-*"
-      - "android-*"
-      - "darwin-*"
-      - "fuchsia-*"
-      - "google-*"
-      - "llvmlibc-*"
+    Add:
+      - "bugprone-*"
+      - "cert-*"
+      - "clang-analyzer-*"
+      - "concurrency-*"
+      - "cppcoreguidelines-*"
+      - "misc-*"
+      - "modernize-*"
       - "mpi-*"
-      - "objc-*"
-      - "openmp-*"
-      - "zircon-*"
-      - "*-braces-around-statements"
+      - "performance-*"
+      - "portability-*"
+      - "readability-*"
+
+    Remove:
       - "*-magic-numbers"
       - "bugprone-easily-swappable-parameters"
       - "misc-no-recursion"
       - "modernize-use-trailing-return-type"
+      - "readability-braces-around-statements"
       - "readability-function-cognitive-complexity"
       - "readability-identifier-length"

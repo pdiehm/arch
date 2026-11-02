@@ -205,7 +205,7 @@ PenaltyBreakTemplateDeclaration: 10
 PenaltyExcessCharacter: 1000000
 PenaltyIndentedWhitespace: 0
 PenaltyReturnTypeOnItsOwnLine: 60
-PointerAlignment: Left
+PointerAlignment: Right
 PPIndentWidth: -1
 QualifierAlignment: Custom
 QualifierOrder: ["static", "inline", "friend", "const", "constexpr", "volatile", "restrict", "type"]
