@@ -62,7 +62,7 @@ alias type="type -as"
 
 await() {
   local pre="$(date +%s%3N)"
-  eval "$*"
+  eval "$(printf " %q " "$@")"
 
   local result="$?"
   local post="$(date +%s%3N)"
@@ -100,13 +100,14 @@ mkcd() {
 }
 
 watch() (
+  local cmd="$(printf "%q" "$(printf "%q " "$@")")"
   trap "printf '\e[?25h\e[?1049l'" EXIT
   trap "exit 0" INT
   printf "\e[?25l\e[?1049h"
 
   while true; do
     echo -e "\e[H\e[2mWatching: $*\e[m\n"
-    printf "\e[J%s\n" "$(script --quiet --command "zsh --interactive -c $(printf "%q" "$*")" /dev/null)"
+    printf "\e[J%s\n" "$(script --quiet --command "zsh --interactive -c $cmd" /dev/null)"
     sleep 1
   done
 )
