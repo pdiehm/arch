@@ -20,7 +20,7 @@ jobs:
       - name: Prepare Pages Root
         run: |
           install -Dm 644 bin/install.sh _site/install.sh
-          echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPFQ+VK4y/tYvIGxEwalz6CPuDckHooWvJT8+ZmXvUv8" > _site/ssh.pub
+          sed -En 's/\s*echo "(ssh-.*)" .*/\1/p' res/bin/mk.sh > _site/ssh.pub
 
       - name: Configure Pages
         uses: actions/configure-pages@v6.0.0
