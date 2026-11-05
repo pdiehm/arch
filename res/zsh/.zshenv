@@ -1,8 +1,10 @@
 # shellcheck disable=SC1090
 
-export EDITOR="vim"
-export PATH="$HOME/.local/bin:$PATH"
+if [[ $PATH != *$HOME/.local/bin* ]]; then
+  export PATH="$HOME/.local/bin:$PATH"
+fi
 
+export EDITOR="vim"
 export EZA_COLORS="xa=2;34"
 export MANPAGER="bat --plain --language man --paging always --strip-ansi auto"
 
