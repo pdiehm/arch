@@ -24,6 +24,7 @@ function OmniCC(findstart)
       { word = "chore", info = "misc change" },
       { word = "merge", info = "merge commit" },
       { word = "revert", info = "revert commit" },
+      { word = "wip", info = "work in progress commit" },
       { word = "init", info = "initial commit" },
     }
   end
