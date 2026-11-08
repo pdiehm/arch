@@ -199,7 +199,7 @@ shell() {
   cd "${2:-.}"
 
   if [[ -f shell.nix ]]; then
-    exec nix develop --file shell.nix
+    exec nix develop --file shell.nix --command "$SHELL"
   else
     exec "$SHELL"
   fi
