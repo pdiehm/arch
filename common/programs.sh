@@ -11,7 +11,7 @@ symlink -u res/git.conf .config/git/config
 
 package man-{db,pages}
 systemd -m man-db.{service,timer}
-upgrade mandb
+upgrade mandb --quiet
 
 package htop
 copy -um 444 res/htop.conf .config/htop/htoprc
