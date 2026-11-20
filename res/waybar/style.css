@@ -71,6 +71,7 @@ label#cpu.crit,
 label#memory.crit,
 label#disk.crit,
 label#temperature.critical,
+label#systemd-failed-units.degraded,
 label#network.disconnected,
 label#bluetooth.off,
 label#battery.discharging.crit {

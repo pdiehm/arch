@@ -13,7 +13,7 @@
 
   "group/left": {
     "orientation": "inherit",
-    "modules": ["cpu", "memory", "disk", "temperature"]
+    "modules": ["cpu", "memory", "disk", "temperature", "systemd-failed-units"]
   },
 
   "mpris": {
@@ -84,6 +84,10 @@
     "warning-threshold": 50,
     "critical-threshold": 80,
     "interval": 1
+  },
+
+  "systemd-failed-units": {
+    "format": " "
   },
 
   "network": {
