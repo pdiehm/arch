@@ -120,7 +120,7 @@ edit() {
 }
 
 fetch() {
-  for repo in "$@"; do
+  for repo; do
     if [[ -d $repo ]]; then
       git -C "$repo" fetch
     else
@@ -131,7 +131,7 @@ fetch() {
 
 list() {
   for repo in *; do
-    cd "$repo"
+    enter "$repo"
 
     ICON=""
     URL="$(git-url)"
@@ -151,8 +151,6 @@ list() {
       HEAD) printf "\e[1;34m%s \e[0;33m%s\e[36m%s \e[0;2m%s\e[m\n" "$repo" "$(git rev-parse --short HEAD)" "$ICON" "$URL" ;;
       *) printf "\e[1;34m%s \e[0;32m%s\e[36m%s \e[0;2m%s\e[m\n" "$repo" "$HEAD" "$ICON" "$URL" ;;
     esac
-
-    cd ..
   done | column --table
 }
 
@@ -245,32 +243,34 @@ temp() {
 }
 
 update() {
-  enter "$1"
-  STASH=0
+  for repo; do
+    enter "$repo"
+    STASH=0
 
-  HEAD="$(git-head)"
-  if [[ $HEAD == HEAD ]]; then HEAD="$(git rev-parse HEAD)"; fi
-
-  if git-is-dirty; then
-    STASH=1
-    git stash push --include-untracked
-  fi
-
-  git-branches | while read -r branch; do
-    if git-is-local "$branch"; then continue; fi
-    git checkout "$branch"
+    HEAD="$(git-head)"
+    if [[ $HEAD == HEAD ]]; then HEAD="$(git rev-parse HEAD)"; fi
 
     if git-is-dirty; then
+      STASH=1
       git stash push --include-untracked
-      git pull --recurse-submodules=on-demand || conflict
-      git stash pop || conflict
-    else
-      git pull --recurse-submodules=on-demand || conflict
     fi
-  done
 
-  if [[ $HEAD != NULL ]]; then git checkout "$HEAD"; fi
-  if ((STASH)); then git stash pop || conflict; fi
+    git-branches | while read -r branch; do
+      if git-is-local "$branch"; then continue; fi
+      git checkout "$branch"
+
+      if git-is-dirty; then
+        git stash push --include-untracked
+        git pull --recurse-submodules=on-demand || conflict
+        git stash pop || conflict
+      else
+        git pull --recurse-submodules=on-demand || conflict
+      fi
+    done
+
+    if [[ $HEAD != NULL ]]; then git checkout "$HEAD"; fi
+    if ((STASH)); then git stash pop || conflict; fi
+  done
 }
 
 case "${1:-help}" in
