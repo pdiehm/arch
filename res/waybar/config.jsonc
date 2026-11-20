@@ -114,6 +114,7 @@
 
   "wireplumber": {
     "format": "{icon}  {volume}%",
+    "tooltip": false,
     "format-muted": "   ",
     "format-icons": ["", " ", " "],
     "on-click": "wpctl set-mute @DEFAULT_SINK@ toggle",
