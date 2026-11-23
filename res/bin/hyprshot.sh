@@ -10,4 +10,7 @@ elif [[ $1 == window ]]; then
 elif [[ $1 == monitor ]]; then
   MONITOR="$(hyprctl -j activeworkspace | jq --raw-output .monitor)"
   grim -o "$MONITOR" - | swappy -f -
+else
+  echo "Usage: hyprshot (pixel|region|window|monitor)"
+  exit 1
 fi
