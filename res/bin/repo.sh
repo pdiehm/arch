@@ -85,7 +85,7 @@ help() {
   echo "  remove <name>          Remove repo"
   echo "  run <name> <cmd> ...   Run command in repo"
   echo "  shell <name> [path]    Open shell in repo"
-  echo "  status <name>          Print status of repo"
+  echo "  status [name]          Print status of repo"
   echo "  temp <url>             Open shell in temporary clone"
   echo "  update [name ...]      Update repos"
 }
@@ -275,7 +275,8 @@ update() {
 
 case "${1:-help}" in
   help) help ;;
-  clone | create | edit | list | remove | run | shell | status | temp) "$@" ;;
+  clone | create | edit | list | remove | run | shell | temp) "$@" ;;
   fetch | update) if (($# > 1)); then "$@"; else "$1" ./*; fi ;;
+  status) if (($# > 1)); then "$@"; elif [[ $OLDPWD =~ ~/Repos/([^/]+).* ]]; then "$@" "${BASH_REMATCH[1]}"; else fatal "Argument required"; fi ;;
   *) fatal "Illegal command: $1" ;;
 esac
